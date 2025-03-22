@@ -63,7 +63,7 @@
   </template>
   
   <script setup lang="ts">
-  import { ref } from 'vue';
+  import { ref, onMounted } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
   import { 
     NCard, 
@@ -95,6 +95,17 @@
   const maxLength = 4;
   const loading = ref(false);
   const errorMessage = ref('');
+  
+  // Проверка авторизации при загрузке
+  onMounted(() => {
+    console.log('PinLoginView mounted');
+    
+    // Если пользователь уже авторизован, перенаправляем на dashboard
+    if (userStore.isAuthenticated) {
+      console.log('User already authenticated, redirecting to dashboard');
+      router.push('/dashboard');
+    }
+  });
   
   // Create keypad layout
   const keypadRows = [
@@ -133,38 +144,30 @@
   const validatePin = async () => {
     try {
       loading.value = true;
+      console.log('Validating PIN...');
       
-      // Simulate API validation delay
-      await new Promise(resolve => setTimeout(resolve, 800));
+      // Получаем пользователя по ПИН-коду
+      const user = await userStore.validatePin(pinCode.value);
       
-      // Check against valid PINs (in real app, this would be an API call)
-      const validPins = {
-        '1234': { id: 1, name: 'Admin User', role: 'Administrator' },
-        '5678': { id: 2, name: 'Test User', role: 'User' }
-      };
-      
-      if (pinCode.value in validPins) {
-        // PIN is valid
-        const userData = validPins[pinCode.value as keyof typeof validPins];
+      if (user) {
+        // ПИН-код верный
+        console.log('PIN valid, user found:', user.name);
         
-        // Set user in store
-        userStore.setUser({
-          id: userData.id,
-          name: userData.name,
-          role: userData.role,
-          pin: pinCode.value
-        });
+        // Установка пользователя в хранилище
+        userStore.setUser(user);
         
-        // Set authentication token
-        userStore.setToken(`token-${userData.id}-${Date.now()}`);
+        // Установка токена аутентификации
+        userStore.setToken(`token-${user.id}-${Date.now()}`);
         
-        // Show success message
+        // Показываем сообщение об успехе
         message.success('Login successful');
         
-        // Redirect to dashboard or requested page
+        // Перенаправление на дашборд или запрошенную страницу
+        console.log('Redirecting to:', redirectPath);
         router.push(redirectPath);
       } else {
-        // PIN is invalid
+        // ПИН-код неверный
+        console.log('PIN invalid');
         errorMessage.value = 'Invalid PIN code. Please try again.';
         pinCode.value = '';
       }

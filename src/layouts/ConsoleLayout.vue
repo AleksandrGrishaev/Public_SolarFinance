@@ -21,8 +21,15 @@
           <span class="logo-text" v-if="!collapsed">Console App</span>
         </div>
   
-        <!-- Navigation Menu (Component) -->
-        <navigation-menu :collapsed="collapsed" />
+        <!-- Navigation Menu -->
+        <n-menu
+          :value="activeKey"
+          :collapsed="collapsed"
+          :collapsed-width="64"
+          :collapsed-icon-size="22"
+          :options="menuOptions"
+          @update:value="handleMenuUpdate"
+        />
   
         <!-- User Section at Bottom -->
         <div class="user-section" :class="{ 'user-section-collapsed': collapsed }">
@@ -79,9 +86,8 @@
   
         <!-- Content -->
         <n-layout-content class="console-content">
-          <n-card class="content-card">
-            <slot />
-          </n-card>
+          <!-- Слот для контента дочерних маршрутов -->
+          <router-view />
         </n-layout-content>
   
         <!-- Footer -->
@@ -103,21 +109,23 @@
     NLayoutHeader, 
     NLayoutContent, 
     NLayoutFooter,
+    NMenu,
     NButton, 
     NDropdown,
-    NCard,
     NAvatar,
     NTooltip,
     NIcon
   } from 'naive-ui';
   import { 
+    IconDashboard,
+    IconUsers,
     IconMoon,
     IconSun,
     IconLogout,
-    IconAppWindowFilled  } from '@tabler/icons-vue';
+    IconAppWindowFilled
+  } from '@tabler/icons-vue';
   import { useUserStore } from '@/stores/user';
   import { useThemeStore } from '@/stores/theme';
-  import NavigationMenu from '@/components/NavigationMenu.vue';
   
   // Router and route
   const router = useRouter();
@@ -142,6 +150,14 @@
   // Sidebar collapse state
   const collapsed = ref(false);
   
+  // Active menu item
+  const activeKey = computed(() => {
+    const path = route.path;
+    if (path.startsWith('/accounts')) return 'accounts';
+    if (path.startsWith('/dashboard')) return 'dashboard';
+    return '';
+  });
+  
   // Page title based on route
   const pageTitle = computed(() => {
     return route.meta.title as string || 'Console';
@@ -152,6 +168,20 @@
     return () => h(icon);
   }
   
+  // Menu options
+  const menuOptions = [
+    {
+      label: 'Dashboard',
+      key: 'dashboard',
+      icon: renderIcon(IconDashboard),
+    },
+    {
+      label: 'Accounts',
+      key: 'accounts',
+      icon: renderIcon(IconUsers),
+    }
+  ];
+  
   // User menu dropdown options
   const userMenuOptions = [
     {
@@ -160,6 +190,18 @@
       icon: renderIcon(IconLogout)
     }
   ];
+  
+  // Handle menu item click
+  const handleMenuUpdate = (key: string) => {
+    switch (key) {
+      case 'dashboard':
+        router.push('/dashboard');
+        break;
+      case 'accounts':
+        router.push('/accounts');
+        break;
+    }
+  };
   
   // Handle user menu selection - simplified to only handle logout
   const handleLogout = (key: string) => {
@@ -266,10 +308,6 @@
   .console-content {
     padding: 24px;
     min-height: calc(100vh - 64px - 50px); /* Viewport height minus header and footer */
-  }
-  
-  .content-card {
-    min-height: 300px;
   }
   
   .console-footer {

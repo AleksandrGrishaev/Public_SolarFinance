@@ -57,12 +57,14 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/DashboardView.vue'),
         meta: {
           requiresAuth: true,
-          title: 'Dashboard'
+          title: 'Dashboard',
+          // Explicitly allowing all roles
+          roles: ['Administrator', 'User', 'Operator']
         }
       }
     ]
   },
-  // Accounts route - added as requested
+  // Accounts route
   {
     path: '/accounts',
     component: ConsoleLayout,
@@ -73,7 +75,9 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/AccountsView.vue'),
         meta: {
           requiresAuth: true,
-          title: 'Accounts'
+          title: 'Accounts',
+          // Explicitly allowing all roles
+          roles: ['Administrator', 'User', 'Operator']
         }
       }
     ]
@@ -101,16 +105,24 @@ const router = createRouter({
   routes
 })
 
-// Global navigation guard
+// Global navigation guard with logging
 router.beforeEach((to, from, next) => {
+  console.log(`[Router] Navigating from "${from.path}" to "${to.path}"`);
+  console.log(`[Router] Route requires auth:`, to.meta.requiresAuth);
+  
   // Update page title
   document.title = `${to.meta.title || 'Console'} - Vue Application`
   
   // Get user store
   const userStore = useUserStore()
+  console.log(`[Router] User authenticated:`, userStore.isAuthenticated);
+  if (userStore.user) {
+    console.log(`[Router] User role:`, userStore.user.role);
+  }
   
   // Check if route requires authentication
   if (to.meta.requiresAuth && !userStore.isAuthenticated) {
+    console.log(`[Router] Authentication required, redirecting to login`);
     // Redirect to login with intended destination
     next({ 
       name: 'login', 
@@ -119,10 +131,13 @@ router.beforeEach((to, from, next) => {
   } 
   // Check role-based access
   else if (to.meta.roles && userStore.user) {
+    console.log(`[Router] Checking role access, required roles:`, to.meta.roles);
     // If route has role requirements, check if user has appropriate role
     if (to.meta.roles.includes(userStore.user.role)) {
+      console.log(`[Router] Role check passed, proceeding`);
       next() // User has required role, proceed
     } else {
+      console.log(`[Router] Role check failed, redirecting to dashboard`);
       // User doesn't have required role, redirect to dashboard
       const message = messageProvider.createMessage()
       message.error(`You don't have permission to access ${to.meta.title}`)
@@ -131,13 +146,20 @@ router.beforeEach((to, from, next) => {
   } 
   // If route doesn't require auth, but user is already logged in
   else if (to.name === 'login' && userStore.isAuthenticated) {
+    console.log(`[Router] Already authenticated, redirecting to dashboard`);
     // Redirect to dashboard if already logged in
     next({ name: 'dashboard' })
   } 
   // All checks passed, proceed to route
   else {
+    console.log(`[Router] All checks passed, proceeding to route`);
     next()
   }
+})
+
+// After navigation log
+router.afterEach((to) => {
+  console.log(`[Router] Navigation completed to "${to.path}"`);
 })
 
 export default router

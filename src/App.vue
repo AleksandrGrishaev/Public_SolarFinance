@@ -15,6 +15,7 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { 
   NConfigProvider, 
   NLoadingBarProvider, 
@@ -28,9 +29,15 @@ import { useUserStore } from '@/stores/user';
 // Get stores
 const themeStore = useThemeStore();
 const userStore = useUserStore();
+const router = useRouter();
 
 // Initialize theme and user on app mount
 onMounted(() => {
+  // Простое логирование
+  console.log('App mounted');
+  console.log('Current route:', router.currentRoute.value.path);
+  console.log('User authenticated:', userStore.isAuthenticated);
+  
   // Initialize theme
   themeStore.initTheme();
   
