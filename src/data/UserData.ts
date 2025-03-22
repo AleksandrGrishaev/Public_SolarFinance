@@ -5,24 +5,17 @@ import { type User } from '@/stores/user';
 export const availableUsers: User[] = [
   { 
     id: 1, 
-    name: 'Admin User', 
+    name: 'Alex', 
     role: 'Administrator', 
     pin: '1234', 
     email: 'admin@example.com' 
   },
   { 
     id: 2, 
-    name: 'Test User', 
+    name: 'Sasha Solar', 
     role: 'User', 
     pin: '5678', 
     email: 'user@example.com' 
-  },
-  { 
-    id: 3, 
-    name: 'John Doe', 
-    role: 'Operator', 
-    pin: '9999', 
-    email: 'john@example.com' 
   },
 ];
 
@@ -32,13 +25,9 @@ export const userRoles = {
     level: 3,
     permissions: ['read', 'write', 'delete', 'manage_users', 'settings']
   },
-  Operator: {
-    level: 2,
-    permissions: ['read', 'write', 'limited_settings']
-  },
   User: {
     level: 1,
-    permissions: ['read', 'limited_write']
+    permissions: ['read', 'write', 'delete', 'manage_users', 'settings']
   }
 };
 
