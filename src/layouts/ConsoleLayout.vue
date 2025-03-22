@@ -21,22 +21,15 @@
           <span class="logo-text" v-if="!collapsed">Console App</span>
         </div>
   
-        <!-- Navigation Menu -->
-        <n-menu
-          :value="activeKey"
-          :collapsed="collapsed"
-          :collapsed-width="64"
-          :collapsed-icon-size="22"
-          :options="menuOptions"
-          @update:value="handleMenuUpdate"
-        />
+        <!-- Navigation Menu (Component) -->
+        <navigation-menu :collapsed="collapsed" />
   
         <!-- User Section at Bottom -->
         <div class="user-section" :class="{ 'user-section-collapsed': collapsed }">
           <n-dropdown
             trigger="click"
             :options="userMenuOptions"
-            @select="handleUserMenuSelect"
+            @select="handleLogout"
           >
             <div class="user-dropdown-trigger">
               <n-avatar round size="medium">
@@ -110,7 +103,6 @@
     NLayoutHeader, 
     NLayoutContent, 
     NLayoutFooter,
-    NMenu, 
     NButton, 
     NDropdown,
     NCard,
@@ -119,17 +111,13 @@
     NIcon
   } from 'naive-ui';
   import { 
-    IconDashboard, 
-    IconUsers, 
-    IconSettings,
     IconMoon,
     IconSun,
     IconLogout,
-    IconAppWindowFilled,
-    IconUser
-  } from '@tabler/icons-vue';
+    IconAppWindowFilled  } from '@tabler/icons-vue';
   import { useUserStore } from '@/stores/user';
   import { useThemeStore } from '@/stores/theme';
+  import NavigationMenu from '@/components/NavigationMenu.vue';
   
   // Router and route
   const router = useRouter();
@@ -154,15 +142,6 @@
   // Sidebar collapse state
   const collapsed = ref(false);
   
-  // Active menu item
-  const activeKey = computed(() => {
-    const path = route.path;
-    if (path.startsWith('/accounts')) return 'accounts';
-    if (path.startsWith('/dashboard')) return 'dashboard';
-    if (path.startsWith('/settings')) return 'settings';
-    return '';
-  });
-  
   // Page title based on route
   const pageTitle = computed(() => {
     return route.meta.title as string || 'Console';
@@ -173,27 +152,8 @@
     return () => h(icon);
   }
   
-  // Menu options
-  const menuOptions = [
-    {
-      label: 'Dashboard',
-      key: 'dashboard',
-      icon: renderIcon(IconDashboard),
-    },
-    {
-      label: 'Settings',
-      key: 'settings',
-      icon: renderIcon(IconSettings),
-    }
-  ];
-  
   // User menu dropdown options
   const userMenuOptions = [
-    {
-      label: 'Profile',
-      key: 'profile',
-      icon: renderIcon(IconUser)
-    },
     {
       label: 'Logout',
       key: 'logout',
@@ -201,24 +161,10 @@
     }
   ];
   
-  // Handle menu item click
-  const handleMenuUpdate = (key: string) => {
-    switch (key) {
-      case 'dashboard':
-        router.push('/dashboard');
-        break;
-      case 'settings':
-        router.push('/settings');
-        break;
-    }
-  };
-  
-  // Handle user menu selection
-  const handleUserMenuSelect = (key: string) => {
+  // Handle user menu selection - simplified to only handle logout
+  const handleLogout = (key: string) => {
     if (key === 'logout') {
       logout();
-    } else if (key === 'profile') {
-      router.push('/profile');
     }
   };
   

@@ -116,7 +116,6 @@
     IconFileImport,
     IconRefresh,
     IconUserPlus,
-    IconMessage,
     IconAlertCircle,
     IconDeviceAnalytics
   } from '@tabler/icons-vue';

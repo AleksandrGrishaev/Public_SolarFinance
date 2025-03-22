@@ -62,6 +62,22 @@ const routes: Array<RouteRecordRaw> = [
       }
     ]
   },
+  // Accounts route - added as requested
+  {
+    path: '/accounts',
+    component: ConsoleLayout,
+    children: [
+      {
+        path: '',
+        name: 'accounts',
+        component: () => import('@/views/AccountsView.vue'),
+        meta: {
+          requiresAuth: true,
+          title: 'Accounts'
+        }
+      }
+    ]
+  },
   // 404 Not Found
   {
     path: '/:pathMatch(.*)*',
