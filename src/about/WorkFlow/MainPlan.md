@@ -26,10 +26,6 @@ Copysrc/
 
 Настройка проекта
 
-Инициализация проекта Vue 3 с TypeScript
-Установка Naive UI, Vue Router, Pinia, Tabler Icons
-Настройка базовой структуры проекта
-
 
 Определение базовых типов
 
@@ -372,3 +368,253 @@ export {
   transactionService,
   // Другие сервисы
 };
+
+## Модальные окна для ввода данных
+Модальные окна будут базироваться на компоненте BaseModal.vue, который будет служить основой для всех модальных окон в приложении. Ниже приведена список основных модальных окон и их назначение:
+
+AccountModal.vue - Добавление/редактирование счетов
+CashModal.vue - Добавление/редактирование наличных средств
+LoanModal.vue - Добавление/редактирование ссуд
+TransactionModal.vue - Добавление/редактирование операций
+AssetModal.vue - Добавление/редактирование активов
+LiabilityModal.vue - Добавление/редактирование пассивов
+InvestmentModal.vue - Добавление/редактирование инвестиций
+CryptoModal.vue - Добавление/редактирование криптовалют
+UserModal.vue - Добавление/редактирование пользователей
+CategoryModal.vue - Добавление/редактирование пользовательских категорий
+AssetTypeModal.vue - Добавление/редактирование пользовательских типов активов
+LiabilityTypeModal.vue - Добавление/редактирование пользовательских типов пассивов
+
+## Types
+
+// Базовый интерфейс для всех сущностей
+interface BaseEntity {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// === Пользователи ===
+interface User extends BaseEntity {
+  name: string;
+  pin: string; // Зашифрованный PIN-код
+  avatar?: string;
+  isAdmin: boolean;
+}
+
+// === Финансы ===
+
+// Счета
+enum AccountType {
+  DEBIT = 'debit',
+  CREDIT = 'credit'
+}
+
+interface Account extends BaseEntity {
+  name: string;
+  icon: string;
+  currency: string;
+  type: AccountType;
+  initialBalance: number;
+  currentBalance: number;
+  ownerId: string;
+  ownershipShares?: Record<string, number>;
+}
+
+// Наличные
+interface Cash extends BaseEntity {
+  icon: string;
+  currency: string;
+  initialAmount: number;
+  currentAmount: number;
+  ownerId: string;
+  ownershipShares?: Record<string, number>;
+}
+
+// === Транзакции ===
+enum TransactionType {
+  INCOME = 'income',
+  EXPENSE = 'expense',
+  TRANSFER = 'transfer'
+}
+
+// Предустановленные категории транзакций
+enum DefaultTransactionCategory {
+  SALARY = 'salary',
+  GIFT = 'gift',
+  FOOD = 'food',
+  TRANSPORT = 'transport',
+  ENTERTAINMENT = 'entertainment',
+  HOUSING = 'housing',
+  UTILITIES = 'utilities',
+  HEALTH = 'health',
+  EDUCATION = 'education',
+  INVESTMENT = 'investment',
+  ASSET_PURCHASE = 'assetPurchase',
+  LIABILITY_PURCHASE = 'liabilityPurchase',
+  DEBT_PAYMENT = 'debtPayment',
+  OTHER = 'other'
+}
+
+// Интерфейс для пользовательских категорий
+interface CustomCategory extends BaseEntity {
+  name: string;
+  icon: string;
+  color: string;
+  parentCategory?: DefaultTransactionCategory | string; // Может быть связана с предустановленной категорией
+}
+
+// Транзакция может использовать как предустановленную, так и пользовательскую категорию
+interface Transaction extends BaseEntity {
+  type: TransactionType;
+  amount: number;
+  currency: string;
+  category: DefaultTransactionCategory | string; // Строка для ID пользовательской категории
+  description: string;
+  date: Date;
+  sourceId?: string; 
+  sourceType?: string; 
+  destinationId?: string;
+  destinationType?: string;
+  relatedAssetId?: string;
+  createdBy: string;
+}
+
+// === Активы и пассивы ===
+
+// Интерфейс для пользовательских типов активов
+interface AssetTypeEntity extends BaseEntity {
+  name: string;
+  icon: string;
+  description?: string;
+}
+
+// Предустановленные типы активов
+enum DefaultAssetType {
+  BUSINESS = 'business',
+  PROJECT = 'project',
+  REAL_ESTATE = 'realEstate'
+}
+
+interface Asset extends BaseEntity {
+  name: string;
+  type: DefaultAssetType | string; // Строка для ID пользовательского типа
+  icon: string;
+  initialValue: number;
+  currentValue: number;
+  currency: string;
+  description: string;
+  isManaged: boolean;
+  ownerId: string;
+  ownershipShares?: Record<string, number>;
+}
+
+// Интерфейс для пользовательских типов пассивов
+interface LiabilityTypeEntity extends BaseEntity {
+  name: string;
+  icon: string;
+  description?: string;
+}
+
+// Предустановленные типы пассивов
+enum DefaultLiabilityType {
+  PROPERTY = 'property',
+  VEHICLE = 'vehicle',
+  ELECTRONICS = 'electronics',
+  FURNITURE = 'furniture',
+  OTHER = 'other'
+}
+
+interface Liability extends BaseEntity {
+  name: string;
+  type: DefaultLiabilityType | string; // Строка для ID пользовательского типа
+  icon: string;
+  initialValue: number;
+  currentValue: number;
+  currency: string;
+  description: string;
+  purchaseDate: Date;
+  ownerId: string;
+  ownershipShares?: Record<string, number>;
+}
+
+// === Инвестиции ===
+
+// Предустановленные типы инвестиций
+enum DefaultInvestmentType {
+  STOCK = 'stock',
+  BOND = 'bond',
+  ETF = 'etf',
+  MUTUAL_FUND = 'mutualFund',
+  DEPOSIT = 'deposit',
+  OTHER = 'other'
+}
+
+// Интерфейс для пользовательских типов инвестиций
+interface InvestmentTypeEntity extends BaseEntity {
+  name: string;
+  icon: string;
+  description?: string;
+}
+
+interface Investment extends BaseEntity {
+  name: string;
+  type: DefaultInvestmentType | string; // Строка для ID пользовательского типа
+  icon: string;
+  amount: number;
+  initialValue: number;
+  currentValue: number;
+  currency: string;
+  purchaseDate: Date;
+  ownerId: string;
+  ownershipShares?: Record<string, number>;
+}
+
+// === Криптовалюта ===
+interface Cryptocurrency extends BaseEntity {
+  symbol: string;
+  name: string;
+  amount: number;
+  initialValueUSD: number;
+  currentValueUSD: number;
+  walletAddress?: string;
+  ownerId: string;
+  ownershipShares?: Record<string, number>;
+}
+
+// === Кредиты/Ссуды ===
+
+// Предустановленные типы кредитов
+enum DefaultLoanType {
+  MORTGAGE = 'mortgage',
+  CAR_LOAN = 'carLoan',
+  PERSONAL_LOAN = 'personalLoan',
+  BUSINESS_LOAN = 'businessLoan',
+  CREDIT_CARD = 'creditCard',
+  FAMILY_LOAN = 'familyLoan',
+  OTHER = 'other'
+}
+
+// Интерфейс для пользовательских типов кредитов
+interface LoanTypeEntity extends BaseEntity {
+  name: string;
+  icon: string;
+  description?: string;
+}
+
+interface Loan extends BaseEntity {
+  name: string;
+  type: DefaultLoanType | string; // Строка для ID пользовательского типа
+  icon: string;
+  initialAmount: number;
+  currentAmount: number;
+  currency: string;
+  interestRate?: number;
+  startDate: Date;
+  endDate?: Date;
+  paymentSchedule?: string;
+  lenderId?: string;
+  borrowerId: string;
+  ownershipShares?: Record<string, number>;
+  relatedAssetId?: string;
+}
