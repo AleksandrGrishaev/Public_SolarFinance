@@ -1,7 +1,5 @@
-// src/router/index.ts
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import { useMessage } from 'naive-ui'
 
 // Layouts
 import EmptyLayout from '@/layouts/EmptyLayout.vue'
@@ -16,22 +14,10 @@ declare module 'vue-router' {
   }
 }
 
-// Create message instance outside component
-let _messageInstance: ReturnType<typeof useMessage> | null = null;
-const messageProvider = {
-  createMessage: () => {
-    if (!_messageInstance) {
-      window.$message = useMessage();
-      _messageInstance = window.$message;
-    }
-    return _messageInstance;
-  }
-};
-
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    redirect: '/dashboard',
+    redirect: '/transaction',
     meta: {
       requiresAuth: true,
       title: 'Home'
@@ -46,6 +32,16 @@ const routes: Array<RouteRecordRaw> = [
       title: 'Login'
     }
   },
+  // Transaction route - добавляем прямой маршрут для транзакций
+  {
+    path: '/transaction',
+    name: 'transaction',
+    component: () => import('@/views/TransactionView.vue'),
+    meta: {
+      requiresAuth: true,
+      title: 'Add Transaction'
+    }
+  },
   // Dashboard route
   {
     path: '/dashboard',
@@ -57,9 +53,7 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/DashboardView.vue'),
         meta: {
           requiresAuth: true,
-          title: 'Dashboard',
-          // Explicitly allowing all roles
-          roles: ['Administrator', 'User', 'Operator']
+          title: 'Dashboard'
         }
       }
     ]
@@ -75,9 +69,7 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/AccountsView.vue'),
         meta: {
           requiresAuth: true,
-          title: 'Accounts',
-          // Explicitly allowing all roles
-          roles: ['Administrator', 'User', 'Operator']
+          title: 'Accounts'
         }
       }
     ]
@@ -105,61 +97,28 @@ const router = createRouter({
   routes
 })
 
-// Global navigation guard with logging
+// Упрощенный guard для навигации
 router.beforeEach((to, from, next) => {
-  console.log(`[Router] Navigating from "${from.path}" to "${to.path}"`);
-  console.log(`[Router] Route requires auth:`, to.meta.requiresAuth);
-  
   // Update page title
-  document.title = `${to.meta.title || 'Console'} - Vue Application`
+  document.title = `${to.meta.title || 'Console'} - Finance App`
   
   // Get user store
   const userStore = useUserStore()
-  console.log(`[Router] User authenticated:`, userStore.isAuthenticated);
-  if (userStore.user) {
-    console.log(`[Router] User role:`, userStore.user.role);
-  }
   
   // Check if route requires authentication
   if (to.meta.requiresAuth && !userStore.isAuthenticated) {
-    console.log(`[Router] Authentication required, redirecting to login`);
-    // Redirect to login with intended destination
-    next({ 
-      name: 'login', 
-      query: { redirect: to.fullPath } 
-    })
-  } 
-  // Check role-based access
-  else if (to.meta.roles && userStore.user) {
-    console.log(`[Router] Checking role access, required roles:`, to.meta.roles);
-    // If route has role requirements, check if user has appropriate role
-    if (to.meta.roles.includes(userStore.user.role)) {
-      console.log(`[Router] Role check passed, proceeding`);
-      next() // User has required role, proceed
-    } else {
-      console.log(`[Router] Role check failed, redirecting to dashboard`);
-      // User doesn't have required role, redirect to dashboard
-      const message = messageProvider.createMessage()
-      message.error(`You don't have permission to access ${to.meta.title}`)
-      next({ name: 'dashboard' })
-    }
+    // Redirect to login
+    next({ name: 'login' })
   } 
   // If route doesn't require auth, but user is already logged in
   else if (to.name === 'login' && userStore.isAuthenticated) {
-    console.log(`[Router] Already authenticated, redirecting to dashboard`);
     // Redirect to dashboard if already logged in
-    next({ name: 'dashboard' })
+    next({ name: 'transaction' })
   } 
   // All checks passed, proceed to route
   else {
-    console.log(`[Router] All checks passed, proceeding to route`);
     next()
   }
-})
-
-// After navigation log
-router.afterEach((to) => {
-  console.log(`[Router] Navigation completed to "${to.path}"`);
 })
 
 export default router

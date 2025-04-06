@@ -4,6 +4,13 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 
+// Объявление типов для глобального message provider
+declare global {
+  interface Window {
+    $message: any
+  }
+}
+
 // Простое логирование
 console.log('Application starting');
 
@@ -28,11 +35,3 @@ app.config.errorHandler = (err, instance, info) => {
 // Mount the app
 app.mount('#app')
 console.log('App mounted to DOM');
-
-// Create a global message function for use outside of components
-// Needed for router navigation guards
-declare global {
-  interface Window {
-    $message: any
-  }
-}

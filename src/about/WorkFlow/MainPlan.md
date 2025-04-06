@@ -470,7 +470,6 @@ interface Transaction extends BaseEntity {
   amount: number;
   currency: string;
   category: DefaultTransactionCategory | string; // Строка для ID пользовательской категории
-  description: string;
   date: Date;
   sourceId?: string; 
   sourceType?: string; 
