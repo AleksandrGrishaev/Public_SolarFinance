@@ -4,34 +4,28 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 
-// Объявление типов для глобального message provider
+// Типы для глобального message provider
 declare global {
   interface Window {
     $message: any
   }
 }
 
-// Простое логирование
-console.log('Application starting');
-
-// Create app instance
+// Создание экземпляра приложения
 const app = createApp(App)
 
-// Install plugins
+// Инициализация Pinia
 const pinia = createPinia()
 app.use(pinia)
-console.log('Pinia installed');
 
+// Инициализация роутера
 app.use(router)
-console.log('Router installed');
-console.log('Available routes:', router.getRoutes().map(route => route.path));
 
-// Global error handler
+// Глобальный обработчик ошибок
 app.config.errorHandler = (err, instance, info) => {
   console.error('Global error:', err)
   console.error('Error info:', info)
 }
 
-// Mount the app
+// Монтирование приложения
 app.mount('#app')
-console.log('App mounted to DOM');

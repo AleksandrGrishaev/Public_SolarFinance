@@ -2,9 +2,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { availableUsers, hasPermission } from '@/data/UserData'
-import { type User } from '../types/user';
-
-
+import { type User } from '@/types/user';
 
 export const useUserStore = defineStore('user', () => {
   // State

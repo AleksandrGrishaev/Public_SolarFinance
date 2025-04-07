@@ -7,7 +7,7 @@
         <div class="account-name">{{ selectedAccount.name }}</div>
         <div class="dropdown-icon">
           <n-icon>
-            <chevron-down />
+            <icon-chevron-down />
           </n-icon>
         </div>
       </div>
@@ -25,8 +25,8 @@
   </template>
   
   <script setup lang="ts">
-  import { ref, onMounted, computed } from 'vue'
-  import { ChevronDown } from '@vicons/tabler'
+  import { ref, computed, h } from 'vue'
+  import { IconChevronDown } from '@tabler/icons-vue'
   import { NIcon, NDropdown } from 'naive-ui'
   
   const props = defineProps({

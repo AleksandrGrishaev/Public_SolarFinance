@@ -20,11 +20,11 @@
   import { ref } from 'vue'
   import { NIcon } from 'naive-ui'
   import { 
-    Book, 
-    CreditCard, 
-    ChartBar, 
-    DotsCircleHorizontal 
-  } from '@vicons/tabler'
+    IconBook, 
+    IconCreditCard, 
+    IconChartBar, 
+    IconDotsCircleHorizontal 
+  } from '@tabler/icons-vue'
   
   const props = defineProps({
     activeTab: {
@@ -36,10 +36,10 @@
   const emit = defineEmits(['change-tab'])
   
   const tabs = ref([
-    { id: 'books', name: 'Books', icon: Book },
-    { id: 'assets', name: 'Assets', icon: CreditCard },
-    { id: 'charts', name: 'Charts', icon: ChartBar },
-    { id: 'more', name: 'More', icon: DotsCircleHorizontal }
+    { id: 'books', name: 'Books', icon: IconBook },
+    { id: 'assets', name: 'Assets', icon: IconCreditCard },
+    { id: 'charts', name: 'Charts', icon: IconChartBar },
+    { id: 'more', name: 'More', icon: IconDotsCircleHorizontal }
   ])
   
   const selectTab = (tabId) => {

@@ -97,25 +97,43 @@ const router = createRouter({
   routes
 })
 
-// Упрощенный guard для навигации
-router.beforeEach((to, from, next) => {
-  // Update page title
+// Отслеживание инициализации хранилища пользователя
+let isUserStoreInitialized = false
+
+// Навигационный guard с дополнительной логикой инициализации
+router.beforeEach(async (to, from, next) => {
+  // Обновление заголовка страницы
   document.title = `${to.meta.title || 'Console'} - Finance App`
   
-  // Get user store
+  // Получение хранилища пользователя
   const userStore = useUserStore()
   
-  // Check if route requires authentication
+  // При первом переходе инициализируем данные пользователя из localStorage
+  if (!isUserStoreInitialized) {
+    console.log('[Router] First navigation, initializing user store')
+    try {
+      await userStore.init()
+      isUserStoreInitialized = true
+      console.log('[Router] User authentication status:', userStore.isAuthenticated)
+      if (userStore.isAuthenticated) {
+        console.log('[Router] User restored from localStorage:', userStore.user?.name)
+      }
+    } catch (error) {
+      console.error('[Router] Error initializing user store:', error)
+    }
+  }
+  
+  // Проверка авторизации и перенаправление
   if (to.meta.requiresAuth && !userStore.isAuthenticated) {
-    // Redirect to login
+    console.log('[Router] Authentication required, redirecting to login')
     next({ name: 'login' })
   } 
-  // If route doesn't require auth, but user is already logged in
+  // Если пользователь уже авторизован и пытается открыть страницу логина
   else if (to.name === 'login' && userStore.isAuthenticated) {
-    // Redirect to dashboard if already logged in
+    console.log('[Router] Already authenticated, redirecting to transaction')
     next({ name: 'transaction' })
-  } 
-  // All checks passed, proceed to route
+  }
+  // В остальных случаях разрешаем переход
   else {
     next()
   }

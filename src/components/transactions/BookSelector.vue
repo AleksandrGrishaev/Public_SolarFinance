@@ -7,7 +7,9 @@
         @click="selectBook(book)"
       >
         <div class="book-icon">
-          <i class="icon-book"></i>
+          <n-icon>
+            <icon-book />
+          </n-icon>
         </div>
         <div class="book-name">{{ book.name }}</div>
       </div>
@@ -16,6 +18,8 @@
   
   <script setup lang="ts">
   import { ref } from 'vue'
+  import { NIcon } from 'naive-ui'
+  import { IconBook } from '@tabler/icons-vue'
   
   const props = defineProps({
     selectedBook: {

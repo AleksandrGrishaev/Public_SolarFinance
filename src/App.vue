@@ -20,7 +20,6 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import { useRouter } from 'vue-router';
 import { 
   darkTheme,
   NConfigProvider, 
@@ -31,30 +30,19 @@ import {
   useMessage
 } from 'naive-ui';
 import { useThemeStore } from './stores/theme';
-import { useUserStore } from './stores/user';
 
-// Get stores
+// Получение хранилища темы
 const themeStore = useThemeStore();
-const userStore = useUserStore();
-const router = useRouter();
 
 // Устанавливаем сообщения глобально, чтобы они были доступны в роутере
 onMounted(() => {
   // Инициализируем глобальный message provider
   window.$message = useMessage();
-  
-  console.log('App mounted');
+  console.log('[App] Global message provider initialized');
   
   // Инициализируем тему
   themeStore.initTheme();
-  
-  // Инициализируем пользователя из localStorage
-  if (userStore.init) {
-    userStore.init();
-    console.log('User authenticated:', userStore.isAuthenticated);
-  }
-  
-  console.log('Current route:', router.currentRoute.value.path);
+  console.log('[App] Theme initialized:', themeStore.isDark ? 'dark' : 'light');
 });
 </script>
 

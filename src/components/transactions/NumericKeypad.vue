@@ -36,7 +36,7 @@
         <!-- Кнопка удаления -->
         <button class="delete-button" @click="$emit('delete')">
           <n-icon size="22">
-            <backspace />
+            <icon-backspace />
           </n-icon>
         </button>
       </div>
@@ -45,7 +45,7 @@
   
   <script setup lang="ts">
   import { NIcon } from 'naive-ui'
-  import { Backspace } from '@vicons/tabler'
+  import { IconBackspace } from '@tabler/icons-vue'
   
   const emit = defineEmits(['input', 'delete', 'submit'])
   
