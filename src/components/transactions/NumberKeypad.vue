@@ -76,7 +76,7 @@
   
   .number-row {
     width: 100%;
-    height: 64px;
+    height: 48px;
     padding: 8px 0;
     display: flex;
     justify-content: space-around;
@@ -109,7 +109,7 @@
   
   .add-button {
     flex: 1;
-    height: 50px;
+    height: 30px;
     padding: 10px;
     background: #53B794;
     border-radius: 16px;
