@@ -13,7 +13,10 @@
               <slot name="title">{{ title }}</slot>
             </div>
             
-            <div v-if="rightIcon" class="right-icon-wrapper" @click="$emit('rightIconClick')">
+            <div v-if="rightContent" class="right-content-wrapper">
+              <slot name="rightContent"></slot>
+            </div>
+            <div v-else-if="rightIcon" class="right-icon-wrapper" @click="$emit('rightIconClick')">
               <component :is="rightIcon" class="icon-right" />
             </div>
             <div v-else class="icon-placeholder"></div>
@@ -43,6 +46,10 @@ const props = defineProps({
   rightIcon: {
     type: Object,
     default: null
+  },
+  rightContent: {
+    type: Boolean,
+    default: false
   },
   closeOnOverlayClick: {
     type: Boolean,
@@ -117,6 +124,14 @@ defineEmits(['update:modelValue', 'rightIconClick']);
   cursor: pointer;
 }
 
+.right-content-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  cursor: pointer;
+  min-width: 24px;
+}
+
 .icon-placeholder {
   width: 24px;
   height: 24px;
@@ -126,21 +141,24 @@ defineEmits(['update:modelValue', 'rightIconClick']);
   flex: 1;
   text-align: center;
   color: white;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 20px;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 24px;
 }
 
 .popup-content {
   padding: 13px 16px 30px 16px;
   width: 100%;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .icon-close {
   color: #A44942;
-  width: 18px;
-  height: 18px;
+  width: 14px;
+  height: 14px;
 }
 
 .icon-right {

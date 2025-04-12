@@ -4,7 +4,7 @@
     v-model="isVisible" 
     title="Category list" 
     :rightIcon="IconPlus"
-    @rightIconClick="handleAddCategory"
+    @rightIconClick="showAddCategoryPopup = true"
   >
     <div class="category-list-container">
       <!-- Фильтры -->
@@ -58,9 +58,17 @@
       </div>
 
       <!-- Кнопка создания новой категории -->
-      <CreateCategoryButton @click="handleAddCategory" />
+      <CreateCategoryButton @click="showAddCategoryPopup = true" />
     </div>
   </BasePopup>
+
+  <!-- New Category Add Popup -->
+  <CategoryAddPopup
+    v-model="showAddCategoryPopup"
+    :initial-type="selectedType"
+    :initial-book-id="selectedBook"
+    @save="handleSaveNewCategory"
+  />
 </template>
 
 <script setup lang="ts">
@@ -71,6 +79,7 @@ import TransactionTypeSelector from '../transactions/TransactionTypeSelector.vue
 import CategoryItem from './CategoryItem.vue';
 import CategoryFilterToggle from './CategoryFilterToggle.vue';
 import CreateCategoryButton from '../ui/CreateCategoryButton.vue';
+import CategoryAddPopup from './CategoryAddPopup.vue';
 import { IconPlus } from '@tabler/icons-vue';
 import { 
   books,
@@ -105,6 +114,7 @@ const emit = defineEmits(['update:modelValue', 'select', 'add', 'edit', 'reorder
 const selectedBook = ref(props.initialBook);
 const selectedType = ref(props.initialType);
 const showInactiveCategories = ref(false);
+const showAddCategoryPopup = ref(false);
 
 // Категории с флагом активности
 const categoriesWithActiveState = ref<Category[]>([]);
@@ -222,10 +232,22 @@ const handleCategoryMenu = (category) => {
 
 // Добавление новой категории
 const handleAddCategory = () => {
+  showAddCategoryPopup.value = true;
+};
+
+// Обработка сохранения новой категории
+const handleSaveNewCategory = (newCategory) => {
+  console.log('New category saved:', newCategory);
+  
+  // Emit add event with the new category data
   emit('add', {
+    category: newCategory,
     bookId: selectedBook.value,
     type: selectedType.value
   });
+  
+  // Close add category popup
+  showAddCategoryPopup.value = false;
 };
 </script>
 

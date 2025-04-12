@@ -1,51 +1,51 @@
 <!-- src/components/ui/CreateCategoryButton.vue -->
 <template>
-    <div class="create-button-container">
-      <button class="create-button" @click="$emit('click')">
-        <IconPlus class="create-icon" />
-        <span>{{ text }}</span>
-      </button>
+    <div class="create-category-button" @click="$emit('click')">
+      <div class="icon-wrapper">
+        <IconPlus class="plus-icon" />
+      </div>
+      <span>Add category</span>
     </div>
   </template>
   
   <script setup lang="ts">
   import { IconPlus } from '@tabler/icons-vue';
   
-  defineProps({
-    text: {
-      type: String,
-      default: 'Create category'
-    }
-  });
-  
   defineEmits(['click']);
   </script>
   
   <style scoped>
-  .create-button-container {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-  }
-  
-  .create-button {
+  .create-category-button {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
-    padding: 9px 19px;
-    border-radius: 34px;
-    border: 1px solid white;
-    background: transparent;
+    padding: 12px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    cursor: pointer;
     color: white;
     font-size: 16px;
     font-weight: 500;
-    line-height: 24px;
-    cursor: pointer;
+    margin-top: 16px;
+    transition: background-color 0.2s;
   }
   
-  .create-icon {
-    width: 10px;
-    height: 10px;
-    color: white;
+  .create-category-button:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+  
+  .icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+  }
+  
+  .plus-icon {
+    color: #53B794;
+    width: 18px;
+    height: 18px;
   }
   </style>

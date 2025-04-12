@@ -1,0 +1,95 @@
+Date : 2025-04-12 17:11:25
+Directory : /Users/peaker/dev/solar-finance/src
+Total : 48 files,  6495 codes, 344 comments, 976 blanks, all 7815 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| Vue        |         23 |      2,888 |         51 |        381 |      3,320 |
+| Markdown   |          4 |      2,417 |          0 |        368 |      2,785 |
+| TypeScript |         21 |      1,190 |        293 |        227 |      1,710 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++-----------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                    | files      | code       | comment    | blank      | total      |
++-----------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                       |         48 |      6,495 |        344 |        976 |      7,815 |
+| . (Files)                                                                               |          2 |        107 |          7 |         16 |        130 |
+| about                                                                                   |          4 |      2,417 |          0 |        368 |      2,785 |
+| about (Files)                                                                           |          2 |        643 |          0 |        149 |        792 |
+| about/WorkFlow                                                                          |          2 |      1,774 |          0 |        219 |      1,993 |
+| components                                                                              |         14 |      1,660 |         24 |        217 |      1,901 |
+| components (Files)                                                                      |          1 |         58 |          1 |          7 |         66 |
+| components/categories                                                                   |          5 |        673 |         12 |         95 |        780 |
+| components/navigation                                                                   |          1 |         88 |          1 |          9 |         98 |
+| components/transactions                                                                 |          5 |        651 |          8 |         80 |        739 |
+| components/ui                                                                           |          2 |        190 |          2 |         26 |        218 |
+| data                                                                                    |          2 |        185 |         15 |         18 |        218 |
+| layouts                                                                                 |          3 |        359 |         11 |         50 |        420 |
+| router                                                                                  |          1 |         94 |         13 |          9 |        116 |
+| services                                                                                |          5 |        485 |        170 |        116 |        771 |
+| services (Files)                                                                        |          1 |         54 |         22 |         11 |         87 |
+| services/api                                                                            |          2 |         82 |         31 |         36 |        149 |
+| services/finance                                                                        |          1 |        158 |         64 |         38 |        260 |
+| services/transaction                                                                    |          1 |        191 |         53 |         31 |        275 |
+| stores                                                                                  |          2 |        205 |         28 |         50 |        283 |
+| types                                                                                   |         10 |        203 |         60 |         28 |        291 |
+| views                                                                                   |          5 |        780 |         16 |        104 |        900 |
++-----------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-----------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                                | language   | code       | comment    | blank      | total      |
++-----------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| /Users/peaker/dev/solar-finance/src/App.vue                                             | Vue        |         89 |          0 |         10 |         99 |
+| /Users/peaker/dev/solar-finance/src/about/Description.md                                | Markdown   |         58 |          0 |         28 |         86 |
+| /Users/peaker/dev/solar-finance/src/about/WorkFlow/MainPlan.md                          | Markdown   |        468 |          0 |        151 |        619 |
+| /Users/peaker/dev/solar-finance/src/about/WorkFlow/Mock.md                              | Markdown   |      1,306 |          0 |         68 |      1,374 |
+| /Users/peaker/dev/solar-finance/src/about/main.md                                       | Markdown   |        585 |          0 |        121 |        706 |
+| /Users/peaker/dev/solar-finance/src/components/NavigationMenu.vue                       | Vue        |         58 |          1 |          7 |         66 |
+| /Users/peaker/dev/solar-finance/src/components/categories/CategoryFilterToggle.vue      | Vue        |         59 |          1 |         10 |         70 |
+| /Users/peaker/dev/solar-finance/src/components/categories/CategoryIcon.vue              | Vue        |        112 |          1 |         12 |        125 |
+| /Users/peaker/dev/solar-finance/src/components/categories/CategoryItem.vue              | Vue        |        113 |          1 |         18 |        132 |
+| /Users/peaker/dev/solar-finance/src/components/categories/CategoryListPopup.vue         | Vue        |        218 |          6 |         35 |        259 |
+| /Users/peaker/dev/solar-finance/src/components/categories/CategorySelector.vue          | Vue        |        171 |          3 |         20 |        194 |
+| /Users/peaker/dev/solar-finance/src/components/navigation/NavMenu.vue                   | Vue        |         88 |          1 |          9 |         98 |
+| /Users/peaker/dev/solar-finance/src/components/transactions/AccountSelector.vue         | Vue        |        218 |          4 |         29 |        251 |
+| /Users/peaker/dev/solar-finance/src/components/transactions/BookSelector.vue            | Vue        |         89 |          0 |          9 |         98 |
+| /Users/peaker/dev/solar-finance/src/components/transactions/NumberKeypad.vue            | Vue        |        123 |          2 |         12 |        137 |
+| /Users/peaker/dev/solar-finance/src/components/transactions/PercentageSlider.vue        | Vue        |        152 |          1 |         21 |        174 |
+| /Users/peaker/dev/solar-finance/src/components/transactions/TransactionTypeSelector.vue | Vue        |         69 |          1 |          9 |         79 |
+| /Users/peaker/dev/solar-finance/src/components/ui/BasePopup.vue                         | Vue        |        146 |          1 |         20 |        167 |
+| /Users/peaker/dev/solar-finance/src/components/ui/CreateCategoryButton.vue              | Vue        |         44 |          1 |          6 |         51 |
+| /Users/peaker/dev/solar-finance/src/data/UserData.ts                                    | TypeScript |         30 |          4 |          3 |         37 |
+| /Users/peaker/dev/solar-finance/src/data/categories.ts                                  | TypeScript |        155 |         11 |         15 |        181 |
+| /Users/peaker/dev/solar-finance/src/layouts/ConsoleLayout.vue                           | Vue        |        281 |         10 |         38 |        329 |
+| /Users/peaker/dev/solar-finance/src/layouts/EmptyLayout.vue                             | Vue        |         15 |          0 |          2 |         17 |
+| /Users/peaker/dev/solar-finance/src/layouts/IosLayout.vue                               | Vue        |         63 |          1 |         10 |         74 |
+| /Users/peaker/dev/solar-finance/src/main.ts                                             | TypeScript |         18 |          7 |          6 |         31 |
+| /Users/peaker/dev/solar-finance/src/router/index.ts                                     | TypeScript |         94 |         13 |          9 |        116 |
+| /Users/peaker/dev/solar-finance/src/services/BaseCrudService.ts                         | TypeScript |         54 |         22 |         11 |         87 |
+| /Users/peaker/dev/solar-finance/src/services/api/ApiService.ts                          | TypeScript |          6 |          1 |          4 |         11 |
+| /Users/peaker/dev/solar-finance/src/services/api/LocalStorageApiService.ts              | TypeScript |         76 |         30 |         32 |        138 |
+| /Users/peaker/dev/solar-finance/src/services/finance/FinanceService.ts                  | TypeScript |        158 |         64 |         38 |        260 |
+| /Users/peaker/dev/solar-finance/src/services/transaction/TransactionService.ts          | TypeScript |        191 |         53 |         31 |        275 |
+| /Users/peaker/dev/solar-finance/src/stores/theme.ts                                     | TypeScript |         48 |          6 |          7 |         61 |
+| /Users/peaker/dev/solar-finance/src/stores/user.ts                                      | TypeScript |        157 |         22 |         43 |        222 |
+| /Users/peaker/dev/solar-finance/src/types/asset.ts                                      | TypeScript |         23 |         10 |          4 |         37 |
+| /Users/peaker/dev/solar-finance/src/types/base.ts                                       | TypeScript |          5 |          0 |          0 |          5 |
+| /Users/peaker/dev/solar-finance/src/types/crypto.ts                                     | TypeScript |         11 |          0 |          4 |         15 |
+| /Users/peaker/dev/solar-finance/src/types/finance.ts                                    | TypeScript |         23 |          9 |          4 |         36 |
+| /Users/peaker/dev/solar-finance/src/types/index.ts                                      | TypeScript |          9 |          0 |          0 |          9 |
+| /Users/peaker/dev/solar-finance/src/types/investment.ts                                 | TypeScript |         26 |          9 |          3 |         38 |
+| /Users/peaker/dev/solar-finance/src/types/liability.ts                                  | TypeScript |         25 |          9 |          4 |         38 |
+| /Users/peaker/dev/solar-finance/src/types/loan.ts                                       | TypeScript |         31 |         10 |          4 |         45 |
+| /Users/peaker/dev/solar-finance/src/types/transaction.ts                                | TypeScript |         42 |         13 |          4 |         59 |
+| /Users/peaker/dev/solar-finance/src/types/user.ts                                       | TypeScript |          8 |          0 |          1 |          9 |
+| /Users/peaker/dev/solar-finance/src/views/AccountsView.vue                              | Vue        |         22 |          1 |          3 |         26 |
+| /Users/peaker/dev/solar-finance/src/views/DashboardView.vue                             | Vue        |        221 |          4 |         19 |        244 |
+| /Users/peaker/dev/solar-finance/src/views/NotFoundView.vue                              | Vue        |         32 |          1 |          4 |         37 |
+| /Users/peaker/dev/solar-finance/src/views/PinLoginView.vue                              | Vue        |        232 |          5 |         39 |        276 |
+| /Users/peaker/dev/solar-finance/src/views/TransactionView.vue                           | Vue        |        273 |          5 |         39 |        317 |
+| Total                                                                                   |            |      6,495 |        344 |        976 |      7,815 |
++-----------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
