@@ -36,28 +36,49 @@
         <!-- Parent category dropdown -->
         <div class="form-row">
           <label>Parent</label>
-          <ParentCategorySelector 
-            v-model="categoryData.parent"
-            :available-parents="availableParents"
-          />
+          <div class="dropdown-select" @click="showParentSelector = true">
+            <span>{{ categoryData.parent?.name || 'Category' }}</span>
+            <svg width="7" height="6" viewBox="0 0 7 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3.05569 6L-0.000210353 0L1.19234 0L3.40973 4.60249L3.33519 4.56522H3.52153L3.447 4.60249L5.66439 0L6.85693 0L3.80103 6H3.05569Z" fill="#404040"/>
+            </svg>
+          </div>
         </div>
   
         <!-- Type selection -->
         <div class="form-row">
           <label>Type</label>
-          <ToggleButtonGroup 
-            v-model="categoryData.type"
-            :options="typeOptions"
-          />
+          <div class="toggle-group">
+            <button 
+              v-for="option in typeOptions" 
+              :key="option.value"
+              class="toggle-button" 
+              :class="{ active: categoryData.type === option.value }"
+              @click="categoryData.type = option.value"
+            >
+              {{ option.label }}
+            </button>
+          </div>
         </div>
   
         <!-- Share selection -->
         <div class="form-row">
           <label>Share</label>
-          <ToggleButtonGroup 
-            v-model="categoryData.share"
-            :options="shareOptions"
-          />
+          <div class="toggle-group">
+            <button 
+              class="toggle-button" 
+              :class="{ active: categoryData.share === 'personal', 'personal-active': categoryData.share === 'personal' }"
+              @click="categoryData.share = 'personal'"
+            >
+              Personal
+            </button>
+            <button 
+              class="toggle-button" 
+              :class="{ active: categoryData.share === 'public' }"
+              @click="categoryData.share = 'public'"
+            >
+              Public
+            </button>
+          </div>
         </div>
   
         <!-- Book selection -->
@@ -79,7 +100,9 @@
         <!-- Use in Charts toggle -->
         <div class="form-row">
           <label>Use in Charts</label>
-          <ToggleSwitch v-model="categoryData.useInCharts" />
+          <div class="toggle-switch" :class="{ 'toggle-on': categoryData.useInCharts }" @click="categoryData.useInCharts = !categoryData.useInCharts">
+            <div class="toggle-thumb"></div>
+          </div>
         </div>
       </div>
   
@@ -96,9 +119,6 @@
   import TextInput from '../ui/inputs/TextInput.vue';
   import ColorPicker from '../ui/inputs/ColorPicker.vue';
   import IconPicker from '../ui/inputs/IconPicker.vue';
-  import ParentCategorySelector from '../ui/inputs/ParentCategorySelector.vue';
-  import ToggleButtonGroup from '../ui/inputs/ToggleButtonGroup.vue';
-  import ToggleSwitch from '../ui/inputs/ToggleSwitch.vue';
   import { books, categories } from '../../data/categories';
   
   const props = defineProps({
@@ -131,11 +151,6 @@
     { label: 'Transfer', value: 'transfer' }
   ];
   
-  const shareOptions = [
-    { label: 'Personal', value: 'personal', customActiveClass: true },
-    { label: 'Public', value: 'public' }
-  ];
-  
   // Category data
   const categoryData = ref({
     name: '',
@@ -150,6 +165,9 @@
   
   // Selected books
   const selectedBooks = ref([props.initialBookId]);
+  
+  // UI states
+  const showParentSelector = ref(false);
   
   // Available parent categories
   const availableParents = computed(() => {
@@ -253,6 +271,8 @@
   
   .icon-color-row {
     justify-content: space-between;
+    padding-left: 16px;
+    padding-right: 16px;
   }
   
   .form-group {
@@ -265,7 +285,22 @@
     color: white;
     font-size: 16px;
     font-weight: 400;
-    min-width: 80px;
+    min-width: 64px;
+  }
+  
+  .dropdown-select {
+    height: 32px;
+    background-color: #949496;
+    border-radius: 14px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    color: #404040;
+    font-size: 12px;
+    cursor: pointer;
+    flex: 1;
   }
   
   .toggle-group {
@@ -275,6 +310,7 @@
     border-radius: 28px;
     padding: 6px;
     gap: 4px;
+    flex: 1;
   }
   
   .toggle-button {
@@ -287,11 +323,43 @@
     font-size: 12px;
     cursor: pointer;
     white-space: nowrap;
+    flex: 1;
+    text-align: center;
   }
   
   .toggle-button.active {
     background-color: black;
     color: white;
+  }
+  
+  .toggle-button.personal-active {
+    background-color: #A44942;
+  }
+  
+  .toggle-switch {
+    width: 59px;
+    height: 32px;
+    background-color: #949496;
+    border-radius: 16px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .toggle-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 26px;
+    height: 26px;
+    background-color: #666;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+  }
+  
+  .toggle-switch.toggle-on .toggle-thumb {
+    left: calc(100% - 29px);
+    background-color: white;
   }
   
   .save-category-button {
