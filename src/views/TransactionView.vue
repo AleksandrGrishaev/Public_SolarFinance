@@ -1,4 +1,4 @@
-<!-- /Users/peaker/dev/solar-finance/src/views/TransactionView.vue -->
+<!-- src/views/TransactionView.vue -->
 <template>
   <div class="transaction-view">
     <div class="body-container">
@@ -40,11 +40,31 @@
       <div class="keypad-container">
         <number-keypad 
           @input="handleKeypadInput" 
-          @add="saveTransaction" 
+          @add="handleAddTransaction" 
           @delete="deleteLastDigit" 
         />
       </div>
     </div>
+
+    <!-- Selector popup -->
+    <category-selector
+      v-model="showCategorySelector"
+      :categories="availableCategories"
+      @select="handleCategorySelect"
+      @add="handleAddCategory"
+      @edit="handleOpenCategoryList"
+    />
+    
+    <!-- List/Edit popup -->
+    <category-list-popup
+      v-model="showCategoryList"
+      :categories="availableCategories"
+      :initialBook="selectedBook"
+      :initialType="selectedType === 'transfer' ? 'expense' : selectedType"
+      @select="handleCategoryListSelect"
+      @add="handleAddCategoryFromList"
+      @reorder="handleCategoriesReordered"
+    />
   </div>
 </template>
 
@@ -55,12 +75,15 @@ import TransactionTypeSelector from '../components/transactions/TransactionTypeS
 import AccountSelector from '../components/transactions/AccountSelector.vue';
 import PercentageSlider from '../components/transactions/PercentageSlider.vue';
 import NumberKeypad from '../components/transactions/NumberKeypad.vue';
+import CategorySelector from '../components/categories/CategorySelector.vue';
+import CategoryListPopup from '../components/categories/CategoryListPopup.vue';
+import CategoryIcon from '../components/categories/CategoryIcon.vue';
+
+const emit = defineEmits(['update:showMenu']);
 
 // Сообщаем макету, что нужно показать меню
 onMounted(() => {
-  // Этот код нужно будет включить в реальном приложении, 
-  // если вы используете событие для управления меню через макет
-  // emit('update:showMenu', true);
+  emit('update:showMenu', true);
 });
 
 // Data models
@@ -70,6 +93,9 @@ const selectedType = ref('expense');
 const selectedAccount = ref('dollar');
 const destinationAccount = ref('bank2');
 const distributionPercentage = ref(50);
+const showCategorySelector = ref(false);
+const showCategoryList = ref(false);
+const selectedCategory = ref(null);
 
 // Mock data
 const availableBooks = [
@@ -92,6 +118,74 @@ const availableAccounts = [
 const owners = [
   { id: 'alex', name: 'Alex' },
   { id: 'wife', name: 'Wife' }
+];
+
+const availableCategories = [
+  { 
+    id: 'renovation', 
+    name: 'Renovation', 
+    parentName: 'House',
+    color: '#F5C54C', 
+    icon: 'IconTool',
+    type: 'expense',
+    bookId: 'my'
+  },
+  { 
+    id: 'food', 
+    name: 'Food', 
+    color: '#A2C94F', 
+    icon: 'IconBread',
+    type: 'expense',
+    bookId: 'my'
+  },
+  { 
+    id: 'transport', 
+    name: 'Transport', 
+    color: '#70B1E0', 
+    icon: 'IconCar',
+    type: 'expense',
+    bookId: 'family'
+  },
+  { 
+    id: 'entertainment', 
+    name: 'Entertainment', 
+    color: '#E882A3', 
+    icon: 'IconDeviceTv',
+    type: 'expense',
+    bookId: 'family'
+  },
+  { 
+    id: 'utilities', 
+    name: 'Utilities', 
+    color: '#8F7ED8', 
+    icon: 'IconHome',
+    type: 'expense',
+    bookId: 'wife'
+  },
+  { 
+    id: 'health', 
+    name: 'Health', 
+    color: '#D85A5A', 
+    icon: 'IconHeartbeat',
+    type: 'income',
+    bookId: 'my'
+  },
+  { 
+    id: 'education', 
+    name: 'Education', 
+    color: '#5AD8B9', 
+    icon: 'IconBook',
+    type: 'income',
+    bookId: 'family'
+  },
+  { 
+    id: 'shopping', 
+    name: 'Shopping', 
+    color: '#D8A55A', 
+    icon: 'IconShoppingCart',
+    type: 'income',
+    bookId: 'wife'
+  },
 ];
 
 // Устанавливаем наблюдение за изменением типа транзакции
@@ -127,6 +221,16 @@ const deleteLastDigit = () => {
   }
 };
 
+const handleAddTransaction = () => {
+  // For expenses and incomes, we need to select a category first
+  if (selectedType.value !== 'transfer' && !selectedCategory.value) {
+    showCategorySelector.value = true;
+    return;
+  }
+  
+  saveTransaction();
+};
+
 const saveTransaction = () => {
   // Here we would save the transaction to the store/backend
   const transactionData = {
@@ -141,12 +245,54 @@ const saveTransaction = () => {
     transactionData.destinationAccount = destinationAccount.value;
   } else {
     transactionData.distribution = distributionPercentage.value;
+    transactionData.category = selectedCategory.value;
   }
   
   console.log('Saving transaction:', transactionData);
   
   // Reset the form or navigate back
   amount.value = '0';
+  selectedCategory.value = null;
+};
+
+const handleCategorySelect = (category) => {
+  selectedCategory.value = category;
+  saveTransaction();
+};
+
+const handleAddCategory = () => {
+  // Закрываем селектор категорий и открываем список категорий
+  showCategorySelector.value = false;
+  showCategoryList.value = true;
+};
+
+const handleOpenCategoryList = () => {
+  // Закрываем селектор категорий и открываем список категорий
+  showCategorySelector.value = false;
+  showCategoryList.value = true;
+};
+
+const handleCategoryListSelect = (category) => {
+  // Выбор категории из списка возвращает нас к первому попапу
+  selectedCategory.value = category;
+  showCategoryList.value = false;
+  showCategorySelector.value = true;
+};
+
+const handleAddCategoryFromList = (data) => {
+  // Здесь должен быть код для добавления новой категории
+  console.log('Adding new category with data:', data);
+  // Потенциально здесь можно открыть третий попап для добавления категории
+  // или реализовать эту логику в самом списке категорий
+};
+
+const handleCategoriesReordered = (reorderedCategories) => {
+  console.log('Categories reordered:', reorderedCategories);
+  // Здесь мы должны обновить порядок категорий в хранилище
+  // Но для демонстрации просто логируем новый порядок
+  
+  // В реальном приложении это могло бы выглядеть так:
+  // store.dispatch('categories/updateOrder', reorderedCategories);
 };
 </script>
 

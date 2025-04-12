@@ -1,4 +1,4 @@
-<!-- /Users/peaker/dev/solar-finance/src/components/transactions/NumberKeypad.vue -->
+<!-- src/components/transactions/NumberKeypad.vue -->
 <template>
   <div class="keyboard">
     <div class="input">
