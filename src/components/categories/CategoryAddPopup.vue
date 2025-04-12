@@ -1,5 +1,42 @@
-<!-- src/components/categories/CategoryAddPopup.vue -->
-<template>
+.input-wrapper {
+    width: 179px;
+  }
+  
+  /* Более специфичный селектор для перезаписи */
+  .category-form .form-row .input-wrapper .custom-input {
+    height: 36px !important;
+    width: 100% !important;
+    background-color: #949496 !important;
+    border: none !important;
+    border-radius: 14px !important;
+    padding: 8px 12px !important;
+    color: #FFFFFF !important;
+    font-size: 16px !important;
+    box-sizing: border-box !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    outline: none !important;
+    display: block !important;
+    border-width: 0 !important;
+    border-style: none !important;
+    border-color: transparent !important;
+    border-image: none !important;
+    text-indent: 0 !important;
+  }
+  
+  .category-form .form-row .input-wrapper .custom-input:focus {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+  
+  .category-form .form-row .input-wrapper .custom-input::placeholder {
+    color: rgba(64, 64, 64, 0.7) !important;
+  }<!-- src/components/categories/CategoryAddPopup.vue -->
+  <template>
     <BasePopup
       v-model="isVisible"
       title="New Category"
@@ -24,13 +61,17 @@
           </div>
         </div>
   
-        <!-- Name input -->
+        <!-- Name input with scoped styling-->
         <div class="form-row">
           <label>Name</label>
-          <TextInput 
-            v-model="categoryData.name"
-            placeholder="Category name"
-          />
+          <div class="input-wrapper">
+            <input
+              v-model="categoryData.name"
+              placeholder="Category name"
+              class="custom-input"
+              style="height: 36px; width: 100%; background-color: #949496; border: none; border-radius: 14px; padding: 8px 12px; color: #FFFFFF; font-size: 16px; box-sizing: border-box; appearance: none; -webkit-appearance: none; -moz-appearance: none; box-shadow: none; margin: 0; outline: none; display: block; border-width: 0; border-style: none; border-color: transparent; border-image: none; text-indent: 0;"
+            />
+          </div>
         </div>
   
         <!-- Parent category dropdown -->
@@ -116,7 +157,6 @@
   <script setup lang="ts">
   import { ref, computed, watch } from 'vue';
   import BasePopup from '../ui/BasePopup.vue';
-  import TextInput from '../ui/inputs/TextInput.vue';
   import ColorPicker from '../ui/inputs/ColorPicker.vue';
   import IconPicker from '../ui/inputs/IconPicker.vue';
   import { books, categories } from '../../data/categories';
@@ -260,6 +300,8 @@
     flex-direction: column;
     gap: 16px;
     width: 100%;
+    padding: 0 16px;
+    box-sizing: border-box;
   }
   
   .form-row {
@@ -271,8 +313,6 @@
   
   .icon-color-row {
     justify-content: space-between;
-    padding-left: 16px;
-    padding-right: 16px;
   }
   
   .form-group {
@@ -300,7 +340,7 @@
     color: #404040;
     font-size: 12px;
     cursor: pointer;
-    flex: 1;
+    width: 179px;
   }
   
   .toggle-group {
@@ -310,7 +350,7 @@
     border-radius: 28px;
     padding: 6px;
     gap: 4px;
-    flex: 1;
+    max-width: 300px;
   }
   
   .toggle-button {
@@ -364,6 +404,7 @@
   
   .save-category-button {
     margin-top: 20px;
+    margin-bottom: 16px;
     padding: 9px 19px;
     background-color: #53B794;
     color: white;
