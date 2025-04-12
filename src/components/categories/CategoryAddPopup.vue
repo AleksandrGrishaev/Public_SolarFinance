@@ -1,42 +1,5 @@
-.input-wrapper {
-    width: 179px;
-  }
-  
-  /* Более специфичный селектор для перезаписи */
-  .category-form .form-row .input-wrapper .custom-input {
-    height: 36px !important;
-    width: 100% !important;
-    background-color: #949496 !important;
-    border: none !important;
-    border-radius: 14px !important;
-    padding: 8px 12px !important;
-    color: #FFFFFF !important;
-    font-size: 16px !important;
-    box-sizing: border-box !important;
-    appearance: none !important;
-    -webkit-appearance: none !important;
-    -moz-appearance: none !important;
-    box-shadow: none !important;
-    margin: 0 !important;
-    outline: none !important;
-    display: block !important;
-    border-width: 0 !important;
-    border-style: none !important;
-    border-color: transparent !important;
-    border-image: none !important;
-    text-indent: 0 !important;
-  }
-  
-  .category-form .form-row .input-wrapper .custom-input:focus {
-    outline: none !important;
-    border: none !important;
-    box-shadow: none !important;
-  }
-  
-  .category-form .form-row .input-wrapper .custom-input::placeholder {
-    color: rgba(64, 64, 64, 0.7) !important;
-  }<!-- src/components/categories/CategoryAddPopup.vue -->
-  <template>
+<!-- src/components/categories/CategoryAddPopup.vue -->
+<template>
     <BasePopup
       v-model="isVisible"
       title="New Category"
@@ -61,7 +24,7 @@
           </div>
         </div>
   
-        <!-- Name input with scoped styling-->
+        <!-- Name input -->
         <div class="form-row">
           <label>Name</label>
           <div class="input-wrapper">
@@ -77,12 +40,10 @@
         <!-- Parent category dropdown -->
         <div class="form-row">
           <label>Parent</label>
-          <div class="dropdown-select" @click="showParentSelector = true">
-            <span>{{ categoryData.parent?.name || 'Category' }}</span>
-            <svg width="7" height="6" viewBox="0 0 7 6" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M3.05569 6L-0.000210353 0L1.19234 0L3.40973 4.60249L3.33519 4.56522H3.52153L3.447 4.60249L5.66439 0L6.85693 0L3.80103 6H3.05569Z" fill="#404040"/>
-            </svg>
-          </div>
+          <ParentCategorySelector 
+            v-model="categoryData.parent"
+            :category-type="categoryData.type"
+          />
         </div>
   
         <!-- Type selection -->
@@ -94,7 +55,7 @@
               :key="option.value"
               class="toggle-button" 
               :class="{ active: categoryData.type === option.value }"
-              @click="categoryData.type = option.value"
+              @click="handleTypeChange(option.value)"
             >
               {{ option.label }}
             </button>
@@ -159,6 +120,7 @@
   import BasePopup from '../ui/BasePopup.vue';
   import ColorPicker from '../ui/inputs/ColorPicker.vue';
   import IconPicker from '../ui/inputs/IconPicker.vue';
+  import ParentCategorySelector from '../ui/inputs/ParentCategorySelector.vue';
   import { books, categories } from '../../data/categories';
   
   const props = defineProps({
@@ -206,17 +168,6 @@
   // Selected books
   const selectedBooks = ref([props.initialBookId]);
   
-  // UI states
-  const showParentSelector = ref(false);
-  
-  // Available parent categories
-  const availableParents = computed(() => {
-    return categories.filter(cat => 
-      cat.type === categoryData.value.type && 
-      !cat.parentName  // Only top-level categories can be parents
-    );
-  });
-  
   // Initialize with props
   watch(() => props.initialType, (newValue) => {
     categoryData.value.type = newValue;
@@ -240,6 +191,15 @@
   });
   
   // Methods
+  // Обработка смены типа категории
+  const handleTypeChange = (type) => {
+    // Если изменился тип, то сбрасываем родительскую категорию
+    if (categoryData.value.type !== type) {
+      categoryData.value.parent = null;
+    }
+    categoryData.value.type = type;
+  };
+  
   const toggleBook = (bookId) => {
     const index = selectedBooks.value.indexOf(bookId);
     if (index === -1) {
@@ -262,6 +222,7 @@
     const newCategory = {
       id: 'category_' + Date.now(), // Generate a unique ID
       name: categoryData.value.name,
+      parentId: categoryData.value.parent ? categoryData.value.parent.id : undefined,
       parentName: categoryData.value.parent ? categoryData.value.parent.name : undefined,
       color: categoryData.value.color,
       icon: categoryData.value.icon,
@@ -328,19 +289,43 @@
     min-width: 64px;
   }
   
-  .dropdown-select {
-    height: 32px;
-    background-color: #949496;
-    border-radius: 14px;
-    padding: 0 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    color: #404040;
-    font-size: 12px;
-    cursor: pointer;
+  .input-wrapper {
     width: 179px;
+  }
+  
+  /* Более специфичный селектор для перезаписи */
+  .category-form .form-row .input-wrapper .custom-input {
+    height: 36px !important;
+    width: 100% !important;
+    background-color: #949496 !important;
+    border: none !important;
+    border-radius: 14px !important;
+    padding: 8px 12px !important;
+    color: #FFFFFF !important;
+    font-size: 16px !important;
+    box-sizing: border-box !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    outline: none !important;
+    display: block !important;
+    border-width: 0 !important;
+    border-style: none !important;
+    border-color: transparent !important;
+    border-image: none !important;
+    text-indent: 0 !important;
+  }
+  
+  .category-form .form-row .input-wrapper .custom-input:focus {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+  
+  .category-form .form-row .input-wrapper .custom-input::placeholder {
+    color: rgba(64, 64, 64, 0.7) !important;
   }
   
   .toggle-group {

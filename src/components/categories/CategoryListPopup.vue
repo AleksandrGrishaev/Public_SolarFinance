@@ -22,10 +22,33 @@
 
       <!-- Список активных категорий -->
       <div class="category-list">
-        <div 
-          v-for="category in activeCategories" 
-          :key="category.id"
-        >
+        <!-- Сначала родительские группы с дочерними категориями -->
+        <div v-for="parentCategory in activeParentCategories" :key="parentCategory.id" class="category-group-wrapper">
+          <div class="parent-category">
+            <CategoryIcon 
+              :icon-name="parentCategory.icon" 
+              :background-color="parentCategory.color"
+              size="xsmall" 
+            />
+            <div class="parent-name">{{ parentCategory.name }}</div>
+          </div>
+          
+          <!-- Дочерние категории для данного родителя -->
+          <div class="child-categories">
+            <CategoryItem
+              v-for="category in getActiveChildCategories(parentCategory.id)"
+              :key="category.id"
+              :category="category"
+              :active="true"
+              @select="selectCategory(category)"
+              @toggle="toggleCategoryActive(category, $event)"
+              @menu="handleCategoryMenu(category)"
+            />
+          </div>
+        </div>
+        
+        <!-- Затем самостоятельные категории (без родителя и не являющиеся родителями) -->
+        <div v-for="category in activeStandaloneCategories" :key="category.id">
           <CategoryItem
             :category="category"
             :active="true"
@@ -43,10 +66,31 @@
 
       <!-- Список неактивных категорий -->
       <div v-if="showInactiveCategories" class="category-list inactive-list">
-        <div 
-          v-for="category in inactiveCategories" 
-          :key="category.id"
-        >
+        <!-- Аналогично для неактивных категорий -->
+        <div v-for="parentCategory in inactiveParentCategories" :key="parentCategory.id" class="category-group-wrapper">
+          <div class="parent-category">
+            <CategoryIcon 
+              :icon-name="parentCategory.icon" 
+              :background-color="parentCategory.color"
+              size="xsmall" 
+            />
+            <div class="parent-name">{{ parentCategory.name }}</div>
+          </div>
+          
+          <div class="child-categories">
+            <CategoryItem
+              v-for="category in getInactiveChildCategories(parentCategory.id)"
+              :key="category.id"
+              :category="category"
+              :active="false"
+              @select="selectCategory(category)"
+              @toggle="toggleCategoryActive(category, $event)"
+              @menu="handleCategoryMenu(category)"
+            />
+          </div>
+        </div>
+        
+        <div v-for="category in inactiveStandaloneCategories" :key="category.id">
           <CategoryItem
             :category="category"
             :active="false"
@@ -76,6 +120,7 @@ import { ref, computed, watch } from 'vue';
 import BasePopup from '../ui/BasePopup.vue';
 import BookSelector from '../transactions/BookSelector.vue';
 import TransactionTypeSelector from '../transactions/TransactionTypeSelector.vue';
+import CategoryIcon from './CategoryIcon.vue';
 import CategoryItem from './CategoryItem.vue';
 import CategoryFilterToggle from './CategoryFilterToggle.vue';
 import CreateCategoryButton from '../ui/CreateCategoryButton.vue';
@@ -86,6 +131,9 @@ import {
   filterTransactionTypes,
   getCategoriesForBookAndType,
   getAllCategoriesForType,
+  getSelectableCategoriesForType,
+  getParentCategoriesWithChildren,
+  hasChildCategories,
   type Category
 } from '../../data/categories';
 
@@ -119,27 +167,27 @@ const showAddCategoryPopup = ref(false);
 // Категории с флагом активности
 const categoriesWithActiveState = ref<Category[]>([]);
 
-// При открытии попапа, устанавливаем переданные значения фильтров и инициализируем категории
+// При открытии попапа, устанавливаем значения и инициализируем категории
 watch(() => props.modelValue, (newValue) => {
   if (newValue) {
     selectedBook.value = props.initialBook;
     selectedType.value = props.initialType;
     
-    // Получаем категории для текущей книги и типа транзакции
-    const bookCategories = getCategoriesForBookAndType(selectedBook.value, selectedType.value);
-    
-    // Получаем все категории для данного типа транзакции (включая те, которые еще не добавлены в книгу)
+    // Получаем ВСЕ категории для данного типа транзакции
     const allCategoriesForType = getAllCategoriesForType(selectedType.value);
     
-    // Создаем карту категорий из книги для быстрого поиска
-    const bookCategoryMap = new Map(bookCategories.map(cat => [cat.id, cat]));
+    // Получаем выбираемые категории для текущей книги
+    const selectableCategories = getCategoriesForBookAndType(selectedBook.value, selectedType.value);
+    
+    // Создаем карту выбираемых категорий для быстрого поиска
+    const selectableMap = new Map(selectableCategories.map(cat => [cat.id, cat]));
     
     // Формируем список всех категорий с флагом активности
     categoriesWithActiveState.value = allCategoriesForType.map(cat => {
-      const isInBook = bookCategoryMap.has(cat.id);
+      const isInSelectable = selectableMap.has(cat.id);
       return {
         ...cat,
-        isActive: isInBook && (bookCategoryMap.get(cat.id)?.isActive || cat.id === 'renovation')
+        isActive: isInSelectable
       };
     });
   }
@@ -157,14 +205,14 @@ watch(() => props.initialType, (newValue) => {
 // При изменении книги или типа транзакции, обновляем список категорий
 watch([selectedBook, selectedType], () => {
   if (props.modelValue) {
-    // Получаем категории для текущей книги и типа транзакции
-    const bookCategories = getCategoriesForBookAndType(selectedBook.value, selectedType.value);
-    
-    // Получаем все категории для данного типа транзакции
+    // Получаем ВСЕ категории для данного типа транзакции
     const allCategoriesForType = getAllCategoriesForType(selectedType.value);
     
-    // Создаем карту категорий из книги для быстрого поиска
-    const bookCategoryMap = new Map(bookCategories.map(cat => [cat.id, cat]));
+    // Получаем выбираемые категории для текущей книги
+    const selectableCategories = getCategoriesForBookAndType(selectedBook.value, selectedType.value);
+    
+    // Создаем карту выбираемых категорий для быстрого поиска
+    const selectableMap = new Map(selectableCategories.map(cat => [cat.id, cat]));
     
     // Сохраняем предыдущее состояние активности категорий
     const activeStateMap = new Map(
@@ -173,13 +221,13 @@ watch([selectedBook, selectedType], () => {
     
     // Формируем список всех категорий с флагом активности
     categoriesWithActiveState.value = allCategoriesForType.map(cat => {
-      const isInBook = bookCategoryMap.has(cat.id);
+      const isInSelectable = selectableMap.has(cat.id);
       const wasActive = activeStateMap.has(cat.id) ? activeStateMap.get(cat.id) : false;
       
       return {
         ...cat,
-        // Категория активна, если она в книге и была активна ранее, или это категория "Renovation"
-        isActive: isInBook && (wasActive || cat.id === 'renovation')
+        // Категория активна, если она в книге и была активна ранее
+        isActive: isInSelectable && (wasActive || cat.id === 'renovation')
       };
     });
   }
@@ -198,16 +246,98 @@ const activeCategories = computed(() => {
     .sort((a, b) => (a.order || 0) - (b.order || 0));
 });
 
-// Неактивные категории (все доступные категории, которые не активны)
+// Неактивные категории
 const inactiveCategories = computed(() => {
   return categoriesWithActiveState.value
     .filter(cat => !cat.isActive)
     .sort((a, b) => (a.order || 0) - (b.order || 0));
 });
 
+// Активные родительские категории, у которых есть дочерние элементы
+const activeParentCategories = computed(() => {
+  // Находим все уникальные родительские ID среди активных категорий
+  const parentIds = new Set();
+  activeCategories.value.forEach(cat => {
+    if (cat.parentId) {
+      parentIds.add(cat.parentId);
+    }
+  });
+  
+  // Возвращаем все родительские категории для активных дочерних категорий
+  return categoriesWithActiveState.value
+    .filter(cat => parentIds.has(cat.id))
+    .sort((a, b) => (a.order || 0) - (b.order || 0));
+});
+
+// Неактивные родительские категории с дочерними элементами
+const inactiveParentCategories = computed(() => {
+  // Находим все уникальные родительские ID среди неактивных категорий
+  const parentIds = new Set();
+  inactiveCategories.value.forEach(cat => {
+    if (cat.parentId) {
+      parentIds.add(cat.parentId);
+    }
+  });
+  
+  // Возвращаем все родительские категории для неактивных дочерних категорий
+  return categoriesWithActiveState.value
+    .filter(cat => parentIds.has(cat.id))
+    .sort((a, b) => (a.order || 0) - (b.order || 0));
+});
+
+// Активные самостоятельные категории (без родителя и не являющиеся родителями)
+const activeStandaloneCategories = computed(() => {
+  return activeCategories.value
+    .filter(cat => {
+      // Категория не должна иметь родителя
+      if (cat.parentId) return false;
+      
+      // И не должна иметь дочерних элементов
+      if (hasChildCategories(cat.id)) return false;
+      
+      return true;
+    })
+    .sort((a, b) => (a.order || 0) - (b.order || 0));
+});
+
+// Неактивные самостоятельные категории
+const inactiveStandaloneCategories = computed(() => {
+  return inactiveCategories.value
+    .filter(cat => {
+      // Категория не должна иметь родителя
+      if (cat.parentId) return false;
+      
+      // И не должна иметь дочерних элементов
+      if (hasChildCategories(cat.id)) return false;
+      
+      return true;
+    })
+    .sort((a, b) => (a.order || 0) - (b.order || 0));
+});
+
+// Получение активных дочерних категорий для конкретного родителя
+function getActiveChildCategories(parentId) {
+  return activeCategories.value
+    .filter(cat => cat.parentId === parentId)
+    .sort((a, b) => (a.order || 0) - (b.order || 0));
+}
+
+// Получение неактивных дочерних категорий для конкретного родителя
+function getInactiveChildCategories(parentId) {
+  return inactiveCategories.value
+    .filter(cat => cat.parentId === parentId)
+    .sort((a, b) => (a.order || 0) - (b.order || 0));
+}
+
 // Выбор категории
 const selectCategory = (category) => {
-  emit('select', category);
+  // Проверяем, что выбранная категория не имеет дочерних элементов
+  if (!hasChildCategories(category.id)) {
+    emit('select', category);
+  } else {
+    // Если категория имеет дочерние элементы, не позволяем её выбрать
+    console.log("Категория с дочерними элементами не может быть выбрана");
+  }
 };
 
 // Переключение активности категории
@@ -228,11 +358,6 @@ const toggleCategoryActive = (category, isActive) => {
 // Обработка меню категории
 const handleCategoryMenu = (category) => {
   emit('edit', category);
-};
-
-// Добавление новой категории
-const handleAddCategory = () => {
-  showAddCategoryPopup.value = true;
 };
 
 // Обработка сохранения новой категории
@@ -277,5 +402,33 @@ const handleSaveNewCategory = (newCategory) => {
 .inactive-list {
   margin-top: 0;
   opacity: 0.7;
+}
+
+.category-group-wrapper {
+  margin-bottom: 8px;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.parent-category {
+  display: flex;
+  align-items: center;
+  padding: 8px 10px;
+  gap: 10px;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.parent-name {
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+}
+
+.child-categories {
+  display: flex;
+  flex-direction: column;
+  padding-left: 10px;
 }
 </style>

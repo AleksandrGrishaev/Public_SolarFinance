@@ -3,7 +3,9 @@
     <div class="parent-selector-container">
       <div class="dropdown-select" @click="isOpen = !isOpen">
         <span>{{ displayValue }}</span>
-        <IconChevronDown size="14" />
+        <svg width="7" height="6" viewBox="0 0 7 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3.05569 6L-0.000210353 0L1.19234 0L3.40973 4.60249L3.33519 4.56522H3.52153L3.447 4.60249L5.66439 0L6.85693 0L3.80103 6H3.05569Z" fill="#404040"/>
+        </svg>
       </div>
       
       <div v-if="isOpen" class="dropdown-menu">
@@ -13,34 +15,35 @@
         >
           No parent
         </div>
-        <div 
-          v-for="category in availableParents" 
-          :key="category.id"
-          class="dropdown-item"
-          @click="selectParent(category)"
-        >
+  
+        <div v-for="category in availableParents" :key="category.id">
           <div 
-            class="category-color-dot" 
-            :style="{ backgroundColor: category.color }"
-          ></div>
-          <span>{{ category.name }}</span>
+            class="dropdown-item"
+            @click="selectParent(category)"
+          >
+            <div 
+              class="category-color-dot" 
+              :style="{ backgroundColor: category.color }"
+            ></div>
+            <span>{{ category.name }}</span>
+          </div>
         </div>
       </div>
     </div>
   </template>
   
   <script setup lang="ts">
-  import { ref, computed } from 'vue';
-  import { IconChevronDown } from '@tabler/icons-vue';
+  import { ref, computed, watch } from 'vue';
+  import { getParentCategoriesForType } from '../../../data/categories';
   
   const props = defineProps({
     modelValue: {
       type: Object,
       default: null
     },
-    availableParents: {
-      type: Array,
-      default: () => []
+    categoryType: {
+      type: String,
+      default: 'expense'
     }
   });
   
@@ -48,10 +51,26 @@
   
   const isOpen = ref(false);
   
+  // Получаем доступные родительские категории для текущего типа транзакции
+  const availableParents = computed(() => {
+    return getParentCategoriesForType(props.categoryType);
+  });
+  
+  // Отслеживаем изменение типа транзакции
+  watch(() => props.categoryType, () => {
+    // Если тип сменился, и выбранная родительская категория не подходит,
+    // то сбрасываем выбор
+    if (props.modelValue && props.modelValue.type !== props.categoryType) {
+      emit('update:modelValue', null);
+    }
+  });
+  
+  // Текст для отображения
   const displayValue = computed(() => {
     return props.modelValue ? props.modelValue.name : 'Category';
   });
   
+  // Выбор родительской категории
   const selectParent = (category) => {
     emit('update:modelValue', category);
     isOpen.value = false;
