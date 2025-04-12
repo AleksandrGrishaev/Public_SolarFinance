@@ -1,78 +1,98 @@
 <template>
-    <div class="book-selector">
-      <div
-        v-for="book in books"
-        :key="book.id"
-        :class="['book-option', { active: selectedBook.id === book.id }]"
-        @click="selectBook(book)"
-      >
-        <div class="book-icon">
-          <n-icon>
-            <icon-book />
-          </n-icon>
+  <div class="book-element">
+    <div class="area">
+      <div class="icon">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M16.5816 13.3335H6.58159C5.80659 13.3335 5.41909 13.3335 5.10075 13.4185C4.67684 13.5322 4.29033 13.7554 3.98007 14.0658C3.6698 14.3763 3.44672 14.7629 3.33325 15.1868" stroke="white" stroke-width="1.5"/>
+          <path d="M6.66658 5.83341H13.3333M6.66658 8.75008H10.8333M8.33325 18.3334C5.97658 18.3334 4.79742 18.3334 4.06575 17.6009C3.33325 16.8692 3.33325 15.6901 3.33325 13.3334V6.66675C3.33325 4.31008 3.33325 3.13091 4.06575 2.39925C4.79742 1.66675 5.97658 1.66675 8.33325 1.66675H11.6666C14.0233 1.66675 15.2024 1.66675 15.9341 2.39925C16.6666 3.13091 16.6666 4.31008 16.6666 6.66675M11.6666 18.3334C14.0233 18.3334 15.2024 18.3334 15.9341 17.6009C16.6666 16.8692 16.6666 15.6901 16.6666 13.3334V10.0001" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="books-selector">
+        <div
+          v-for="book in books"
+          :key="book.id"
+          class="book-item"
+          :class="{ 'selected': modelValue === book.id }"
+          @click="$emit('update:modelValue', book.id)"
+        >
+          {{ book.name }}
         </div>
-        <div class="book-name">{{ book.name }}</div>
       </div>
     </div>
-  </template>
-  
-  <script setup lang="ts">
-  import { ref } from 'vue'
-  import { NIcon } from 'naive-ui'
-  import { IconBook } from '@tabler/icons-vue'
-  
-  const props = defineProps({
-    selectedBook: {
-      type: Object,
-      required: true
-    }
-  })
-  
-  const emit = defineEmits(['select-book'])
-  
-  const books = ref([
-    { id: 'my', name: 'My', type: 'Personal' },
-    { id: 'family', name: 'Family', type: 'Family' },
-    { id: 'wife', name: 'Wife', type: 'Personal' }
-  ])
-  
-  const selectBook = (book) => {
-    emit('select-book', book)
+  </div>
+</template>
+
+<script setup lang="ts">
+defineProps({
+  books: {
+    type: Array as () => Array<{ id: string, name: string }>,
+    required: true
+  },
+  modelValue: {
+    type: String,
+    required: true
   }
-  </script>
+});
+
+defineEmits(['update:modelValue']);
+</script>
+
+<style scoped>
+.book-element {
+  display: inline-block;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+.area {
+  padding: 6px 10px 6px 13px;
+  background: #46484A;
+  border-radius: 28px;
+  display: inline-flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 6px;
+}
+
+.icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.books-selector {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 2px;
+}
+
+.book-item {
+  height: 28px;
+  padding: 0 16px;
+  background: #46484A;
+  border-radius: 34px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  overflow: hidden;
+  cursor: pointer;
   
-  <style scoped>
-  .book-selector {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 16px;
-    padding: 4px;
-    background-color: #333;
-    border-radius: 24px;
-  }
-  
-  .book-option {
-    display: flex;
-    align-items: center;
-    padding: 8px 16px;
-    border-radius: 20px;
-    margin: 0 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-  
-  .book-option.active {
-    background-color: #444;
-    font-weight: 500;
-  }
-  
-  .book-icon {
-    margin-right: 6px;
-    display: flex;
-    align-items: center;
-  }
-  
-  .book-name {
-    font-size: 14px;
-  }
-  </style>
+  /* Текстовые стили */
+  color: white;
+  font-size: 12px;
+  font-family: Inter, sans-serif;
+  font-weight: 400;
+  line-height: 16px;
+  word-wrap: break-word;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.book-item.selected {
+  background: black;
+}
+</style>

@@ -1,127 +1,150 @@
+<!-- /Users/peaker/dev/solar-finance/src/components/transactions/AccountSelector.vue -->
 <template>
-    <div class="account-selector" @click="showDropdown = !showDropdown">
-      <div class="selected-account">
-        <div class="account-icon" :style="{ backgroundColor: getAccountColor(selectedAccount.id) }">
-          {{ selectedAccount.code.charAt(0) }}
+  <div class="account-element">
+    <div class="single-account">
+      <div class="account-icon" :style="{ backgroundColor: selectedAccount.color }">
+        {{ selectedAccount.symbol }}
+      </div>
+      <div class="account-name">
+        {{ selectedAccount.name }}
+      </div>
+      <div class="choose-button" @click="toggleAccountSelection">
+        <svg width="9" height="6" viewBox="0 0 9 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3.9047 6.11346L3.97424 6.25H4.12747H4.87281H5.02604L5.09558 6.11346L8.15148 0.113461L8.3366 -0.25L7.92871 -0.25L6.73616 -0.25L6.57911 -0.25L6.51094 -0.108509L4.50014 4.06517L2.48934 -0.108509L2.42117 -0.25L2.26411 -0.25L1.07157 -0.25L0.66368 -0.25L0.848797 0.113461L3.9047 6.11346Z" fill="#949496" stroke="#949496" stroke-width="0.5"/>
+        </svg>
+      </div>
+    </div>
+    
+    <div v-if="showAccountSelection" class="account-selection">
+      <div 
+        v-for="account in accounts" 
+        :key="account.id"
+        class="account-option"
+        @click="selectAccount(account.id)"
+      >
+        <div class="account-icon" :style="{ backgroundColor: account.color }">
+          {{ account.symbol }}
         </div>
-        <div class="account-name">{{ selectedAccount.name }}</div>
-        <div class="dropdown-icon">
-          <n-icon>
-            <icon-chevron-down />
-          </n-icon>
+        <div class="account-name">
+          {{ account.name }}
         </div>
       </div>
-      
-      <n-dropdown
-        v-model:show="showDropdown"
-        :options="dropdownOptions"
-        @select="handleAccountSelect"
-        trigger="manual"
-        placement="bottom-start"
-      >
-        <div ref="dropdownTrigger" style="width: 0; height: 0;"></div>
-      </n-dropdown>
     </div>
-  </template>
-  
-  <script setup lang="ts">
-  import { ref, computed, h } from 'vue'
-  import { IconChevronDown } from '@tabler/icons-vue'
-  import { NIcon, NDropdown } from 'naive-ui'
-  
-  const props = defineProps({
-    selectedAccount: {
-      type: Object,
-      required: true
-    }
-  })
-  
-  const emit = defineEmits(['select-account'])
-  
-  const accounts = ref([
-    { id: 'dollar', name: 'Dollar', symbol: '$', code: 'USD' },
-    { id: 'euro', name: 'Euro', symbol: '€', code: 'EUR' },
-    { id: 'ruble', name: 'Ruble', symbol: '₽', code: 'RUB' }
-  ])
-  
-  const showDropdown = ref(false)
-  const dropdownTrigger = ref(null)
-  
-  // Формируем опции для выпадающего списка
-  const dropdownOptions = computed(() => {
-    return accounts.value.map(account => ({
-      label: account.name,
-      key: account.id,
-      icon: () => h('div', { 
-        style: { 
-          backgroundColor: getAccountColor(account.id),
-          width: '24px',
-          height: '24px',
-          borderRadius: '50%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'white',
-          marginRight: '8px'
-        } 
-      }, account.code.charAt(0))
-    }))
-  })
-  
-  const handleAccountSelect = (key) => {
-    const account = accounts.value.find(c => c.id === key)
-    if (account) {
-      emit('select-account', account)
-    }
-    showDropdown.value = false
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+
+const props = defineProps({
+  accounts: {
+    type: Array,
+    required: true
+  },
+  modelValue: {
+    type: String,
+    required: true
   }
-  
-  // Цвета для иконок счетов
-  const getAccountColor = (accountId) => {
-    const colors = {
-      dollar: '#F9A825', // Золотистый для доллара
-      euro: '#1565C0', // Синий для евро
-      ruble: '#4CAF50'  // Зеленый для рубля
-    }
-    return colors[accountId] || '#9E9E9E'
-  }
-  </script>
-  
-  <style scoped>
-  .account-selector {
+});
+
+const emit = defineEmits(['update:modelValue']);
+
+const showAccountSelection = ref(false);
+
+const selectedAccount = computed(() => {
+  return props.accounts.find(account => account.id === props.modelValue) || props.accounts[0];
+});
+
+const toggleAccountSelection = () => {
+  showAccountSelection.value = !showAccountSelection.value;
+};
+
+const selectAccount = (accountId) => {
+  emit('update:modelValue', accountId);
+  showAccountSelection.value = false;
+};
+</script>
+
+<style scoped>
+.account-element {
+  width: 100%;
     display: flex;
-    justify-content: center;
-    margin: 16px 0;
-  }
-  
-  .selected-account {
-    display: flex;
-    align-items: center;
-    background-color: #333;
-    padding: 8px 16px;
-    border-radius: 20px;
-    cursor: pointer;
-  }
-  
-  .account-icon {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 8px;
-    font-weight: 600;
-    font-size: 14px;
-  }
-  
-  .account-name {
-    font-size: 16px;
-    margin-right: 8px;
-  }
-  
-  .dropdown-icon {
-    display: flex;
-    align-items: center;
-  }
-  </style>
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.single-account {
+  width: auto;
+  min-width: 100px;
+  max-width: 200px;
+  padding: 6px 14px;
+  background: #46484A;
+  border-radius: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.account-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.account-name {
+  flex: 1;
+  height: 28px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+}
+
+.choose-button {
+  padding: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.account-selection {
+  position: absolute;
+  top: 100%;
+  left: 21px;
+  right: 21px;
+  background: #2A2A2A;
+  border-radius: 16px;
+  padding: 8px;
+  margin-top: 8px;
+  z-index: 10;
+}
+
+.account-option {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.account-option .account-name {
+  justify-content: flex-start;
+}
+
+.account-option:hover {
+  background: #3A3A3A;
+}
+</style>

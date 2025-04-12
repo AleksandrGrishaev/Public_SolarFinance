@@ -1,9 +1,9 @@
+// src/router/index.ts
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-
 // Layouts
 import EmptyLayout from '@/layouts/EmptyLayout.vue'
-import ConsoleLayout from '@/layouts/ConsoleLayout.vue'
+import IosLayout from '@/layouts/IosLayout.vue'
 
 // Define route meta types
 declare module 'vue-router' {
@@ -32,44 +32,18 @@ const routes: Array<RouteRecordRaw> = [
       title: 'Login'
     }
   },
-  // Transaction route - добавляем прямой маршрут для транзакций
+  // Transaction route - используем IosLayout для транзакций
   {
     path: '/transaction',
-    name: 'transaction',
-    component: () => import('@/views/TransactionView.vue'),
-    meta: {
-      requiresAuth: true,
-      title: 'Add Transaction'
-    }
-  },
-  // Dashboard route
-  {
-    path: '/dashboard',
-    component: ConsoleLayout,
+    component: IosLayout,
     children: [
       {
         path: '',
-        name: 'dashboard',
-        component: () => import('@/views/DashboardView.vue'),
+        name: 'transaction',
+        component: () => import('@/views/TransactionView.vue'),
         meta: {
           requiresAuth: true,
-          title: 'Dashboard'
-        }
-      }
-    ]
-  },
-  // Accounts route
-  {
-    path: '/accounts',
-    component: ConsoleLayout,
-    children: [
-      {
-        path: '',
-        name: 'accounts',
-        component: () => import('@/views/AccountsView.vue'),
-        meta: {
-          requiresAuth: true,
-          title: 'Accounts'
+          title: 'Add Transaction'
         }
       }
     ]
