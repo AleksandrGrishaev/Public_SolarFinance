@@ -1,4 +1,4 @@
-<!-- src/components/transactions/CategorySelector.vue -->
+<!-- src/components/categories/CategorySelector.vue -->
 <template>
   <BasePopup 
     v-model="isVisible" 
@@ -7,10 +7,11 @@
     @rightIconClick="handleEditClick"
   >
     <div class="category-container">
+      <!-- First row of categories (up to 5 categories) -->
       <div class="category-line">
-        <template v-for="(category, index) in displayedCategories" :key="category.id">
+        <template v-for="(category, index) in activeCategories" :key="category.id">
           <div 
-            v-if="index < Math.min(displayedCategories.length, 5)"
+            v-if="index < 5"
             class="category-item"
             @click="selectCategory(category)"
           >
@@ -23,10 +24,11 @@
         </template>
       </div>
 
+      <!-- Second row of categories (5-8) plus add button -->
       <div class="category-line">
-        <template v-for="(category, index) in displayedCategories" :key="category.id">
+        <template v-for="(category, index) in activeCategories" :key="category.id">
           <div 
-            v-if="index >= 5 && index < Math.min(displayedCategories.length, 9)"
+            v-if="index >= 5 && index < 9"
             class="category-item"
             @click="selectCategory(category)"
           >
@@ -62,25 +64,28 @@ const props = defineProps({
   categories: {
     type: Array,
     default: () => []
+  },
+  bookId: {
+    type: String,
+    default: 'my'
+  },
+  transactionType: {
+    type: String,
+    default: 'expense'
   }
 });
 
 const emit = defineEmits(['update:modelValue', 'select', 'add', 'edit']);
 
-// If no categories are provided, use these mockup categories
-const defaultCategories = [
-  { id: 'renovation', name: 'Renovation', color: '#F5C54C', icon: 'IconTool' },
-  { id: 'food', name: 'Food', color: '#A2C94F', icon: 'IconBread' },
-  { id: 'transport', name: 'Transport', color: '#70B1E0', icon: 'IconCar' },
-  { id: 'entertainment', name: 'Entertainment', color: '#E882A3', icon: 'IconDeviceTv' },
-  { id: 'utilities', name: 'Utilities', color: '#8F7ED8', icon: 'IconHome' },
-  { id: 'health', name: 'Health', color: '#D85A5A', icon: 'IconHeartbeat' },
-  { id: 'education', name: 'Education', color: '#5AD8B9', icon: 'IconBook' },
-  { id: 'shopping', name: 'Shopping', color: '#D8A55A', icon: 'IconShoppingCart' },
-];
-
-const displayedCategories = computed(() => {
-  return props.categories.length > 0 ? props.categories : defaultCategories;
+// Используем только активные категории для текущей книги и типа транзакции
+const activeCategories = computed(() => {
+  if (props.categories && props.categories.length) {
+    // Filter categories that are active and match the current book and transaction type
+    return props.categories
+      .filter(category => category.isActive)
+      .sort((a, b) => (a.order || 0) - (b.order || 0));
+  }
+  return [];
 });
 
 const isVisible = computed({
@@ -178,5 +183,12 @@ const handleEditClick = () => {
   width: 24px;
   height: 24px;
   color: #949496;
+}
+
+/* Empty state message when no categories are available */
+.empty-state {
+  text-align: center;
+  color: #949496;
+  padding: 20px;
 }
 </style>

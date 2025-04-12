@@ -10,67 +10,75 @@
       <!-- Фильтры -->
       <div class="filters">
         <book-selector 
-          :books="availableBooks" 
+          :books="books" 
           v-model="selectedBook"
         />
         
         <transaction-type-selector 
-          :types="transactionTypes" 
+          :types="filterTransactionTypes" 
           v-model="selectedType" 
         />
       </div>
 
-      <!-- Список категорий -->
+      <!-- Список активных категорий -->
       <div class="category-list">
-        <draggable 
-          v-model="sortedCategories" 
-          item-key="id"
-          handle=".category-drag-handle"
-          @end="saveOrder"
-          :animation="200"
+        <div 
+          v-for="category in activeCategories" 
+          :key="category.id"
         >
-          <template #item="{element: category}">
-            <div class="category-item" @click="selectCategory(category)">
-              <div class="category-info">
-                <CategoryIcon 
-                  :iconName="category.icon" 
-                  :backgroundColor="category.color"
-                  size="xsmall" 
-                />
-                
-                <div class="category-text">
-                  <div v-if="category.parentName" class="category-parent-name">{{ category.parentName }}</div>
-                  <div class="category-name">{{ category.name }}</div>
-                </div>
-              </div>
-              
-              <div class="category-drag-handle">
-                <IconMenu2 class="handle-icon" />
-              </div>
-            </div>
-          </template>
-        </draggable>
+          <CategoryItem
+            :category="category"
+            :active="true"
+            @select="selectCategory(category)"
+            @toggle="toggleCategoryActive(category, $event)"
+            @menu="handleCategoryMenu(category)"
+          />
+        </div>
+      </div>
+
+      <!-- Переключатель для неактивных категорий -->
+      <CategoryFilterToggle
+        v-model="showInactiveCategories"
+      />
+
+      <!-- Список неактивных категорий -->
+      <div v-if="showInactiveCategories" class="category-list inactive-list">
+        <div 
+          v-for="category in inactiveCategories" 
+          :key="category.id"
+        >
+          <CategoryItem
+            :category="category"
+            :active="false"
+            @select="selectCategory(category)"
+            @toggle="toggleCategoryActive(category, $event)"
+            @menu="handleCategoryMenu(category)"
+          />
+        </div>
       </div>
 
       <!-- Кнопка создания новой категории -->
-      <div class="create-button-container">
-        <button class="create-button" @click="handleAddCategory">
-          <IconPlus class="create-icon" />
-          <span>Create category</span>
-        </button>
-      </div>
+      <CreateCategoryButton @click="handleAddCategory" />
     </div>
   </BasePopup>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch} from 'vue';
-import { VueDraggableNext as draggable } from 'vue-draggable-next';
+import { ref, computed, watch } from 'vue';
 import BasePopup from '../ui/BasePopup.vue';
 import BookSelector from '../transactions/BookSelector.vue';
 import TransactionTypeSelector from '../transactions/TransactionTypeSelector.vue';
-import CategoryIcon from '../categories/CategoryIcon.vue';
-import { IconPlus, IconMenu2 } from '@tabler/icons-vue';
+import CategoryItem from './CategoryItem.vue';
+import CategoryFilterToggle from './CategoryFilterToggle.vue';
+import CreateCategoryButton from '../ui/CreateCategoryButton.vue';
+import { IconPlus } from '@tabler/icons-vue';
+import { 
+  books,
+  filterTransactionTypes,
+  getCategoriesForBookAndType,
+  getAllCategoriesForType,
+  type Category
+} from '../../data/categories';
 
 const props = defineProps({
   modelValue: {
@@ -91,17 +99,39 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['update:modelValue', 'select', 'add', 'edit', 'reorder']);
+const emit = defineEmits(['update:modelValue', 'select', 'add', 'edit', 'reorder', 'toggleActive']);
 
 // Состояние
 const selectedBook = ref(props.initialBook);
 const selectedType = ref(props.initialType);
+const showInactiveCategories = ref(false);
 
-// При открытии попапа, устанавливаем переданные значения фильтров
+// Категории с флагом активности
+const categoriesWithActiveState = ref<Category[]>([]);
+
+// При открытии попапа, устанавливаем переданные значения фильтров и инициализируем категории
 watch(() => props.modelValue, (newValue) => {
   if (newValue) {
     selectedBook.value = props.initialBook;
     selectedType.value = props.initialType;
+    
+    // Получаем категории для текущей книги и типа транзакции
+    const bookCategories = getCategoriesForBookAndType(selectedBook.value, selectedType.value);
+    
+    // Получаем все категории для данного типа транзакции (включая те, которые еще не добавлены в книгу)
+    const allCategoriesForType = getAllCategoriesForType(selectedType.value);
+    
+    // Создаем карту категорий из книги для быстрого поиска
+    const bookCategoryMap = new Map(bookCategories.map(cat => [cat.id, cat]));
+    
+    // Формируем список всех категорий с флагом активности
+    categoriesWithActiveState.value = allCategoriesForType.map(cat => {
+      const isInBook = bookCategoryMap.has(cat.id);
+      return {
+        ...cat,
+        isActive: isInBook && (bookCategoryMap.get(cat.id)?.isActive || cat.id === 'renovation')
+      };
+    });
   }
 });
 
@@ -114,78 +144,36 @@ watch(() => props.initialType, (newValue) => {
   selectedType.value = newValue;
 });
 
-// Mock данные
-const availableBooks = [
-  { id: 'my', name: 'My' },
-  { id: 'family', name: 'Family' },
-  { id: 'wife', name: 'Wife' }
-];
-
-const transactionTypes = [
-  { id: 'expense', name: 'Expense' },
-  { id: 'income', name: 'Income' }
-];
-
-// Если нет категорий, используем эти
-const defaultCategories = [
-  { 
-    id: 'renovation', 
-    name: 'Renovation', 
-    parentName: 'House',
-    color: '#F8D76E', 
-    icon: 'IconTool',
-    type: 'expense',
-    bookId: 'my',
-    order: 0
-  },
-  { 
-    id: 'category1', 
-    name: 'Name Category', 
-    color: 'white', 
-    icon: '',
-    type: 'expense',
-    bookId: 'my',
-    order: 1
-  },
-  { 
-    id: 'category2', 
-    name: 'Name Category', 
-    color: 'white', 
-    icon: '',
-    type: 'expense',
-    bookId: 'family',
-    order: 0
-  },
-  { 
-    id: 'category3', 
-    name: 'Name Category', 
-    parentName: 'Parent name',
-    color: 'white', 
-    icon: '',
-    type: 'expense',
-    bookId: 'family',
-    order: 1
-  },
-  { 
-    id: 'category4', 
-    name: 'Name Category', 
-    parentName: 'Parent name',
-    color: 'white', 
-    icon: '',
-    type: 'income',
-    bookId: 'my',
-    order: 0
-  },
-  { 
-    id: 'category5', 
-    name: 'Name Category', 
-    color: 'white', 
-    icon: '',
-    type: 'income',
-    bookId: 'family',
-    order: 0
-  },
-];
+// При изменении книги или типа транзакции, обновляем список категорий
+watch([selectedBook, selectedType], () => {
+  if (props.modelValue) {
+    // Получаем категории для текущей книги и типа транзакции
+    const bookCategories = getCategoriesForBookAndType(selectedBook.value, selectedType.value);
+    
+    // Получаем все категории для данного типа транзакции
+    const allCategoriesForType = getAllCategoriesForType(selectedType.value);
+    
+    // Создаем карту категорий из книги для быстрого поиска
+    const bookCategoryMap = new Map(bookCategories.map(cat => [cat.id, cat]));
+    
+    // Сохраняем предыдущее состояние активности категорий
+    const activeStateMap = new Map(
+      categoriesWithActiveState.value.map(cat => [cat.id, cat.isActive])
+    );
+    
+    // Формируем список всех категорий с флагом активности
+    categoriesWithActiveState.value = allCategoriesForType.map(cat => {
+      const isInBook = bookCategoryMap.has(cat.id);
+      const wasActive = activeStateMap.has(cat.id) ? activeStateMap.get(cat.id) : false;
+      
+      return {
+        ...cat,
+        // Категория активна, если она в книге и была активна ранее, или это категория "Renovation"
+        isActive: isInBook && (wasActive || cat.id === 'renovation')
+      };
+    });
+  }
+});
 
 // Отслеживаем видимость попапа
 const isVisible = computed({
@@ -193,28 +181,18 @@ const isVisible = computed({
   set: (value) => emit('update:modelValue', value)
 });
 
-// Фильтруем категории по выбранным книге и типу
-const filteredCategories = computed(() => {
-  const allCategories = props.categories.length > 0 ? props.categories : defaultCategories;
-  
-  return allCategories.filter(category => 
-    category.bookId === selectedBook.value && 
-    category.type === selectedType.value
-  );
+// Активные категории (те, которые отмечены как активные)
+const activeCategories = computed(() => {
+  return categoriesWithActiveState.value
+    .filter(cat => cat.isActive)
+    .sort((a, b) => (a.order || 0) - (b.order || 0));
 });
 
-// Сортированные категории для drag & drop
-const sortedCategories = computed({
-  get: () => {
-    const filtered = [...filteredCategories.value];
-    return filtered.sort((a, b) => (a.order || 0) - (b.order || 0));
-  },
-  set: (value) => {
-    // Обновляем порядок при перетаскивании
-    value.forEach((category, index) => {
-      category.order = index;
-    });
-  }
+// Неактивные категории (все доступные категории, которые не активны)
+const inactiveCategories = computed(() => {
+  return categoriesWithActiveState.value
+    .filter(cat => !cat.isActive)
+    .sort((a, b) => (a.order || 0) - (b.order || 0));
 });
 
 // Выбор категории
@@ -222,9 +200,24 @@ const selectCategory = (category) => {
   emit('select', category);
 };
 
-// Сохранение порядка после перетаскивания
-const saveOrder = () => {
-  emit('reorder', sortedCategories.value);
+// Переключение активности категории
+const toggleCategoryActive = (category, isActive) => {
+  const index = categoriesWithActiveState.value.findIndex(c => c.id === category.id);
+  if (index !== -1) {
+    categoriesWithActiveState.value[index].isActive = isActive;
+    
+    // Отправляем событие об изменении активности категории
+    emit('toggleActive', {
+      category,
+      isActive,
+      bookId: selectedBook.value
+    });
+  }
+};
+
+// Обработка меню категории
+const handleCategoryMenu = (category) => {
+  emit('edit', category);
 };
 
 // Добавление новой категории
@@ -257,88 +250,10 @@ const handleAddCategory = () => {
   flex-direction: column;
   gap: 8px;
   width: 100%;
-  margin-top: 13px;
-  margin-bottom: 32px;
 }
 
-.category-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 2px 10px;
-  height: 38px;
-  width: 100%;
-  box-sizing: border-box;
-  cursor: pointer;
-}
-
-.category-info {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 232px;
-}
-
-.category-text {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 2px 0;
-}
-
-.category-parent-name {
-  color: white;
-  font-size: 10px;
-  font-weight: 400;
-  line-height: 12px;
-}
-
-.category-name {
-  color: white;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 20px;
-}
-
-.category-drag-handle {
-  width: 24px;
-  height: 24px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: move;
-}
-
-.handle-icon {
-  color: white;
-  width: 20px;
-  height: 20px;
-}
-
-.create-button-container {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
-}
-
-.create-button {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 19px;
-  border-radius: 34px;
-  border: 1px solid white;
-  background: transparent;
-  color: white;
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 24px;
-  cursor: pointer;
-}
-
-.create-icon {
-  width: 10px;
-  height: 10px;
-  color: white;
+.inactive-list {
+  margin-top: 0;
+  opacity: 0.7;
 }
 </style>

@@ -10,7 +10,7 @@
       <div class="filter-group">
         <!-- Селектор книги всегда на экране, но может быть невидимым -->
         <book-selector 
-          :books="availableBooks" 
+          :books="books" 
           v-model="selectedBook"
           :class="{ 'invisible': selectedType === 'transfer' }"
         />
@@ -21,7 +21,7 @@
         />
         
         <account-selector 
-          :accounts="availableAccounts" 
+          :accounts="accounts" 
           v-model="selectedAccount"
           :is-transfer="selectedType === 'transfer'"
           :destination-account-id="destinationAccount"
@@ -46,10 +46,12 @@
       </div>
     </div>
 
-    <!-- Selector popup -->
-    <category-selector
+   <!-- Selector popup -->
+   <category-selector
       v-model="showCategorySelector"
-      :categories="availableCategories"
+      :categories="filteredCategories"
+      :bookId="selectedBook"
+      :transactionType="selectedType"
       @select="handleCategorySelect"
       @add="handleAddCategory"
       @edit="handleOpenCategoryList"
@@ -58,18 +60,18 @@
     <!-- List/Edit popup -->
     <category-list-popup
       v-model="showCategoryList"
-      :categories="availableCategories"
       :initialBook="selectedBook"
       :initialType="selectedType === 'transfer' ? 'expense' : selectedType"
       @select="handleCategoryListSelect"
       @add="handleAddCategoryFromList"
       @reorder="handleCategoriesReordered"
+      @toggleActive="handleToggleActiveCategory"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import BookSelector from '../components/transactions/BookSelector.vue';
 import TransactionTypeSelector from '../components/transactions/TransactionTypeSelector.vue';
 import AccountSelector from '../components/transactions/AccountSelector.vue';
@@ -77,7 +79,13 @@ import PercentageSlider from '../components/transactions/PercentageSlider.vue';
 import NumberKeypad from '../components/transactions/NumberKeypad.vue';
 import CategorySelector from '../components/categories/CategorySelector.vue';
 import CategoryListPopup from '../components/categories/CategoryListPopup.vue';
-import CategoryIcon from '../components/categories/CategoryIcon.vue';
+import {
+  books,
+  transactionTypes,
+  accounts,
+  owners,
+  getCategoriesForBookAndType
+} from '../data/categories';
 
 const emit = defineEmits(['update:showMenu']);
 
@@ -97,106 +105,28 @@ const showCategorySelector = ref(false);
 const showCategoryList = ref(false);
 const selectedCategory = ref(null);
 
-// Mock data
-const availableBooks = [
-  { id: 'my', name: 'My' },
-  { id: 'family', name: 'Family' },
-  { id: 'wife', name: 'Wife' }
-];
-
-const transactionTypes = [
-  { id: 'expense', name: 'Expense' },
-  { id: 'income', name: 'Income' },
-  { id: 'transfer', name: 'Transfer' }
-];
-
-const availableAccounts = [
-  { id: 'dollar', name: 'Dollar', currency: 'USD', color: '#BE9A40', symbol: 'D' },
-  { id: 'bank2', name: 'Bank 2', currency: 'USD', color: '#B46B66', symbol: 'B' }
-];
-
-const owners = [
-  { id: 'alex', name: 'Alex' },
-  { id: 'wife', name: 'Wife' }
-];
-
-const availableCategories = [
-  { 
-    id: 'renovation', 
-    name: 'Renovation', 
-    parentName: 'House',
-    color: '#F5C54C', 
-    icon: 'IconTool',
-    type: 'expense',
-    bookId: 'my'
-  },
-  { 
-    id: 'food', 
-    name: 'Food', 
-    color: '#A2C94F', 
-    icon: 'IconBread',
-    type: 'expense',
-    bookId: 'my'
-  },
-  { 
-    id: 'transport', 
-    name: 'Transport', 
-    color: '#70B1E0', 
-    icon: 'IconCar',
-    type: 'expense',
-    bookId: 'family'
-  },
-  { 
-    id: 'entertainment', 
-    name: 'Entertainment', 
-    color: '#E882A3', 
-    icon: 'IconDeviceTv',
-    type: 'expense',
-    bookId: 'family'
-  },
-  { 
-    id: 'utilities', 
-    name: 'Utilities', 
-    color: '#8F7ED8', 
-    icon: 'IconHome',
-    type: 'expense',
-    bookId: 'wife'
-  },
-  { 
-    id: 'health', 
-    name: 'Health', 
-    color: '#D85A5A', 
-    icon: 'IconHeartbeat',
-    type: 'income',
-    bookId: 'my'
-  },
-  { 
-    id: 'education', 
-    name: 'Education', 
-    color: '#5AD8B9', 
-    icon: 'IconBook',
-    type: 'income',
-    bookId: 'family'
-  },
-  { 
-    id: 'shopping', 
-    name: 'Shopping', 
-    color: '#D8A55A', 
-    icon: 'IconShoppingCart',
-    type: 'income',
-    bookId: 'wife'
-  },
-];
+// Вычисляемые категории для текущей книги и типа транзакции
+const filteredCategories = computed(() => {
+  if (selectedType.value === 'transfer') {
+    return [];
+  }
+  return getCategoriesForBookAndType(selectedBook.value, selectedType.value);
+});
 
 // Устанавливаем наблюдение за изменением типа транзакции
 watch(selectedType, (newType) => {
   // Если тип изменился на "transfer", убедимся что оба счета различны
-  if (newType === 'transfer' && selectedAccount.value === destinationAccount.value && availableAccounts.length > 1) {
+  if (newType === 'transfer' && selectedAccount.value === destinationAccount.value && accounts.length > 1) {
     // Устанавливаем другой счет в качестве получателя
-    const otherAccount = availableAccounts.find(acc => acc.id !== selectedAccount.value);
+    const otherAccount = accounts.find(acc => acc.id !== selectedAccount.value);
     if (otherAccount) {
       destinationAccount.value = otherAccount.id;
     }
+  }
+  
+  // Сбрасываем выбранную категорию, если тип изменился
+  if (newType !== 'transfer' && selectedCategory.value && selectedCategory.value.type !== newType) {
+    selectedCategory.value = null;
   }
 });
 
@@ -293,6 +223,12 @@ const handleCategoriesReordered = (reorderedCategories) => {
   
   // В реальном приложении это могло бы выглядеть так:
   // store.dispatch('categories/updateOrder', reorderedCategories);
+};
+
+const handleToggleActiveCategory = ({ category, isActive, bookId }) => {
+  console.log(`Category ${category.name} is now ${isActive ? 'active' : 'inactive'} in book ${bookId}`);
+  // Здесь обновляем состояние активности категории в хранилище
+  // store.dispatch('categories/toggleActive', { categoryId: category.id, isActive, bookId });
 };
 </script>
 
