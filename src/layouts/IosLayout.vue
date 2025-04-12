@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import NavMenu from '../components/navigation/NavMenu.vue';
 
 const props = defineProps({
@@ -31,8 +31,6 @@ const updateShowMenu = (value: boolean) => {
 };
 
 // Вычисляемое свойство, учитывающее как пропсы, так и локальное состояние
-import { computed } from 'vue';
-
 const showNavMenu = computed(() => {
   return props.showNavMenu && localShowNavMenu.value;
 });
@@ -52,8 +50,8 @@ const showNavMenu = computed(() => {
 
 .ios-content {
   flex: 1;
-  overflow-y: auto;
-  padding: 0;
+  position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
@@ -64,10 +62,13 @@ const showNavMenu = computed(() => {
 }
 
 .menu-container {
-  position: relative;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   justify-content: center;
-  margin-bottom: 20px;
   padding-bottom: 20px; /* Отступ в 20px от низа экрана */
+  z-index: 100;
 }
 </style>
