@@ -7,54 +7,86 @@
     @rightIconClick="handleEditClick"
   >
     <div class="category-container">
-      <!-- First row of categories (up to 5 categories) -->
-      <div class="category-line">
-        <template v-for="(category, index) in activeCategories" :key="category.id">
-          <div 
-            v-if="index < 5"
-            class="category-item"
-            @click="selectCategory(category)"
-          >
-            <CategoryIcon 
-              :iconName="category.icon" 
-              :backgroundColor="category.color" 
-            />
-            <div class="category-name">{{ truncateName(category.name) }}</div>
-          </div>
-        </template>
+      <div class="debug-info" v-if="debugMode">
+        <div>Total categories: {{ props.categories.length }}</div>
+        <div>Selectable: {{ selectableCategories.length }}</div>
+        <div>With Parents: {{ categoriesWithParent.length }}</div>
+        <div>Standalone: {{ standaloneCategories.length }}</div>
       </div>
-
-      <!-- Second row of categories (5-8) plus add button -->
-      <div class="category-line">
-        <template v-for="(category, index) in activeCategories" :key="category.id">
-          <div 
-            v-if="index >= 5 && index < 9"
-            class="category-item"
-            @click="selectCategory(category)"
-          >
-            <CategoryIcon 
-              :iconName="category.icon" 
-              :backgroundColor="category.color" 
-            />
-            <div class="category-name">{{ truncateName(category.name) }}</div>
-          </div>
-        </template>
-        
-        <div class="category-item" @click="handleAddCategory">
-          <div class="add-icon-container">
-            <IconPlus class="add-icon" />
+      
+      <!-- Группы категорий с родителями -->
+      <template v-for="(parentId, index) in uniqueParentIds" :key="index">
+        <div class="category-group" v-if="getParentCategory(parentId) && getCategoriesByParentId(parentId).length > 0">
+          <div class="parent-label">{{ getParentCategory(parentId).name }}</div>
+          
+          <div class="category-line">
+            <div 
+              v-for="category in getCategoriesByParentId(parentId)"
+              :key="category.id"
+              class="category-item"
+              @click="selectCategory(category)"
+            >
+              <CategoryIcon 
+                :icon-name="category.icon" 
+                :background-color="category.color" 
+                size="small"
+              />
+              <div class="category-name">{{ truncateName(category.name) }}</div>
+            </div>
           </div>
         </div>
+      </template>
+
+      <!-- Категории без родителя -->
+      <div v-if="standaloneCategories.length > 0" class="category-group">
+        <div class="parent-label" v-if="categoriesWithParent.length > 0">Other</div>
+        
+        <div class="category-line">
+          <div 
+            v-for="category in standaloneCategories"
+            :key="category.id"
+            class="category-item"
+            @click="selectCategory(category)"
+          >
+            <CategoryIcon 
+              :icon-name="category.icon" 
+              :background-color="category.color" 
+              size="small"
+            />
+            <div class="category-name">{{ truncateName(category.name) }}</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Кнопка добавления категории (всегда отображается) -->
+      <div class="category-group">
+        <div class="category-line">
+          <div class="category-item" @click="handleAddCategory">
+            <div class="add-icon-container">
+              <IconPlus class="add-icon" />
+            </div>
+            <div class="category-name">Add</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Пустое состояние - показываем, только если нет категорий -->
+      <div v-if="selectableCategories.length === 0" class="empty-state">
+        <div>No categories available</div>
+        <div>Create a new category to get started</div>
       </div>
     </div>
   </BasePopup>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import BasePopup from '../ui/BasePopup.vue';
 import CategoryIcon from './CategoryIcon.vue';
 import { IconEdit, IconPlus } from '@tabler/icons-vue';
+
+// Режим отладки (установите в true, чтобы видеть отладочную информацию)
+const debugMode = ref(true);
 
 const props = defineProps({
   modelValue: {
@@ -77,38 +109,82 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'select', 'add', 'edit']);
 
-// Используем только активные категории для текущей книги и типа транзакции
-const activeCategories = computed(() => {
-  if (props.categories && props.categories.length) {
-    // Filter categories that are active and match the current book and transaction type
-    return props.categories
-      .filter(category => category.isActive)
-      .sort((a, b) => (a.order || 0) - (b.order || 0));
-  }
-  return [];
-});
-
+// Видимость попапа
 const isVisible = computed({
   get: () => props.modelValue,
   set: (value) => emit('update:modelValue', value)
 });
 
+// Отфильтрованные категории - только активные и соответствующие текущему типу транзакции
+const filteredCategories = computed(() => {
+  if (!props.categories || props.categories.length === 0) return [];
+  
+  return props.categories
+    .filter(category => {
+      return category.isActive && category.type === props.transactionType;
+    })
+    .sort((a, b) => (a.order || 0) - (b.order || 0));
+});
+
+// Категории, которые можно выбрать
+// 1. Все дочерние категории (с parentId)
+// 2. Категории без родителя, у которых нет дочерних элементов
+const selectableCategories = computed(() => {
+  return filteredCategories.value;
+});
+
+// Категории с родителем (подкатегории)
+const categoriesWithParent = computed(() => {
+  return selectableCategories.value.filter(cat => cat.parentId);
+});
+
+// Категории без родителя
+const standaloneCategories = computed(() => {
+  return selectableCategories.value.filter(cat => !cat.parentId);
+});
+
+// Уникальные ID родителей для группировки
+const uniqueParentIds = computed(() => {
+  const parentIds = new Set();
+  categoriesWithParent.value.forEach(cat => {
+    if (cat.parentId) {
+      parentIds.add(cat.parentId);
+    }
+  });
+  return Array.from(parentIds);
+});
+
+// Получение родительской категории по ID
+function getParentCategory(parentId) {
+  return props.categories.find(cat => cat.id === parentId);
+}
+
+// Получение категорий по ID родителя
+function getCategoriesByParentId(parentId) {
+  return categoriesWithParent.value.filter(cat => cat.parentId === parentId);
+}
+
+// Усечение длинных названий
 const truncateName = (name) => {
-  if (name.length > 6) {
-    return name.substring(0, 6) + '...';
+  if (!name) return '';
+  if (name.length > 8) {
+    return name.substring(0, 8) + '...';
   }
   return name;
 };
 
+// Выбор категории
 const selectCategory = (category) => {
   emit('select', category);
   isVisible.value = false;
 };
 
+// Добавление новой категории
 const handleAddCategory = () => {
   emit('add');
 };
 
+// Редактирование категорий
 const handleEditClick = () => {
   emit('edit');
 };
@@ -118,45 +194,51 @@ const handleEditClick = () => {
 .category-container {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 16px;
   width: 100%;
   box-sizing: border-box;
+  padding: 8px 0 16px;
+}
+
+.debug-info {
+  padding: 4px 16px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: yellow;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.category-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.parent-label {
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .category-line {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
-  padding: 10px 16px;
+  padding: 0 16px;
   width: 100%;
   box-sizing: border-box;
-}
-
-/* For iPhone and similar width devices */
-@media screen and (max-width: 375px) {
-  .category-line {
-    gap: 23px;
-    justify-content: flex-start;
-  }
-}
-
-/* For larger screens */
-@media screen and (min-width: 376px) {
-  .category-line {
-    gap: 25px;
-    justify-content: flex-start;
-  }
+  gap: 16px;
 }
 
 .category-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  margin-bottom: 10px;
+  gap: 6px;
   cursor: pointer;
-  /* Fix the width to avoid layout shifts */
-  width: 50px;
+  width: 56px;
 }
 
 .category-name {
@@ -164,15 +246,15 @@ const handleEditClick = () => {
   font-size: 12px;
   line-height: 16px;
   text-align: center;
-  max-width: 50px;
+  width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .add-icon-container {
-  width: 50px;
-  height: 50px;
-  border-radius: 25px;
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
   border: 1px solid #949496;
   display: flex;
   justify-content: center;
@@ -180,15 +262,16 @@ const handleEditClick = () => {
 }
 
 .add-icon {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   color: #949496;
 }
 
-/* Empty state message when no categories are available */
 .empty-state {
   text-align: center;
   color: #949496;
-  padding: 20px;
+  padding: 16px;
+  font-size: 14px;
+  line-height: 20px;
 }
 </style>

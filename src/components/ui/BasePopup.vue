@@ -30,10 +30,8 @@
     </Transition>
   </Teleport>
 </template>
-
 <script setup lang="ts">
 import { IconX } from '@tabler/icons-vue';
-
 const props = defineProps({
   modelValue: {
     type: Boolean,
@@ -56,10 +54,8 @@ const props = defineProps({
     default: true
   }
 });
-
 defineEmits(['update:modelValue', 'rightIconClick']);
 </script>
-
 <style scoped>
 .popup-overlay {
   position: fixed;
@@ -76,14 +72,13 @@ defineEmits(['update:modelValue', 'rightIconClick']);
   width: 100vw;
   height: 100vh;
 }
-
 .popup-container {
   background: #404040;
   border-top-left-radius: 48px;
   border-top-right-radius: 48px;
   width: 100vw;
   padding-top: 16px;
-  max-height: 80vh;
+  max-height: 90vh;
   overflow-y: auto;
   transform: translateY(100%);
   transition: transform 0.3s ease-out;
@@ -91,12 +86,11 @@ defineEmits(['update:modelValue', 'rightIconClick']);
   position: fixed;
   left: 0;
   bottom: 0;
+  padding-bottom: 3vh; /* Добавлен отступ снизу в 5% */
 }
-
 .popup-open {
   transform: translateY(0);
 }
-
 .popup-header {
   display: flex;
   justify-content: space-between;
@@ -105,7 +99,6 @@ defineEmits(['update:modelValue', 'rightIconClick']);
   width: 100%;
   box-sizing: border-box;
 }
-
 .close-icon-wrapper {
   width: 24px;
   height: 24px;
@@ -114,7 +107,6 @@ defineEmits(['update:modelValue', 'rightIconClick']);
   align-items: center;
   cursor: pointer;
 }
-
 .right-icon-wrapper {
   width: 24px;
   height: 24px;
@@ -123,7 +115,6 @@ defineEmits(['update:modelValue', 'rightIconClick']);
   align-items: center;
   cursor: pointer;
 }
-
 .right-content-wrapper {
   display: flex;
   justify-content: flex-end;
@@ -131,12 +122,10 @@ defineEmits(['update:modelValue', 'rightIconClick']);
   cursor: pointer;
   min-width: 24px;
 }
-
 .icon-placeholder {
   width: 24px;
   height: 24px;
 }
-
 .popup-title {
   flex: 1;
   text-align: center;
@@ -145,7 +134,6 @@ defineEmits(['update:modelValue', 'rightIconClick']);
   font-weight: 500;
   line-height: 24px;
 }
-
 .popup-content {
   padding: 13px 16px 30px 16px;
   width: 100%;
@@ -154,30 +142,25 @@ defineEmits(['update:modelValue', 'rightIconClick']);
   flex-direction: column;
   align-items: center;
 }
-
 .icon-close {
   color: #A44942;
   width: 14px;
   height: 14px;
 }
-
 .icon-right {
   color: #DBDADD;
   width: 18px;
   height: 18px;
 }
-
 /* Transitions */
 .popup-fade-enter-active,
 .popup-fade-leave-active {
   transition: opacity 0.3s ease;
 }
-
 .popup-fade-enter-from,
 .popup-fade-leave-to {
   opacity: 0;
 }
-
 .popup-fade-enter-to,
 .popup-fade-leave-from {
   opacity: 1;
