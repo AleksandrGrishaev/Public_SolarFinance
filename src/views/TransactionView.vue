@@ -10,18 +10,18 @@
       <div class="filter-group">
         <!-- Селектор книги всегда на экране, но может быть невидимым -->
         <book-selector 
-          :books="books" 
+          :books="categoryStore.allBooks" 
           v-model="selectedBook"
           :class="{ 'invisible': selectedType === 'transfer' }"
         />
         
         <transaction-type-selector 
-          :types="transactionTypes" 
+          :types="categoryStore.allTransactionTypes" 
           v-model="selectedType" 
         />
         
         <account-selector 
-          :accounts="accounts" 
+          :accounts="categoryStore.accounts" 
           v-model="selectedAccount"
           :is-transfer="selectedType === 'transfer'"
           :destination-account-id="destinationAccount"
@@ -30,7 +30,7 @@
         
         <!-- Слайдер всегда остается, но может быть невидимым -->
         <percentage-slider 
-          :owners="owners" 
+          :owners="categoryStore.owners" 
           v-model="distributionPercentage"
           :total-amount="parseFloat(amount) || 0"
           :class="{ 'invisible': selectedType === 'transfer' }"
@@ -79,13 +79,11 @@ import PercentageSlider from '../components/transactions/PercentageSlider.vue';
 import NumberKeypad from '../components/transactions/NumberKeypad.vue';
 import CategorySelector from '../components/categories/CategorySelector.vue';
 import CategoryListPopup from '../components/categories/CategoryListPopup.vue';
-import {
-  books,
-  transactionTypes,
-  accounts,
-  owners,
-  getCategoriesForBookAndType
-} from '../data/categories';
+
+// Импортируем данные из нового хранилища категорий
+import { useCategoryStore } from '../stores/category';
+
+const categoryStore = useCategoryStore();
 
 const emit = defineEmits(['update:showMenu']);
 
@@ -112,16 +110,16 @@ const filteredCategories = computed(() => {
   }
   
   // Получаем категории для выбранной книги и типа транзакции
-  return getCategoriesForBookAndType(selectedBook.value, selectedType.value);
+  return categoryStore.getCategoriesForBookAndType(selectedBook.value, selectedType.value);
 });
 
 
 // Устанавливаем наблюдение за изменением типа транзакции
 watch(selectedType, (newType) => {
   // Если тип изменился на "transfer", убедимся что оба счета различны
-  if (newType === 'transfer' && selectedAccount.value === destinationAccount.value && accounts.length > 1) {
+  if (newType === 'transfer' && selectedAccount.value === destinationAccount.value && categoryStore.accounts.length > 1) {
     // Устанавливаем другой счет в качестве получателя
-    const otherAccount = accounts.find(acc => acc.id !== selectedAccount.value);
+    const otherAccount = categoryStore.accounts.find(acc => acc.id !== selectedAccount.value);
     if (otherAccount) {
       destinationAccount.value = otherAccount.id;
     }
@@ -232,34 +230,13 @@ const handleCategoriesReordered = (reorderedCategories) => {
 const handleToggleActiveCategory = ({ category, isActive, bookId }) => {
   console.log(`Category ${category.name} is now ${isActive ? 'active' : 'inactive'} in book ${bookId}`);
   
-  // Поскольку у нас теперь категории имеют прямую связь с книгами,
-  // мы можем обновить список книг для этой категории
-  const categoryToUpdate = categories.find(cat => cat.id === category.id);
-  if (!categoryToUpdate) return;
-  
+  // Используем методы store для обновления
   if (isActive) {
-    // Если категория стала активной, добавляем книгу в список
-    if (!categoryToUpdate.books) {
-      categoryToUpdate.books = [];
-    }
-    if (!categoryToUpdate.books.includes(bookId)) {
-      categoryToUpdate.books.push(bookId);
-    }
-  } else {
-    // Если категория стала неактивной, удаляем книгу из списка
-    if (categoryToUpdate.books) {
-      const index = categoryToUpdate.books.indexOf(bookId);
-      if (index !== -1) {
-        categoryToUpdate.books.splice(index, 1);
-      }
-    }
+    categoryStore.addCategoryToBook(category.id, bookId);
   }
   
   // Обновляем статус активности
-  categoryToUpdate.isActive = isActive;
-  
-  // В реальном приложении здесь был бы код для обновления категории в хранилище
-  // store.dispatch('categories/updateCategory', categoryToUpdate);
+  categoryStore.toggleCategoryActive(category.id, isActive);
 };
 </script>
 

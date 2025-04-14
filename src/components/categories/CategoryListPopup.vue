@@ -1,4 +1,5 @@
 <!-- src/components/categories/CategoryListPopup.vue -->
+<!-- src/components/categories/CategoryListPopup.vue -->
 <template>
   <BasePopup 
     v-model="isVisible" 
@@ -10,12 +11,12 @@
       <!-- Фильтры -->
       <div class="filters">
         <book-selector 
-          :books="books" 
+          :books="categoryStore.allBooks" 
           v-model="selectedBook"
         />
         
         <transaction-type-selector 
-          :types="filterTransactionTypes" 
+          :types="categoryStore.allFilterTransactionTypes" 
           v-model="selectedType" 
         />
       </div>
@@ -126,20 +127,11 @@ import CategoryFilterToggle from './CategoryFilterToggle.vue';
 import CreateCategoryButton from '../ui/CreateCategoryButton.vue';
 import CategoryAddPopup from './CategoryAddPopup.vue';
 import { IconPlus } from '@tabler/icons-vue';
-import { 
-  books,
-  filterTransactionTypes,
-  categories,
-  getAllCategoriesForType,
-  getAllCategoriesForBookAndType,
-  getActiveCategoriesForBookAndType,
-  getArchivedCategoriesForBookAndType,
-  hasChildCategories,
-  hasChildCategoriesInBook,
-  getChildCategories,
-  getChildCategoriesInBook,
-  type Category
-} from '../../data/categories';
+
+// Импортируем категории из нового хранилища
+import { useCategoryStore, Category } from '../../stores/category';
+
+const categoryStore = useCategoryStore();
 
 const props = defineProps({
   modelValue: {
@@ -178,11 +170,11 @@ watch(() => props.modelValue, (newValue) => {
     selectedType.value = props.initialType;
     
     // Получаем ВСЕ категории для данного типа транзакции
-    const allCategoriesForType = getAllCategoriesForType(selectedType.value);
+    const allCategoriesForType = categoryStore.getAllCategoriesForType(selectedType.value);
     
     // Получаем категории для текущей книги и типа
-    const allCategoriesInBook = getAllCategoriesForBookAndType(selectedBook.value, selectedType.value);
-    const activeCategoriesInBook = getActiveCategoriesForBookAndType(selectedBook.value, selectedType.value);
+    const allCategoriesInBook = categoryStore.getAllCategoriesForBookAndType(selectedBook.value, selectedType.value);
+    const activeCategoriesInBook = categoryStore.getActiveCategoriesForBookAndType(selectedBook.value, selectedType.value);
     
     // Формируем список всех категорий с флагом активности
     categoriesWithActiveState.value = allCategoriesForType.map(cat => {
@@ -214,11 +206,11 @@ watch(() => props.initialType, (newValue) => {
 watch([selectedBook, selectedType], () => {
   if (props.modelValue) {
     // Получаем ВСЕ категории для данного типа транзакции
-    const allCategoriesForType = getAllCategoriesForType(selectedType.value);
+    const allCategoriesForType = categoryStore.getAllCategoriesForType(selectedType.value);
     
     // Получаем категории для текущей книги и типа
-    const allCategoriesInBook = getAllCategoriesForBookAndType(selectedBook.value, selectedType.value);
-    const activeCategoriesInBook = getActiveCategoriesForBookAndType(selectedBook.value, selectedType.value);
+    const allCategoriesInBook = categoryStore.getAllCategoriesForBookAndType(selectedBook.value, selectedType.value);
+    const activeCategoriesInBook = categoryStore.getActiveCategoriesForBookAndType(selectedBook.value, selectedType.value);
     
     // Сохраняем предыдущее состояние активности категорий
     const activeStateMap = new Map(
@@ -350,7 +342,7 @@ function getInactiveChildCategories(parentId) {
 // Выбор категории
 const selectCategory = (category) => {
   // Проверяем, что выбранная категория не имеет дочерних элементов
-  if (!hasChildCategories(category.id)) {
+  if (!categoryStore.hasChildCategories(category.id)) {
     emit('select', category);
   } else {
     // Если категория имеет дочерние элементы, не позволяем её выбрать
@@ -368,26 +360,18 @@ const toggleCategoryActive = (category, isActive) => {
     // Если категория стала активной, убеждаемся, что она принадлежит выбранной книге
     if (isActive) {
       // Добавляем книгу в список книг категории, если её там нет
-      if (!categoriesWithActiveState.value[index].books) {
-        categoriesWithActiveState.value[index].books = [];
-      }
-      
-      if (!categoriesWithActiveState.value[index].books.includes(selectedBook.value)) {
-        categoriesWithActiveState.value[index].books.push(selectedBook.value);
-      }
-      
+      categoryStore.addCategoryToBook(category.id, selectedBook.value);
       categoriesWithActiveState.value[index].isInBook = true;
-    } else {
-      // Если категория стала неактивной, можно оставить её в списке книг,
-      // но отметить как неактивную (isActive = false)
     }
+    
+    // Обновляем статус активности в store
+    categoryStore.toggleCategoryActive(category.id, isActive);
     
     // Отправляем событие об изменении активности категории
     emit('toggleActive', {
       category: {
         ...category,
-        isActive,
-        books: categoriesWithActiveState.value[index].books
+        isActive
       },
       isActive,
       bookId: selectedBook.value
@@ -404,16 +388,19 @@ const handleCategoryMenu = (category) => {
 const handleSaveNewCategory = (newCategory) => {
   console.log('New category saved:', newCategory);
   
-  // Добавляем новую категорию в выбранную книгу
+  // Добавляем новую категорию через store
   const categoryWithBooks = {
     ...newCategory,
     books: [selectedBook.value],
     isActive: true
   };
   
+  // Добавляем категорию через store
+  const addedCategory = categoryStore.addCategory(categoryWithBooks);
+  
   // Emit add event with the new category data
   emit('add', {
-    category: categoryWithBooks,
+    category: addedCategory,
     bookId: selectedBook.value,
     type: selectedType.value
   });

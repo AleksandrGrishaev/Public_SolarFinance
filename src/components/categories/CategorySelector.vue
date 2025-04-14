@@ -85,16 +85,9 @@ import { computed, ref } from 'vue';
 import BasePopup from '../ui/BasePopup.vue';
 import CategoryIcon from './CategoryIcon.vue';
 import { IconEdit, IconPlus } from '@tabler/icons-vue';
+import { useCategoryStore, type Category } from '../../stores/category';
 
-// Импортируем полный список категорий и вспомогательные функции
-import { 
-  categories, 
-  hasChildCategories, 
-  hasChildCategoriesInBook, 
-  getChildCategoriesInBook,
-  getAllCategoriesForBookAndType,
-  type Category 
-} from '../../data/categories';
+const categoryStore = useCategoryStore();
 
 // Режим отладки (установите в true, чтобы видеть отладочную информацию)
 const debugMode = ref(true);
@@ -177,15 +170,8 @@ function getParentCategory(parentId) {
   if (parent) return parent;
   
   // Если не нашли (возможно, родительская категория неактивна), 
-  // ищем в полном списке категорий из импортированного модуля categories
-  const globalParent = categories.find(cat => cat.id === parentId);
-  
-  // Проверяем, что родительская категория принадлежит текущей книге
-  if (globalParent && globalParent.books?.includes(props.bookId)) {
-    return globalParent;
-  }
-  
-  return null;
+  // ищем в полном списке категорий из store
+  return categoryStore.getCategoryById(parentId);
 }
 
 // Получение категорий по ID родителя
@@ -205,7 +191,7 @@ const truncateName = (name) => {
 // Выбор категории
 const selectCategory = (category) => {
   // Проверяем, что выбранная категория не имеет дочерних элементов в текущей книге
-  if (!hasChildCategoriesInBook(category.id, props.bookId)) {
+  if (!categoryStore.hasChildCategoriesInBook(category.id, props.bookId)) {
     emit('select', category);
     isVisible.value = false;
   } else {
