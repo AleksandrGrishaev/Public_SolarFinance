@@ -1,22 +1,24 @@
 <!-- src/views/TransactionView.vue -->
 <template>
   <div class="transaction-view">
-    <div class="body-container">
+    <div v-if="isLoading" class="loading-overlay">
+      <div class="loading-spinner">Загрузка...</div>
+    </div>
+    
+    <div class="body-container" v-else>
       <div class="amount-section">
-        <div class="currency-symbol">$</div>
+        <div class="currency-symbol">{{ currentCurrencySymbol }}</div>
         <div class="amount-input">{{ amount }}</div>
       </div>
       
       <div class="filter-group">
         <!-- Селектор книги всегда на экране, но может быть невидимым -->
         <book-selector 
-          :books="categoryStore.allBooks" 
           v-model="selectedBook"
           :class="{ 'invisible': selectedType === 'transfer' }"
         />
         
         <transaction-type-selector 
-          :types="categoryStore.allTransactionTypes" 
           v-model="selectedType" 
         />
         
@@ -30,7 +32,7 @@
         
         <!-- Слайдер всегда остается, но может быть невидимым -->
         <percentage-slider 
-          :owners="categoryStore.owners" 
+          :owners="systemStore.allOwners" 
           v-model="distributionPercentage"
           :total-amount="parseFloat(amount) || 0"
           :class="{ 'invisible': selectedType === 'transfer' }"
@@ -83,22 +85,52 @@ import CategoryListPopup from '../components/categories/CategoryListPopup.vue';
 // Импортируем хранилища
 import { useCategoryStore } from '../stores/category';
 import { useAccountStore } from '../stores/account';
+import { useBookStore } from '../stores/book';
+import { useSystemStore } from '../stores/system';
 
 const categoryStore = useCategoryStore();
 const accountStore = useAccountStore();
+const bookStore = useBookStore();
+const systemStore = useSystemStore();
 
-// Инициализация хранилища счетов при монтировании компонента
-onMounted(async () => {
-  if (!accountStore.isInitialized) {
-    await accountStore.init();
+// Состояние загрузки
+const isLoading = ref(true);
+
+// Инициализируем все хранилища сразу при создании компонента
+const initAllStores = async () => {
+  try {
+    isLoading.value = true;
+    
+    // Инициализируем все хранилища параллельно
+    await Promise.all([
+      bookStore.isInitialized ? Promise.resolve() : bookStore.init(),
+      accountStore.isInitialized ? Promise.resolve() : accountStore.init()
+    ]);
+    
+    // Устанавливаем начальное значение selectedBook, если оно не соответствует ни одной из имеющихся книг
+    if (bookStore.books.length > 0 && !bookStore.books.some(book => book.id === selectedBook.value)) {
+      selectedBook.value = bookStore.books[0].id;
+    }
+    
+    // Устанавливаем начальное значение selectedAccount, если оно не соответствует ни одному из имеющихся счетов
+    if (accountStore.accounts.length > 0 && !accountStore.accounts.some(account => account.id === selectedAccount.value)) {
+      selectedAccount.value = accountStore.accounts[0].id;
+    }
+    
+    console.log('All stores initialized successfully');
+  } catch (error) {
+    console.error('Error initializing stores:', error);
+  } finally {
+    isLoading.value = false;
   }
-});
+};
 
 const emit = defineEmits(['update:showMenu']);
 
-// Сообщаем макету, что нужно показать меню
-onMounted(() => {
+// Инициализируем хранилища и сообщаем макету, что нужно показать меню
+onMounted(async () => {
   emit('update:showMenu', true);
+  await initAllStores();
 });
 
 // Data models
@@ -111,6 +143,26 @@ const distributionPercentage = ref(50);
 const showCategorySelector = ref(false);
 const showCategoryList = ref(false);
 const selectedCategory = ref(null);
+
+// Вычисляемое свойство для получения символа валюты
+const currentCurrencySymbol = computed(() => {
+  // По умолчанию используем $ если не найдем валюту
+  const defaultSymbol = '$';
+  
+  // Сначала пытаемся получить валюту из выбранного счета
+  if (selectedAccount.value) {
+    const account = accountStore.getAccountById(selectedAccount.value);
+    if (account) {
+      const currency = systemStore.getCurrencyByCode(account.currency);
+      if (currency) {
+        return currency.symbol;
+      }
+    }
+  }
+  
+  // Если не удалось определить валюту счета, используем валюту по умолчанию
+  return systemStore.defaultCurrency?.symbol || defaultSymbol;
+});
 
 // Вычисляемое свойство для получения категорий
 const filteredCategories = computed(() => {
@@ -232,7 +284,7 @@ const handleCategoriesReordered = (reorderedCategories) => {
   // Но для демонстрации просто логируем новый порядок
   
   // В реальном приложении это могло бы выглядеть так:
-  // store.dispatch('categories/updateOrder', reorderedCategories);
+  // categoryStore.updateCategoriesOrder(reorderedCategories);
 };
 
 // Обработка изменения активности категории
@@ -266,6 +318,24 @@ const handleToggleActiveCategory = ({ category, isActive, bookId }) => {
   overflow: hidden;
   /* Позиционируем содержимое вниз */
   justify-content: flex-end;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+}
+
+.loading-spinner {
+  color: white;
+  font-size: 18px;
 }
 
 .body-container {

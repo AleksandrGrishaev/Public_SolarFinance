@@ -1,9 +1,9 @@
-<!-- /Users/peaker/dev/solar-finance/src/components/transactions/TransactionTypeSelector.vue -->
+<!-- src/components/transactions/TransactionTypeSelector.vue -->
 <template>
   <div class="type-element">
     <div class="types">
       <div
-        v-for="type in types"
+        v-for="type in displayTypes"
         :key="type.id"
         class="type-item"
         :class="{ 'selected': modelValue === type.id }"
@@ -16,10 +16,14 @@
 </template>
 
 <script setup lang="ts">
-defineProps({
+import { computed } from 'vue';
+import { useSystemStore } from '../../stores/system';
+
+const props = defineProps({
   types: {
     type: Array as () => Array<{ id: string, name: string }>,
-    required: true
+    required: false,
+    default: () => []
   },
   modelValue: {
     type: String,
@@ -27,13 +31,25 @@ defineProps({
   }
 });
 
-defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue']);
+
+// Используем системное хранилище
+const systemStore = useSystemStore();
+
+const displayTypes = computed(() => {
+  // Если передан массив types в props, используем его
+  if (props.types.length > 0) {
+    return props.types;
+  }
+  
+  // Иначе получаем из хранилища
+  return systemStore.allTransactionTypes;
+});
 </script>
 
 <style scoped>
 .type-element {
   width: 100%;
-
   overflow: hidden;
   display: flex;
   justify-content: center;
@@ -54,7 +70,6 @@ defineEmits(['update:modelValue']);
 .type-item {
   padding-left: 16px;
   padding-right: 16px;
-
   background: #46484A;
   overflow: hidden;
   border-radius: 34px;

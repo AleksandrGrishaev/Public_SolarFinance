@@ -1,3 +1,4 @@
+<!-- src/components/transactions/BookSelector.vue -->
 <template>
   <div class="book-element">
     <div class="area">
@@ -9,7 +10,7 @@
       </div>
       <div class="books-selector">
         <div
-          v-for="book in books"
+          v-for="book in displayBooks"
           :key="book.id"
           class="book-item"
           :class="{ 'selected': modelValue === book.id }"
@@ -23,10 +24,14 @@
 </template>
 
 <script setup lang="ts">
-defineProps({
+import { computed, onMounted } from 'vue';
+import { useBookStore } from '../../stores/book';
+
+const props = defineProps({
   books: {
     type: Array as () => Array<{ id: string, name: string }>,
-    required: true
+    required: false,
+    default: () => []
   },
   modelValue: {
     type: String,
@@ -34,7 +39,28 @@ defineProps({
   }
 });
 
-defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue']);
+
+// Используем хранилище книг
+const bookStore = useBookStore();
+
+// Инициализируем хранилище при монтировании компонента
+onMounted(async () => {
+  if (!bookStore.isInitialized) {
+    await bookStore.init();
+  }
+});
+
+// Используем вычисляемое свойство для получения книг
+const displayBooks = computed(() => {
+  // Если передан массив books в props, используем его
+  if (props.books && props.books.length > 0) {
+    return props.books;
+  }
+  
+  // Иначе получаем из хранилища
+  return bookStore.booksForSelector;
+});
 </script>
 
 <style scoped>
