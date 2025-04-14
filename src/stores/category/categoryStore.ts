@@ -1,6 +1,4 @@
 // src/stores/category/categoryStore.ts
-// Pinia store для управления состоянием категорий
-
 import { defineStore } from 'pinia';
 import type { 
   CategoryState, 
@@ -9,18 +7,17 @@ import type {
 } from './types';
 import { 
   defaultCategories,
-  books, 
   transactionTypes, 
   filterTransactionTypes 
 } from './defaultCategories';
 import { CategoryService } from './categoryService';
 
+
 export const useCategoryStore = defineStore('category', {
   state: (): CategoryState => ({
-    categories: JSON.parse(JSON.stringify(defaultCategories)), // Используем deep clone для избежания мутации исходных данных
-    books: JSON.parse(JSON.stringify(books.map(b => b.id))),
-    transactionTypes: JSON.parse(JSON.stringify(transactionTypes.map(t => t.id))),
-    filterTransactionTypes: JSON.parse(JSON.stringify(filterTransactionTypes.map(t => t.id)))
+    categories: JSON.parse(JSON.stringify(defaultCategories)), // Deep clone для избежания мутации исходных данных
+    transactionTypes: transactionTypes.map(t => t.id),
+    filterTransactionTypes: filterTransactionTypes.map(t => t.id)
   }),
 
   getters: {
@@ -29,22 +26,10 @@ export const useCategoryStore = defineStore('category', {
       return new CategoryService(this.categories);
     },
 
-    // Получаем данные книг из импортированного модуля
-    allBooks() {
-      return books;
-    },
-
-    // Получаем данные типов транзакций из импортированного модуля
-    allTransactionTypes() {
-      return transactionTypes;
-    },
-
-    // Получаем данные типов транзакций для фильтров из импортированного модуля
-    allFilterTransactionTypes() {
-      return filterTransactionTypes;
-    },
-
-    // ПРОВЕРКА ИЕРАРХИИ
+    // Вспомогательные геттеры для получения данных из других сторов
+    // Используются только внутри CategoryStore и не экспортируются наружу
+    
+    // ПРОВЕРКА ИЕРАРХИИ КАТЕГОРИЙ
     
     hasChildCategories(): (categoryId: string) => boolean {
       return (categoryId: string) => this.categoryService.hasChildCategories(categoryId);
@@ -164,9 +149,15 @@ export const useCategoryStore = defineStore('category', {
 
     resetToDefaults(): void {
       this.categories = JSON.parse(JSON.stringify(defaultCategories));
-      this.books = JSON.parse(JSON.stringify(books.map(b => b.id)));
-      this.transactionTypes = JSON.parse(JSON.stringify(transactionTypes.map(t => t.id)));
-      this.filterTransactionTypes = JSON.parse(JSON.stringify(filterTransactionTypes.map(t => t.id)));
+      this.transactionTypes = transactionTypes.map(t => t.id);
+      this.filterTransactionTypes = filterTransactionTypes.map(t => t.id);
+    },
+
+    // Инициализация стора
+    async init() {
+      // При необходимости можно добавить инициализацию зависимостей
+      console.log('[CategoryStore] Initialized');
+      return true;
     }
   }
 });

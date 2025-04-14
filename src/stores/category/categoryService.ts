@@ -195,7 +195,8 @@ export class CategoryService {
       const maxOrder = Math.max(
         ...this.categories
           .filter(c => c.type === category.type)
-          .map(c => c.order || 0)
+          .map(c => c.order || 0),
+        0 // Добавляем 0 как минимальное значение, чтобы избежать -Infinity
       );
       category.order = maxOrder + 1;
     }

@@ -1,23 +1,20 @@
 // src/stores/category/defaultCategories.ts
-// Предустановленные категории и связанные данные
+import type { Category } from './types';
 
-// Importamos todos los tipos de nuestro archivo types.ts
-import type { Category, Book, TransactionType, Account, Owner } from './types';
+// Определения типов транзакций
+export const transactionTypes = [
+  { id: 'expense', name: 'Expense' },
+  { id: 'income', name: 'Income' },
+  { id: 'transfer', name: 'Transfer' }
+];
 
-// Importamos solo los datos del categories.ts, no los tipos
-import { 
-  books, 
-  transactionTypes, 
-  filterTransactionTypes, 
-  accounts, 
-  owners 
-} from '../../data/categories';
+export const filterTransactionTypes = [
+  { id: 'all', name: 'All' },
+  ...transactionTypes
+];
 
-// Reexportamos datos para uso en otros módulos
-export { books, transactionTypes, filterTransactionTypes, accounts, owners };
-
-// Categorías principales con vinculación a libros
-export const parentCategories: Category[] = [
+// Категории верхнего уровня
+const parentCategories: Category[] = [
   { 
     id: 'house', 
     name: 'House', 
@@ -26,7 +23,7 @@ export const parentCategories: Category[] = [
     type: 'expense',
     order: 0,
     isActive: true,
-    books: ['my', 'family'] // Categoría disponible en libros "my" y "family"
+    books: ['my', 'family'] // Категория доступна в книгах "my" и "family"
   },
   { 
     id: 'food', 
@@ -36,7 +33,7 @@ export const parentCategories: Category[] = [
     type: 'expense',
     order: 1,
     isActive: true,
-    books: ['my', 'family', 'wife'] // Disponible en todos los libros
+    books: ['my', 'family', 'wife'] // Доступна во всех книгах
   },
   { 
     id: 'transport', 
@@ -80,9 +77,9 @@ export const parentCategories: Category[] = [
   }
 ];
 
-// Subcategorías para categorías principales
-export const childCategories: Category[] = [
-  // Subcategorías para "House"
+// Подкатегории
+const childCategories: Category[] = [
+  // Подкатегории для "House"
   { 
     id: 'renovation', 
     name: 'Renovation', 
@@ -120,7 +117,7 @@ export const childCategories: Category[] = [
     books: []
   },
   
-  // Subcategorías para "Food"
+  // Подкатегории для "Food"
   { 
     id: 'groceries', 
     name: 'Groceries', 
@@ -146,7 +143,7 @@ export const childCategories: Category[] = [
     books: ['family']
   },
   
-  // Subcategorías para "Transport"
+  // Подкатегории для "Transport"
   { 
     id: 'gas', 
     name: 'Gas', 
@@ -172,7 +169,7 @@ export const childCategories: Category[] = [
     books: []
   },
   
-  // Subcategorías para "Salary"
+  // Подкатегории для "Salary"
   { 
     id: 'main_job', 
     name: 'Main Job', 
@@ -199,8 +196,8 @@ export const childCategories: Category[] = [
   }
 ];
 
-// Otras categorías sin padre
-export const standaloneCategories: Category[] = [
+// Отдельные категории без родителя
+const standaloneCategories: Category[] = [
   { 
     id: 'health', 
     name: 'Health', 
@@ -233,7 +230,7 @@ export const standaloneCategories: Category[] = [
   }
 ];
 
-// Combinamos todas las categorías en un solo array
+// Объединяем все категории в один массив
 export const defaultCategories: Category[] = [
   ...parentCategories,
   ...childCategories,
