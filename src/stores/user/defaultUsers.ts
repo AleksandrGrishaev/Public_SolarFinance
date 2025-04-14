@@ -1,9 +1,12 @@
-// src/data/UserData.ts
-import type { User } from '@/stores/user';
+// src/stores/user/defaultUsers.ts
+import type { User } from './types';
 
-// Данные пользователей для аутентификации
-// Используются только при первой инициализации
-export const availableUsers: User[] = [
+/**
+ * Данные пользователей по умолчанию
+ * Используются только при первой инициализации приложения,
+ * когда в хранилище нет пользователей
+ */
+export const defaultUsers: User[] = [
   { 
     id: 'user_1',
     type: 'user',

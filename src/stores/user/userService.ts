@@ -1,5 +1,6 @@
 // src/stores/user/userService.ts
 import type { User } from './types';
+import { defaultUsers } from './defaultUsers';
 import { LocalStorageApiService } from '@/services/api/LocalStorageApiService';
 
 export class UserService {
@@ -162,40 +163,7 @@ export class UserService {
     const users = await this.getUsers();
     
     if (users.length === 0) {
-      const now = new Date();
-      const defaultUsers: User[] = [
-        {
-          id: 'user_1',
-          name: 'Alex',
-          type: 'user',
-          username: 'alex',
-          pin: '1234',
-          email: 'alex@example.com',
-          isActive: true,
-          createdAt: now,
-          updatedAt: now,
-          settings: {
-            theme: 'system',
-            language: 'en'
-          }
-        },
-        {
-          id: 'user_2',
-          name: 'Wife',
-          type: 'user',
-          username: 'wife',
-          pin: '5678',
-          email: 'wife@example.com',
-          isActive: true,
-          createdAt: now,
-          updatedAt: now,
-          settings: {
-            theme: 'light',
-            language: 'en'
-          }
-        }
-      ];
-      
+      // Используем пользователей из defaultUsers.ts
       for (const user of defaultUsers) {
         await this.apiService.post('/users', user);
       }
