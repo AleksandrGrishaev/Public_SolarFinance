@@ -21,7 +21,7 @@
         />
         
         <account-selector 
-          :accounts="categoryStore.accounts" 
+          :accounts="accountStore.activeAccounts" 
           v-model="selectedAccount"
           :is-transfer="selectedType === 'transfer'"
           :destination-account-id="destinationAccount"
@@ -48,14 +48,14 @@
 
    <!-- Selector popup -->
    <category-selector
-  v-model="showCategorySelector"
-  :categories="filteredCategories"
-  :bookId="selectedBook"
-  :transactionType="selectedType"
-  @select="handleCategorySelect"
-  @add="handleAddCategory"
-  @edit="handleOpenCategoryList"
-/>
+    v-model="showCategorySelector"
+    :categories="filteredCategories"
+    :bookId="selectedBook"
+    :transactionType="selectedType"
+    @select="handleCategorySelect"
+    @add="handleAddCategory"
+    @edit="handleOpenCategoryList"
+  />
     
     <!-- List/Edit popup -->
     <category-list-popup
@@ -80,10 +80,19 @@ import NumberKeypad from '../components/transactions/NumberKeypad.vue';
 import CategorySelector from '../components/categories/CategorySelector.vue';
 import CategoryListPopup from '../components/categories/CategoryListPopup.vue';
 
-// Импортируем данные из нового хранилища категорий
+// Импортируем хранилища
 import { useCategoryStore } from '../stores/category';
+import { useAccountStore } from '../stores/account';
 
 const categoryStore = useCategoryStore();
+const accountStore = useAccountStore();
+
+// Инициализация хранилища счетов при монтировании компонента
+onMounted(async () => {
+  if (!accountStore.isInitialized) {
+    await accountStore.init();
+  }
+});
 
 const emit = defineEmits(['update:showMenu']);
 
@@ -117,9 +126,9 @@ const filteredCategories = computed(() => {
 // Устанавливаем наблюдение за изменением типа транзакции
 watch(selectedType, (newType) => {
   // Если тип изменился на "transfer", убедимся что оба счета различны
-  if (newType === 'transfer' && selectedAccount.value === destinationAccount.value && categoryStore.accounts.length > 1) {
+  if (newType === 'transfer' && selectedAccount.value === destinationAccount.value && accountStore.accounts.length > 1) {
     // Устанавливаем другой счет в качестве получателя
-    const otherAccount = categoryStore.accounts.find(acc => acc.id !== selectedAccount.value);
+    const otherAccount = accountStore.accounts.find(acc => acc.id !== selectedAccount.value);
     if (otherAccount) {
       destinationAccount.value = otherAccount.id;
     }

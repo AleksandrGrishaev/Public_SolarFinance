@@ -1,4 +1,4 @@
-<!-- /Users/peaker/dev/solar-finance/src/components/transactions/AccountSelector.vue -->
+<!-- src/components/transactions/AccountSelector.vue -->
 <template>
   <div class="account-element">
     <!-- Для обычных транзакций (не transfer) -->
@@ -62,10 +62,11 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import type { Account } from '../../stores/account/types';
 
 const props = defineProps({
   accounts: {
-    type: Array,
+    type: Array as () => Account[],
     required: true
   },
   modelValue: {
