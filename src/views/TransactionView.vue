@@ -48,14 +48,14 @@
 
    <!-- Selector popup -->
    <category-selector
-      v-model="showCategorySelector"
-      :categories="filteredCategories"
-      :bookId="selectedBook"
-      :transactionType="selectedType"
-      @select="handleCategorySelect"
-      @add="handleAddCategory"
-      @edit="handleOpenCategoryList"
-    />
+  v-model="showCategorySelector"
+  :categories="filteredCategories"
+  :bookId="selectedBook"
+  :transactionType="selectedType"
+  @select="handleCategorySelect"
+  @add="handleAddCategory"
+  @edit="handleOpenCategoryList"
+/>
     
     <!-- List/Edit popup -->
     <category-list-popup
@@ -105,13 +105,16 @@ const showCategorySelector = ref(false);
 const showCategoryList = ref(false);
 const selectedCategory = ref(null);
 
-// Вычисляемые категории для текущей книги и типа транзакции
+// Вычисляемое свойство для получения категорий
 const filteredCategories = computed(() => {
   if (selectedType.value === 'transfer') {
     return [];
   }
+  
+  // Получаем категории для выбранной книги и типа транзакции
   return getCategoriesForBookAndType(selectedBook.value, selectedType.value);
 });
+
 
 // Устанавливаем наблюдение за изменением типа транзакции
 watch(selectedType, (newType) => {
@@ -225,10 +228,38 @@ const handleCategoriesReordered = (reorderedCategories) => {
   // store.dispatch('categories/updateOrder', reorderedCategories);
 };
 
+// Обработка изменения активности категории
 const handleToggleActiveCategory = ({ category, isActive, bookId }) => {
   console.log(`Category ${category.name} is now ${isActive ? 'active' : 'inactive'} in book ${bookId}`);
-  // Здесь обновляем состояние активности категории в хранилище
-  // store.dispatch('categories/toggleActive', { categoryId: category.id, isActive, bookId });
+  
+  // Поскольку у нас теперь категории имеют прямую связь с книгами,
+  // мы можем обновить список книг для этой категории
+  const categoryToUpdate = categories.find(cat => cat.id === category.id);
+  if (!categoryToUpdate) return;
+  
+  if (isActive) {
+    // Если категория стала активной, добавляем книгу в список
+    if (!categoryToUpdate.books) {
+      categoryToUpdate.books = [];
+    }
+    if (!categoryToUpdate.books.includes(bookId)) {
+      categoryToUpdate.books.push(bookId);
+    }
+  } else {
+    // Если категория стала неактивной, удаляем книгу из списка
+    if (categoryToUpdate.books) {
+      const index = categoryToUpdate.books.indexOf(bookId);
+      if (index !== -1) {
+        categoryToUpdate.books.splice(index, 1);
+      }
+    }
+  }
+  
+  // Обновляем статус активности
+  categoryToUpdate.isActive = isActive;
+  
+  // В реальном приложении здесь был бы код для обновления категории в хранилище
+  // store.dispatch('categories/updateCategory', categoryToUpdate);
 };
 </script>
 

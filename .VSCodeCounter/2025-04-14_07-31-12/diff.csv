@@ -1,0 +1,17 @@
+"filename", "language", "Vue", "TypeScript", "comment", "blank", "total"
+"/Users/peaker/dev/solar-finance/src/components/categories/CategoryAddPopup.vue", "Vue", 358, 0, 9, 44, 411
+"/Users/peaker/dev/solar-finance/src/components/categories/CategoryIcon.vue", "Vue", -29, 0, 0, 2, -27
+"/Users/peaker/dev/solar-finance/src/components/categories/CategoryItem.vue", "Vue", -4, 0, 0, -2, -6
+"/Users/peaker/dev/solar-finance/src/components/categories/CategoryListGrouped.vue", "Vue", 95, 0, 3, 14, 112
+"/Users/peaker/dev/solar-finance/src/components/categories/CategoryListPopup.vue", "Vue", 177, 0, 5, 29, 211
+"/Users/peaker/dev/solar-finance/src/components/categories/CategorySelector.vue", "Vue", 99, 0, 2, 17, 118
+"/Users/peaker/dev/solar-finance/src/components/ui/BasePopup.vue", "Vue", 18, 0, 0, -17, 1
+"/Users/peaker/dev/solar-finance/src/components/ui/inputs/ColorPicker.vue", "Vue", 63, 0, 1, 12, 76
+"/Users/peaker/dev/solar-finance/src/components/ui/inputs/IconPicker.vue", "Vue", 61, 0, 1, 8, 70
+"/Users/peaker/dev/solar-finance/src/components/ui/inputs/ParentCategorySelector.vue", "Vue", 121, 0, 1, 17, 139
+"/Users/peaker/dev/solar-finance/src/components/ui/inputs/TextInput.vue", "Vue", 54, 0, 1, 7, 62
+"/Users/peaker/dev/solar-finance/src/components/ui/inputs/ToggleButtonGroup.vue", "Vue", 64, 0, 1, 7, 72
+"/Users/peaker/dev/solar-finance/src/components/ui/inputs/ToggleSwitch.vue", "Vue", 47, 0, 1, 7, 55
+"/Users/peaker/dev/solar-finance/src/data/categories.ts", "TypeScript", 0, 207, 34, 24, 265
+"/Users/peaker/dev/solar-finance/src/views/TransactionView.vue", "Vue", 25, 0, 0, 6, 31
+"Total", "-", 1149, 207, 59, 175, 1590

@@ -129,11 +129,15 @@ import { IconPlus } from '@tabler/icons-vue';
 import { 
   books,
   filterTransactionTypes,
-  getCategoriesForBookAndType,
+  categories,
   getAllCategoriesForType,
-  getSelectableCategoriesForType,
-  getParentCategoriesWithChildren,
+  getAllCategoriesForBookAndType,
+  getActiveCategoriesForBookAndType,
+  getArchivedCategoriesForBookAndType,
   hasChildCategories,
+  hasChildCategoriesInBook,
+  getChildCategories,
+  getChildCategoriesInBook,
   type Category
 } from '../../data/categories';
 
@@ -164,8 +168,8 @@ const selectedType = ref(props.initialType);
 const showInactiveCategories = ref(false);
 const showAddCategoryPopup = ref(false);
 
-// Категории с флагом активности
-const categoriesWithActiveState = ref<Category[]>([]);
+// Категории с флагом активности и принадлежности к книге
+const categoriesWithActiveState = ref<(Category & { isInBook?: boolean })[]>([]);
 
 // При открытии попапа, устанавливаем значения и инициализируем категории
 watch(() => props.modelValue, (newValue) => {
@@ -176,18 +180,22 @@ watch(() => props.modelValue, (newValue) => {
     // Получаем ВСЕ категории для данного типа транзакции
     const allCategoriesForType = getAllCategoriesForType(selectedType.value);
     
-    // Получаем выбираемые категории для текущей книги
-    const selectableCategories = getCategoriesForBookAndType(selectedBook.value, selectedType.value);
-    
-    // Создаем карту выбираемых категорий для быстрого поиска
-    const selectableMap = new Map(selectableCategories.map(cat => [cat.id, cat]));
+    // Получаем категории для текущей книги и типа
+    const allCategoriesInBook = getAllCategoriesForBookAndType(selectedBook.value, selectedType.value);
+    const activeCategoriesInBook = getActiveCategoriesForBookAndType(selectedBook.value, selectedType.value);
     
     // Формируем список всех категорий с флагом активности
     categoriesWithActiveState.value = allCategoriesForType.map(cat => {
-      const isInSelectable = selectableMap.has(cat.id);
+      // Категория активна, если она активна в данной книге
+      const isActive = activeCategoriesInBook.some(c => c.id === cat.id);
+      
+      // Проверяем, принадлежит ли категория выбранной книге
+      const isInBook = allCategoriesInBook.some(c => c.id === cat.id);
+      
       return {
         ...cat,
-        isActive: isInSelectable
+        isActive,
+        isInBook
       };
     });
   }
@@ -208,11 +216,9 @@ watch([selectedBook, selectedType], () => {
     // Получаем ВСЕ категории для данного типа транзакции
     const allCategoriesForType = getAllCategoriesForType(selectedType.value);
     
-    // Получаем выбираемые категории для текущей книги
-    const selectableCategories = getCategoriesForBookAndType(selectedBook.value, selectedType.value);
-    
-    // Создаем карту выбираемых категорий для быстрого поиска
-    const selectableMap = new Map(selectableCategories.map(cat => [cat.id, cat]));
+    // Получаем категории для текущей книги и типа
+    const allCategoriesInBook = getAllCategoriesForBookAndType(selectedBook.value, selectedType.value);
+    const activeCategoriesInBook = getActiveCategoriesForBookAndType(selectedBook.value, selectedType.value);
     
     // Сохраняем предыдущее состояние активности категорий
     const activeStateMap = new Map(
@@ -221,13 +227,20 @@ watch([selectedBook, selectedType], () => {
     
     // Формируем список всех категорий с флагом активности
     categoriesWithActiveState.value = allCategoriesForType.map(cat => {
-      const isInSelectable = selectableMap.has(cat.id);
+      // Категория активна, если она активна в данной книге
+      const isActive = activeCategoriesInBook.some(c => c.id === cat.id);
+      
+      // Проверяем, принадлежит ли категория выбранной книге
+      const isInBook = allCategoriesInBook.some(c => c.id === cat.id);
+      
+      // Сохраняем предыдущее состояние активности, если оно было
       const wasActive = activeStateMap.has(cat.id) ? activeStateMap.get(cat.id) : false;
       
       return {
         ...cat,
-        // Категория активна, если она в книге и была активна ранее
-        isActive: isInSelectable && (wasActive || cat.id === 'renovation')
+        // Категория активна, если она активна в книге или была активна ранее
+        isActive: isActive || (wasActive && isInBook),
+        isInBook
       };
     });
   }
@@ -292,8 +305,11 @@ const activeStandaloneCategories = computed(() => {
       // Категория не должна иметь родителя
       if (cat.parentId) return false;
       
-      // И не должна иметь дочерних элементов
-      if (hasChildCategories(cat.id)) return false;
+      // И не должна иметь дочерних элементов в выбранной книге
+      // или не должна быть родителем для активных категорий
+      if (activeParentCategories.value.some(parent => parent.id === cat.id)) {
+        return false;
+      }
       
       return true;
     })
@@ -307,8 +323,10 @@ const inactiveStandaloneCategories = computed(() => {
       // Категория не должна иметь родителя
       if (cat.parentId) return false;
       
-      // И не должна иметь дочерних элементов
-      if (hasChildCategories(cat.id)) return false;
+      // И не должна быть родителем для неактивных категорий
+      if (inactiveParentCategories.value.some(parent => parent.id === cat.id)) {
+        return false;
+      }
       
       return true;
     })
@@ -344,11 +362,33 @@ const selectCategory = (category) => {
 const toggleCategoryActive = (category, isActive) => {
   const index = categoriesWithActiveState.value.findIndex(c => c.id === category.id);
   if (index !== -1) {
+    // Обновляем статус активности
     categoriesWithActiveState.value[index].isActive = isActive;
+    
+    // Если категория стала активной, убеждаемся, что она принадлежит выбранной книге
+    if (isActive) {
+      // Добавляем книгу в список книг категории, если её там нет
+      if (!categoriesWithActiveState.value[index].books) {
+        categoriesWithActiveState.value[index].books = [];
+      }
+      
+      if (!categoriesWithActiveState.value[index].books.includes(selectedBook.value)) {
+        categoriesWithActiveState.value[index].books.push(selectedBook.value);
+      }
+      
+      categoriesWithActiveState.value[index].isInBook = true;
+    } else {
+      // Если категория стала неактивной, можно оставить её в списке книг,
+      // но отметить как неактивную (isActive = false)
+    }
     
     // Отправляем событие об изменении активности категории
     emit('toggleActive', {
-      category,
+      category: {
+        ...category,
+        isActive,
+        books: categoriesWithActiveState.value[index].books
+      },
       isActive,
       bookId: selectedBook.value
     });
@@ -364,9 +404,16 @@ const handleCategoryMenu = (category) => {
 const handleSaveNewCategory = (newCategory) => {
   console.log('New category saved:', newCategory);
   
+  // Добавляем новую категорию в выбранную книгу
+  const categoryWithBooks = {
+    ...newCategory,
+    books: [selectedBook.value],
+    isActive: true
+  };
+  
   // Emit add event with the new category data
   emit('add', {
-    category: newCategory,
+    category: categoryWithBooks,
     bookId: selectedBook.value,
     type: selectedType.value
   });

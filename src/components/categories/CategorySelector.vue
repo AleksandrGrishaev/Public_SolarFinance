@@ -12,6 +12,7 @@
         <div>Selectable: {{ selectableCategories.length }}</div>
         <div>With Parents: {{ categoriesWithParent.length }}</div>
         <div>Standalone: {{ standaloneCategories.length }}</div>
+        <div>Unique Parents: {{ uniqueParentIds.length }}</div>
       </div>
       
       <!-- Группы категорий с родителями -->
@@ -37,7 +38,7 @@
         </div>
       </template>
 
-      <!-- Категории без родителя -->
+      <!-- Категории без родителя (не включая те, что уже отображаются как родители) -->
       <div v-if="standaloneCategories.length > 0" class="category-group">
         <div class="parent-label" v-if="categoriesWithParent.length > 0">Other</div>
         
@@ -85,6 +86,16 @@ import BasePopup from '../ui/BasePopup.vue';
 import CategoryIcon from './CategoryIcon.vue';
 import { IconEdit, IconPlus } from '@tabler/icons-vue';
 
+// Импортируем полный список категорий и вспомогательные функции
+import { 
+  categories, 
+  hasChildCategories, 
+  hasChildCategoriesInBook, 
+  getChildCategoriesInBook,
+  getAllCategoriesForBookAndType,
+  type Category 
+} from '../../data/categories';
+
 // Режим отладки (установите в true, чтобы видеть отладочную информацию)
 const debugMode = ref(true);
 
@@ -115,20 +126,14 @@ const isVisible = computed({
   set: (value) => emit('update:modelValue', value)
 });
 
-// Отфильтрованные категории - только активные и соответствующие текущему типу транзакции
+// Отфильтрованные категории - принимаем их уже отфильтрованными
 const filteredCategories = computed(() => {
   if (!props.categories || props.categories.length === 0) return [];
-  
-  return props.categories
-    .filter(category => {
-      return category.isActive && category.type === props.transactionType;
-    })
-    .sort((a, b) => (a.order || 0) - (b.order || 0));
+  console.log('Filtered categories for selector:', props.categories);
+  return props.categories;
 });
 
-// Категории, которые можно выбрать
-// 1. Все дочерние категории (с parentId)
-// 2. Категории без родителя, у которых нет дочерних элементов
+// Категории, которые можно выбрать - все, что пришли в props
 const selectableCategories = computed(() => {
   return filteredCategories.value;
 });
@@ -136,11 +141,6 @@ const selectableCategories = computed(() => {
 // Категории с родителем (подкатегории)
 const categoriesWithParent = computed(() => {
   return selectableCategories.value.filter(cat => cat.parentId);
-});
-
-// Категории без родителя
-const standaloneCategories = computed(() => {
-  return selectableCategories.value.filter(cat => !cat.parentId);
 });
 
 // Уникальные ID родителей для группировки
@@ -154,9 +154,38 @@ const uniqueParentIds = computed(() => {
   return Array.from(parentIds);
 });
 
+// Категории без родителя (не включая те, что уже отображаются как родители)
+const standaloneCategories = computed(() => {
+  // Получаем все ID родительских категорий, у которых есть отображаемые дочерние элементы
+  const parentIdsWithDisplayedChildren = new Set();
+  categoriesWithParent.value.forEach(cat => {
+    if (cat.parentId) {
+      parentIdsWithDisplayedChildren.add(cat.parentId);
+    }
+  });
+  
+  // Возвращаем категории без родителя, исключая те, которые уже отображаются как родители
+  return selectableCategories.value.filter(cat => 
+    !cat.parentId && !parentIdsWithDisplayedChildren.has(cat.id)
+  );
+});
+
 // Получение родительской категории по ID
 function getParentCategory(parentId) {
-  return props.categories.find(cat => cat.id === parentId);
+  // Сначала ищем в списке категорий, пришедших через props
+  const parent = props.categories.find(cat => cat.id === parentId);
+  if (parent) return parent;
+  
+  // Если не нашли (возможно, родительская категория неактивна), 
+  // ищем в полном списке категорий из импортированного модуля categories
+  const globalParent = categories.find(cat => cat.id === parentId);
+  
+  // Проверяем, что родительская категория принадлежит текущей книге
+  if (globalParent && globalParent.books?.includes(props.bookId)) {
+    return globalParent;
+  }
+  
+  return null;
 }
 
 // Получение категорий по ID родителя
@@ -175,8 +204,14 @@ const truncateName = (name) => {
 
 // Выбор категории
 const selectCategory = (category) => {
-  emit('select', category);
-  isVisible.value = false;
+  // Проверяем, что выбранная категория не имеет дочерних элементов в текущей книге
+  if (!hasChildCategoriesInBook(category.id, props.bookId)) {
+    emit('select', category);
+    isVisible.value = false;
+  } else {
+    console.log("Категория с дочерними элементами не может быть выбрана");
+    // Можно добавить уведомление пользователю, что нельзя выбрать категорию с подкатегориями
+  }
 };
 
 // Добавление новой категории

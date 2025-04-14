@@ -20,28 +20,55 @@ Pinia: Управление состоянием приложения
 Tabler Icons: Библиотека векторных иконок     "@tabler/icons-vue": "^3.31.0",
 
 ## Структура проекта
-Copysrc/
-├── App.vue                 # Основной компонент приложения
-├── main.ts                 # Точка входа приложения
-├── assets/                 # Статические ресурсы
-├── components/             # Общие компоненты
-│   └── NavigationMenu.vue  # Компонент навигационного меню
-├── data/                   # Данные приложения
-│   └── userData.ts         # Данные пользователей и их ролей
-├── layouts/                # Макеты приложения
-│   ├── EmptyLayout.vue     # Пустой макет для страниц авторизации
-│   └── ConsoleLayout.vue   # Основной макет консоли с боковой панелью
-├── router/
-│   └── index.ts            # Конфигурация маршрутизации
-├── stores/                 # Хранилища Pinia
-│   ├── theme.ts            # Управление темой (светлая/темная)
-│   └── user.ts             # Управление пользователями и авторизацией
-└── views/                  # Страницы приложения
-    ├── PinLoginView.vue    # Страница входа по PIN-коду
-    ├── DashboardView.vue   # Дашборд с аналитикой
-    ├── AccountsView.vue    # Управление аккаунтами
-    ├── SettingsView.vue    # Настройки приложения
-    └── NotFoundView.vue    # Страница 404
+src
+src/about
+src/assets
+src/components
+src/components/categories
+src/components/categories/CategoryAddPopup.vue
+src/components/categories/CategoryFilterToggle.vue
+src/components/categories/CategoryIcon.vue
+src/components/categories/CategoryItem.vue
+src/components/categories/CategoryListGrouped.vue
+src/components/categories/CategoryListPopup.vue
+src/components/categories/CategorySelector.vue
+src/components/icons
+src/components/navigation
+src/components/navigation/NavMenu.vue
+src/components/transactions
+src/components/transactions/AccountSelector.vue
+src/components/transactions/BookSelector.vue
+src/components/transactions/NumberKeypad.vue
+src/components/transactions/PercentageSlider.vue
+src/components/transactions/TransactionTypeSelector.vue
+src/components/ui
+src/components/ui/inputs
+src/components/ui/BasePopup.vue
+src/components/ui/CreateCategoryButton.vue
+src/components/NavigationMenu.vue
+src/data
+src/data/categories.ts
+src/data/UserData.ts
+src/layouts
+src/router
+src/services
+src/services/api
+src/services/finance
+src/services/transaction
+src/services/transaction/TransactionService.ts
+src/services/BaseCrudService.ts
+src/stores
+src/stores/theme.ts
+src/stores/user.ts
+src/types
+src/views
+src/views/AccountsView.vue
+src/views/DashboardView.vue
+src/views/NotFoundView.vue
+src/views/PinLoginView.vue
+src/views/TransactionView.vue
+src/App.vue
+src/main.ts
 
 ## Основные функции
 ### Аутентификация
