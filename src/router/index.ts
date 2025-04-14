@@ -1,6 +1,7 @@
 // src/router/index.ts
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { useUserStore } from '@/stores/user'
+
 // Layouts
 import EmptyLayout from '@/layouts/EmptyLayout.vue'
 import IosLayout from '@/layouts/IosLayout.vue'
@@ -10,7 +11,6 @@ declare module 'vue-router' {
   interface RouteMeta {
     requiresAuth: boolean
     title: string
-    roles?: string[]
   }
 }
 
@@ -93,7 +93,7 @@ let isUserStoreInitialized = false
 // Навигационный guard с дополнительной логикой инициализации
 router.beforeEach(async (to, from, next) => {
   // Обновление заголовка страницы
-  document.title = `${to.meta.title || 'Console'} - Finance App`
+  document.title = `${to.meta.title || 'Finance'} - Family App`
   
   // Получение хранилища пользователя
   const userStore = useUserStore()
@@ -106,7 +106,7 @@ router.beforeEach(async (to, from, next) => {
       isUserStoreInitialized = true
       console.log('[Router] User authentication status:', userStore.isAuthenticated)
       if (userStore.isAuthenticated) {
-        console.log('[Router] User restored from localStorage:', userStore.user?.name)
+        console.log('[Router] User restored from localStorage:', userStore.username)
       }
     } catch (error) {
       console.error('[Router] Error initializing user store:', error)
@@ -116,7 +116,7 @@ router.beforeEach(async (to, from, next) => {
   // Проверка авторизации и перенаправление
   if (to.meta.requiresAuth && !userStore.isAuthenticated) {
     console.log('[Router] Authentication required, redirecting to login')
-    next({ name: 'login' })
+    next({ name: 'login', query: { redirect: to.fullPath } })
   } 
   // Если пользователь уже авторизован и пытается открыть страницу логина
   else if (to.name === 'login' && userStore.isAuthenticated) {

@@ -54,6 +54,9 @@ export class UserService {
    */
   saveCurrentUser(user: User): void {
     localStorage.setItem(this.CURRENT_USER_KEY, JSON.stringify(user));
+    // Для обратной совместимости
+    localStorage.setItem('user_id', user.id.toString());
+    localStorage.setItem('user_data', JSON.stringify(user));
   }
 
   /**
@@ -69,6 +72,8 @@ export class UserService {
    */
   clearCurrentUser(): void {
     localStorage.removeItem(this.CURRENT_USER_KEY);
+    localStorage.removeItem('user_id');
+    localStorage.removeItem('user_data');
   }
 
   /**
@@ -76,13 +81,14 @@ export class UserService {
    */
   saveAuthToken(token: string): void {
     localStorage.setItem(this.AUTH_TOKEN_KEY, token);
+    localStorage.setItem('auth_token', token); // Для обратной совместимости
   }
 
   /**
    * Получение токена аутентификации
    */
   getAuthToken(): string | null {
-    return localStorage.getItem(this.AUTH_TOKEN_KEY);
+    return localStorage.getItem(this.AUTH_TOKEN_KEY) || localStorage.getItem('auth_token');
   }
 
   /**
@@ -90,10 +96,67 @@ export class UserService {
    */
   clearAuthToken(): void {
     localStorage.removeItem(this.AUTH_TOKEN_KEY);
+    localStorage.removeItem('auth_token');
   }
 
   /**
-   * Создание пользователя по умолчанию, если нет ни одного
+   * Добавление нового пользователя
+   */
+  async addUser(newUser: Omit<User, 'id'>): Promise<User> {
+    const users = await this.getUsers();
+    const id = `user_${Math.max(0, ...users.map(u => 
+      parseInt(u.id.toString().replace('user_', '') || '0')
+    )) + 1}`;
+    
+    const userWithId = { ...newUser, id };
+    
+    try {
+      await this.apiService.post('/users', userWithId);
+      console.log('[UserService] User added:', userWithId.name);
+      return userWithId;
+    } catch (error) {
+      console.error('[UserService] Error adding user:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Обновление пользователя
+   */
+  async updateUser(id: string, userData: Partial<User>): Promise<boolean> {
+    try {
+      await this.apiService.put(`/users/${id}`, userData);
+      
+      // Обновляем текущего пользователя, если это он
+      const currentUser = this.getCurrentUser();
+      if (currentUser && currentUser.id === id) {
+        this.saveCurrentUser({ ...currentUser, ...userData });
+      }
+      
+      console.log('[UserService] User updated:', id);
+      return true;
+    } catch (error) {
+      console.error(`[UserService] Error updating user ${id}:`, error);
+      return false;
+    }
+  }
+
+  /**
+   * Удаление пользователя
+   */
+  async deleteUser(id: string): Promise<boolean> {
+    try {
+      await this.apiService.delete(`/users/${id}`);
+      console.log('[UserService] User deleted:', id);
+      return true;
+    } catch (error) {
+      console.error(`[UserService] Error deleting user ${id}:`, error);
+      return false;
+    }
+  }
+
+  /**
+   * Создание пользователей по умолчанию, если нет ни одного
    */
   async ensureDefaultUsers(): Promise<void> {
     const users = await this.getUsers();
@@ -105,10 +168,9 @@ export class UserService {
           id: 'user_1',
           name: 'Alex',
           type: 'user',
-          username: 'admin',
+          username: 'alex',
           pin: '1234',
-          email: 'admin@example.com',
-          roles: ['admin'],
+          email: 'alex@example.com',
           isActive: true,
           createdAt: now,
           updatedAt: now,
@@ -121,10 +183,9 @@ export class UserService {
           id: 'user_2',
           name: 'Wife',
           type: 'user',
-          username: 'user',
+          username: 'wife',
           pin: '5678',
           email: 'wife@example.com',
-          roles: ['regular'],
           isActive: true,
           createdAt: now,
           updatedAt: now,
@@ -135,7 +196,9 @@ export class UserService {
         }
       ];
       
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(defaultUsers));
+      for (const user of defaultUsers) {
+        await this.apiService.post('/users', user);
+      }
       console.log('[UserService] Created default users');
     }
   }

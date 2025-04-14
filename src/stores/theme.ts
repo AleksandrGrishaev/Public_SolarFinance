@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { useUserStore } from '../stores/user'
 
 export const useThemeStore = defineStore('theme', () => {
   // Состояние
@@ -11,18 +12,35 @@ export const useThemeStore = defineStore('theme', () => {
     isDark.value = !isDark.value
     themeName.value = isDark.value ? 'dark' : 'light'
     applyTheme()
+    saveThemeToUserSettings()
   }
   
   const setDarkTheme = () => {
     isDark.value = true
     themeName.value = 'dark'
     applyTheme()
+    saveThemeToUserSettings()
   }
   
   const setLightTheme = () => {
     isDark.value = false
     themeName.value = 'light'
     applyTheme()
+    saveThemeToUserSettings()
+  }
+  
+  // Сохранение темы в настройках пользователя
+  const saveThemeToUserSettings = () => {
+    // Сохраняем в localStorage
+    localStorage.setItem('theme', themeName.value)
+    
+    // Если пользователь авторизован, сохраняем в его профиле
+    const userStore = useUserStore()
+    if (userStore.isAuthenticated && userStore.currentUser) {
+      userStore.updateUserSettings({
+        theme: themeName.value as 'light' | 'dark' | 'system'
+      })
+    }
   }
   
   // Вспомогательная функция для применения темы
@@ -36,6 +54,18 @@ export const useThemeStore = defineStore('theme', () => {
   
   // Инициализация темы
   const initTheme = () => {
+    // Сначала проверяем настройки авторизованного пользователя
+    const userStore = useUserStore()
+    if (userStore.isAuthenticated && userStore.userSettings?.theme) {
+      const userTheme = userStore.userSettings.theme
+      if (userTheme !== 'system') {
+        isDark.value = userTheme === 'dark'
+        themeName.value = userTheme
+        applyTheme()
+        return
+      }
+    }
+    
     // Проверяем сохраненную тему в localStorage
     const savedTheme = localStorage.getItem('theme')
     if (savedTheme) {

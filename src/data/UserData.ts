@@ -1,37 +1,37 @@
-// src/data/userData.ts
-import { type User } from '@/stores/user';
+// src/data/UserData.ts
+import type { User } from '@/stores/user';
 
 // Данные пользователей для аутентификации
+// Используются только при первой инициализации
 export const availableUsers: User[] = [
   { 
-    id: 1, 
-    name: 'Alex', 
-    role: 'Administrator', 
-    pin: '1234', 
-    email: 'admin@example.com' 
+    id: 'user_1',
+    type: 'user',
+    name: 'Alex',
+    username: 'alex',
+    pin: '1234',
+    email: 'alex@example.com',
+    isActive: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    settings: {
+      theme: 'system',
+      language: 'ru'
+    }
   },
   { 
-    id: 2, 
-    name: 'Sasha Solar', 
-    role: 'User', 
-    pin: '5678', 
-    email: 'user@example.com' 
+    id: 'user_2',
+    type: 'user',
+    name: 'Sasha Solar',
+    username: 'sasha',
+    pin: '5678',
+    email: 'sasha@example.com',
+    isActive: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    settings: {
+      theme: 'light',
+      language: 'ru'
+    }
   },
 ];
-
-// Роли пользователей и их возможности
-export const userRoles = {
-  Administrator: {
-    level: 3,
-    permissions: ['read', 'write', 'delete', 'manage_users', 'settings']
-  },
-  User: {
-    level: 1,
-    permissions: ['read', 'write', 'delete', 'manage_users', 'settings']
-  }
-};
-
-// Проверка наличия разрешения у роли
-export function hasPermission(role: string, permission: string): boolean {
-  return userRoles[role as keyof typeof userRoles]?.permissions.includes(permission) || false;
-}

@@ -1,10 +1,6 @@
 <!-- src/views/MoreView.vue -->
 <template>
   <div class="more-view">
-    <div class="more-header">
-      <h1 class="more-title">Настройки</h1>
-    </div>
-    
     <div class="more-content">
       <!-- User Info Section -->
       <div class="user-info-section">
@@ -20,7 +16,7 @@
         </div>
         <div class="user-details">
           <h2 class="user-name">{{ userStore.username }}</h2>
-          <p class="user-role">{{ userStore.isAdmin ? 'Администратор' : 'Пользователь' }}</p>
+          <p class="user-role">Пользователь</p>
         </div>
       </div>
       
@@ -35,6 +31,23 @@
             <span>Тёмная тема</span>
           </div>
           <n-switch v-model:value="isDarkTheme" @update:value="toggleTheme" />
+        </div>
+        
+        <!-- Language Selection -->
+        <div class="settings-item">
+          <div class="settings-item-label">
+            <n-icon size="20" class="settings-icon">
+              <icon-language />
+            </n-icon>
+            <span>Язык</span>
+          </div>
+          <n-select
+            v-model:value="selectedLanguage"
+            :options="languageOptions"
+            size="small"
+            style="width: 120px"
+            @update:value="changeLanguage"
+          />
         </div>
         
         <!-- App Version -->
@@ -75,12 +88,15 @@ import {
   NButton, 
   NIcon, 
   NSwitch,
+  NSelect,
+  SelectOption,
   useMessage 
 } from 'naive-ui';
 import { 
   IconMoon, 
   IconInfoCircle, 
-  IconLogout 
+  IconLogout,
+  IconLanguage
 } from '@tabler/icons-vue';
 import { useUserStore } from '@/stores/user';
 import { useThemeStore } from '@/stores/theme';
@@ -98,6 +114,13 @@ const message = useMessage();
 // Local state
 const isLoggingOut = ref(false);
 const isDarkTheme = ref(themeStore.isDark);
+const selectedLanguage = ref(userStore.userSettings?.language || 'ru');
+
+// Доступные языки
+const languageOptions = [
+  { label: 'Русский', value: 'ru' },
+  { label: 'English', value: 'en' }
+] as SelectOption[];
 
 // User initials for avatar
 const userInitials = computed(() => {
@@ -111,7 +134,28 @@ const userInitials = computed(() => {
 
 // Toggle theme
 const toggleTheme = (value: boolean) => {
-  themeStore.setTheme(value ? 'dark' : 'light');
+  if (value) {
+    themeStore.setDarkTheme();
+  } else {
+    themeStore.setLightTheme();
+  }
+  
+  // Сохраняем настройку в профиле пользователя
+  if (userStore.currentUser) {
+    userStore.updateUserSettings({ 
+      theme: value ? 'dark' : 'light'
+    });
+  }
+};
+
+// Change language
+const changeLanguage = (value: string) => {
+  // Сохраняем выбранный язык в профиле пользователя
+  if (userStore.currentUser) {
+    userStore.updateUserSettings({ 
+      language: value 
+    });
+  }
 };
 
 // Logout handler
@@ -143,22 +187,10 @@ const handleLogout = async () => {
 .more-view {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
   background-color: var(--app-background);
   color: var(--text-primary);
-  padding-bottom: 120px; /* Для отступа от нижнего меню */
-}
-
-.more-header {
-  padding: 20px 16px;
-  text-align: center;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.more-title {
-  font-size: 20px;
-  font-weight: 600;
-  margin: 0;
+  padding-bottom: 100px; /* Для отступа от нижнего меню */
+  min-height: calc(100vh - 50px); /* Учитываем высоту заголовка в IosLayout */
 }
 
 .more-content {
