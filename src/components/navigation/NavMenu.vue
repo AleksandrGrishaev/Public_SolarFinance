@@ -8,7 +8,7 @@
           :key="item.id"
           class="menu-item"
           :class="{ 'active': activeItem === item.id }"
-          @click="activeItem = item.id"
+          @click="handleItemClick(item)"
         >
           <div v-if="item.id === 'new'" class="icon new-transaction">
             <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -21,21 +21,29 @@
     </div>
   </div>
 </template>
-
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+
+// Router для навигации
+const router = useRouter();
 
 const menuItems = [
-  { id: 'new', label: '' },
-  { id: 'books', label: 'Books' },
-  { id: 'assets', label: 'Assets' },
-  { id: 'charts', label: 'Charts' },
-  { id: 'more', label: 'More' }
+  { id: 'new', label: '', route: '/transaction' },
+  { id: 'books', label: 'Books', route: '/books' },
+  { id: 'assets', label: 'Assets', route: '/accounts' },
+  { id: 'charts', label: 'Charts', route: '/dashboard' },
+  { id: 'more', label: 'More', route: '/more' }
 ];
 
 const activeItem = ref('new');
-</script>
 
+// Обработчик клика по пункту меню
+const handleItemClick = (item: any) => {
+  activeItem.value = item.id;
+  router.push(item.route);
+};
+</script>
 <style scoped>
 .menu-float-element {
   width: 100%;
@@ -47,7 +55,6 @@ const activeItem = ref('new');
   justify-content: center;
   align-items: center;
 }
-
 .menu {
   padding: 6px 8px 6px 12px;
   background: #DBDADD;
@@ -57,14 +64,12 @@ const activeItem = ref('new');
   align-items: center;
   gap: 6px;
 }
-
 .buttons {
   display: flex;
   justify-content: flex-start;
   align-items: center;
   gap: 16px;
 }
-
 .menu-item {
   display: flex;
   flex-direction: column;
@@ -78,7 +83,6 @@ const activeItem = ref('new');
   word-wrap: break-word;
   cursor: pointer;
 }
-
 .icon.new-transaction {
   width: 24px;
   height: 24px;
@@ -92,7 +96,6 @@ const activeItem = ref('new');
   align-items: center;
   gap: 10px;
 }
-
 /* Убрал стили .menu-item.active, так как в предоставленном примере не видно 
    отличия активного текстового элемента */
 </style>

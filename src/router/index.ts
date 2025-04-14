@@ -32,6 +32,22 @@ const routes: Array<RouteRecordRaw> = [
       title: 'Login'
     }
   },
+  // MoreView - используем IosLayout
+  {
+    path: '/more',
+    component: IosLayout,
+    children: [
+      {
+        path: '',
+        name: 'more',
+        component: () => import('@/views/MoreView.vue'),
+        meta: {
+          requiresAuth: true,
+          title: 'Настройки'
+        }
+      }
+    ]
+  },
   // Transaction route - используем IosLayout для транзакций
   {
     path: '/transaction',
