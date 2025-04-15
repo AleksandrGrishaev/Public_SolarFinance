@@ -1,8 +1,9 @@
 <!-- src/components/categories/CategoryViewPopup.vue -->
 <template>
-    <BasePopup 
+  <BasePopup 
       v-model="isVisible" 
       :closeOnOverlayClick="true"
+      :rightContent="true"
       @update:modelValue="handleClose"
     >
       <!-- Кастомный заголовок со слотом title -->
@@ -24,16 +25,11 @@
         </div>
       </template>
       
-      <!-- Левая иконка (закрытие) -->
-      <template #leftIcon>
-        <IconX color="#A44942" class="icon-close" />
-      </template>
+      <!-- Левая иконка (закрытие) - удалена, так как стандартная иконка будет использоваться из BasePopup -->
       
-      <!-- Правая иконка (редактирование) -->
-      <template #rightIcon>
-        <div class="edit-button" @click="handleEdit">
-          Edit
-        </div>
+      <!-- Правая кнопка (редактирование) с классом edit-button -->
+      <template #rightContent>
+        <div class="edit-button" @click="handleEdit">Edit</div>
       </template>
       
       <div class="category-view-container">
@@ -70,7 +66,7 @@
             :currency="transactions[0]?.currency || 'Rp'"
           >
             <TransactionItem
-              v-for="(transaction, index) in transactions"
+              v-for="transaction in transactions"
               :key="transaction.id"
               :transaction="transaction"
               :title="getTransactionTitle(transaction)"
@@ -78,7 +74,7 @@
               :accountName="getAccountName(transaction)"
               :iconName="getTransactionIconName(transaction)"
               :iconColor="category?.color || '#D9D9D9'"
-              :withBorder="index < transactions.length - 1"
+              :withBorder="transactions.indexOf(transaction) < transactions.length - 1"
               @click="handleTransactionClick(transaction)"
             />
           </TransactionDateGroup>
@@ -103,7 +99,6 @@
   import TransactionDateGroup from '../transactions/ViewTransaction/TransactionDateGroup.vue';
   import TransactionItem from '../transactions/ViewTransaction/TransactionItem.vue';
   import { 
-    IconX,
     IconBook,
     IconShare,
     IconChartPie,
@@ -161,15 +156,21 @@
     return typeMap[category.value.type] || category.value.type;
   });
   
+  // Получение книг из BookStore
+  const availableBooks = computed(() => {
+    // Получаем книги, доступные текущему пользователю из BookStore
+    return bookStore.userBooksForSelector || [];
+  });
+  
   const bookNames = computed(() => {
     if (!category.value?.books || category.value.books.length === 0) {
       return 'No books';
     }
     
-    // Преобразуем ID книг в имена
+    // Преобразуем ID книг в имена, используя BookStore
     const bookNames = category.value.books.map(bookId => {
-      // Найти книгу по ID в списке доступных книг
-      const book = availableBooks.value.find(b => b.id === bookId);
+      // Найти книгу по ID в списке книг из store
+      const book = bookStore.getBookById(bookId);
       return book ? book.name : bookId.charAt(0).toUpperCase() + bookId.slice(1);
     });
     
@@ -186,16 +187,6 @@
     date: new Date()
   });
   
-  // Список книг
-  const availableBooks = computed(() => {
-    // В реальном приложении эти данные должны приходить из BookStore
-    return [
-      { id: 'my', name: 'My Book' },
-      { id: 'family', name: 'Family' },
-      { id: 'wife', name: 'Wife' }
-    ];
-  });
-  
   // Получение транзакций для выбранной категории
   const categoryTransactions = ref([]);
   
@@ -203,9 +194,8 @@
   const loadTransactions = () => {
     if (!props.categoryId) return;
     
-    // В реальном приложении здесь должен быть вызов transactionStore.getTransactionsByCategory
-    // с учетом выбранного периода
-    const allTransactions = transactionStore.getAllTransactions();
+    // Используем правильный метод для получения всех транзакций
+    const allTransactions = transactionStore.transactions || [];
     
     // Фильтруем транзакции по категории и периоду
     const filteredTransactions = allTransactions.filter(transaction => {
@@ -241,6 +231,7 @@
       }
     });
     
+    // ИСПРАВЛЕНИЕ: Заменяем массив вместо добавления к нему
     categoryTransactions.value = filteredTransactions;
   };
   
@@ -252,11 +243,16 @@
       const dateKey = transaction.date instanceof Date 
         ? transaction.date.toISOString().split('T')[0]
         : new Date(transaction.date).toISOString().split('T')[0];
-        
+          
       if (!groups[dateKey]) {
         groups[dateKey] = [];
       }
-      groups[dateKey].push(transaction);
+      
+      // ИСПРАВЛЕНИЕ: Проверяем, не добавлена ли уже эта транзакция
+      const isDuplicate = groups[dateKey].some(t => t.id === transaction.id);
+      if (!isDuplicate) {
+        groups[dateKey].push(transaction);
+      }
     });
     
     // Сортировка дат в обратном порядке (сначала новые)
@@ -273,30 +269,37 @@
   
   // Получение заголовка транзакции
   const getTransactionTitle = (transaction) => {
-    // В реальном приложении нужно использовать bookStore.getBookName
-    const bookMap = {
-      'my': 'Alex book',
-      'family': 'Family book',
-      'wife': 'Wife book'
-    };
+    // Используем описание транзакции или название книги
+    if (transaction.description) {
+      return transaction.description;
+    }
     
-    return transaction.description || bookMap[transaction.bookId] || 'Unknown';
+    // Получаем название книги из BookStore
+    const book = bookStore.getBookById(transaction.bookId);
+    return book ? book.name : 'Unknown';
   };
   
   // Получение подзаголовка транзакции
   const getTransactionSubtitle = (transaction) => {
-    // В реальном приложении нужно использовать userStore.getUserName
+    // Получаем имя пользователя из UserStore
+    const user = userStore.getUserById?.(transaction.executedByOwnerId);
+    // Если getUserById не существует или не вернул пользователя, используем запасной вариант
+    if (user) {
+      return user.name || 'Unknown';
+    }
+    
+    // Запасной вариант
     const userMap = {
       'user_1': 'Me',
       'user_2': 'Wife'
     };
-    
     return userMap[transaction.executedByOwnerId] || 'Unknown';
   };
   
   // Получение имени счета
   const getAccountName = (transaction) => {
-    // В реальном приложении нужно использовать accountStore.getAccountName
+    // В идеале должны использовать accountStore.getAccountName
+    // Пока используем запасной вариант
     const accountMap = {
       'card1': 'Card',
       'card2': 'Family Card',
@@ -315,8 +318,8 @@
   
   // Получение имени иконки для транзакции
   const getTransactionIconName = (transaction) => {
-    // В реальном приложении нужно использовать иконку категории
-    // Здесь просто по типу возвращаем иконки
+    // Идеально: использовать иконку категории
+    // Пока просто по типу
     const typeIconMap = {
       'expense': 'shopping',
       'income': 'coin',
@@ -341,14 +344,37 @@
     // Здесь должен быть код для открытия детального просмотра транзакции
   };
   
-  // Обновляем транзакции при изменении фильтров
-  watch([() => props.categoryId, dateFilter], () => {
+  // Убедимся, что сторы инициализированы перед загрузкой данных
+  const ensureStoresInitialized = async () => {
+    if (!bookStore.isInitialized) await bookStore.init();
+    if (!transactionStore.isInitialized) await transactionStore.init();
+    if (!categoryStore.isInitialized) await categoryStore.init();
+    
+    // После инициализации сторов загружаем транзакции
     loadTransactions();
-  }, { immediate: true });
+  };
+  
+  // ИСПРАВЛЕНИЕ: Отслеживаем только изменения нужных свойств, а не всего объекта
+  watch(() => props.categoryId, (newValue, oldValue) => {
+    // Убедимся, что сторы инициализированы перед загрузкой
+    if (transactionStore.isInitialized && newValue !== oldValue) {
+      loadTransactions();
+    }
+  });
+  
+  // Отдельный watch для dateFilter
+  watch(() => [dateFilter.value.period, dateFilter.value.date], () => {
+    // Убедимся, что сторы инициализированы перед загрузкой
+    if (transactionStore.isInitialized && props.categoryId) {
+      loadTransactions();
+    }
+  }, { deep: true });
   
   // Инициализация
   onMounted(() => {
-    loadTransactions();
+    // Очищаем данные при монтировании
+    categoryTransactions.value = [];
+    ensureStoresInitialized();
   });
   </script>
   

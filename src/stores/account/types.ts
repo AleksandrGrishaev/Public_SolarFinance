@@ -1,5 +1,4 @@
 // src/stores/account/types.ts
-import type { Person } from '../common/types';
 
 export interface Account {
   id: string;
@@ -17,4 +16,4 @@ export interface Account {
   updatedAt: Date;
 }
 
-export type AccountType = 'cash' | 'bank' | 'credit_card' | 'savings' | 'investment';
+export type AccountType = 'cash' | 'bank' |  'card' |'credit_card' | 'savings' | 'investment';

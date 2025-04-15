@@ -79,7 +79,7 @@
   const iconComponent = computed(() => {
     const iconMap = {
       'wallet': IconWallet,
-      'credit-card': IconCreditCard,
+      'card': IconCreditCard,
       'cash': IconCash,
       'home': IconHome,
       'bank': IconBuildingBank,
