@@ -1,395 +1,198 @@
 <!-- src/components/ui/DateFilter.vue -->
 <template>
   <div class="date-filter">
-    <!-- Переключатели периодов в новом дизайне D-M-Y -->
-    <div class="periods-container">
+    <!-- Контейнер для компактного отображения по центру -->
+    <div class="filter-container">
+      <!-- Переключатели D-M-Y -->
       <div class="fast-date">
         <div 
           class="date-option"
-          :class="{ 'active': modelValue.period === 'daily' }" 
-          @click="updatePeriod('daily')"
+          :class="{ 'active': dateFilter.currentPeriod === 'daily' }" 
+          @click="dateFilter.setPeriod('daily')"
         >
           D
         </div>
         <div 
           class="date-option"
-          :class="{ 'active': modelValue.period === 'monthly' }" 
-          @click="updatePeriod('monthly')"
+          :class="{ 'active': dateFilter.currentPeriod === 'monthly' }" 
+          @click="dateFilter.setPeriod('monthly')"
         >
           M
         </div>
         <div 
           class="date-option"
-          :class="{ 'active': modelValue.period === 'yearly' }" 
-          @click="updatePeriod('yearly')"
+          :class="{ 'active': dateFilter.currentPeriod === 'yearly' }" 
+          @click="dateFilter.setPeriod('yearly')"
         >
           Y
         </div>
       </div>
+      
+      <!-- Селектор даты -->
+      <div class="date-selector" @click="dateFilter.toggleCalendar">
+        <div class="date-nav" @click.stop="dateFilter.navigateDate(-1)">&lt;</div>
+        <div class="date-value">{{ dateFilter.formattedDateValue }}</div>
+        <div class="date-nav" @click.stop="dateFilter.navigateDate(1)">&gt;</div>
+      </div>
     </div>
     
-    <!-- Контейнер для селектора даты, выровненный по центру -->
-    <div class="selector-container">
-      <!-- Селектор для одиночной даты (месяц/год) -->
-      <n-date-picker 
-        v-if="modelValue.period !== 'daily'"
-        v-model:value="pickerValue"
-        :type="pickerType"
-        :actions="null"
-        placement="bottom"
-        trigger="click"
-        :show="showPicker"
-        @update:show="showPicker = $event"
-        @update:value="onSelectDate"
-      >
-        <div class="date-selector">
-          <div class="date-nav" @click.stop="navigateDate(-1)">&lt;</div>
-          <div class="date-value">{{ formattedDate }}</div>
-          <div class="date-nav" @click.stop="navigateDate(1)">&gt;</div>
-        </div>
-      </n-date-picker>
+    <!-- Календарь -->
+    <div v-if="dateFilter.showCalendar" class="calendar-container" v-click-outside="dateFilter.hideCalendar">
+      <!-- Навигация по месяцам и годам -->
+      <div class="calendar-header">
+        <button class="nav-button" @click="dateFilter.navigateMonth(-1)">&lt;</button>
+        <span class="calendar-title">{{ dateFilter.calendarTitle }}</span>
+        <button class="nav-button" @click="dateFilter.navigateMonth(1)">&gt;</button>
+      </div>
       
-      <!-- Селектор для диапазона дат в режиме Daily -->
-      <n-date-picker 
-        v-else
-        v-model:value="rangeValue"
-        type="daterange"
-        :actions="['confirm']"
-        placement="bottom"
-        trigger="click"
-        :show="showPicker"
-        :is-date-disabled="isDateDisabled"
-        @update:show="showPicker = $event"
-        @confirm="onConfirmDateRange"
-      >
-        <div class="date-selector">
-          <div class="date-nav" @click.stop="navigateDateRange(-1)">&lt;</div>
-          <div class="date-value">{{ formattedDateRange }}</div>
-          <div class="date-nav" @click.stop="navigateDateRange(1)">&gt;</div>
+      <!-- Календарь для Daily -->
+      <div v-if="dateFilter.currentPeriod === 'daily'" class="calendar daily-calendar">
+        <!-- Дни недели -->
+        <div class="weekday-header">
+          <div v-for="day in dateFilter.weekDays" :key="day" class="weekday">{{ day }}</div>
         </div>
-      </n-date-picker>
+        
+        <!-- Дни месяца -->
+        <div class="days-grid">
+          <div 
+            v-for="(day, index) in dateFilter.calendarDays" 
+            :key="index" 
+            class="day-cell"
+            :class="{
+              'outside-month': !day.currentMonth,
+              'selected-start': dateFilter.isSelectedStart(day.date),
+              'selected-end': dateFilter.isSelectedEnd(day.date),
+              'in-range': dateFilter.isInRange(day.date),
+              'today': dateFilter.isToday(day.date)
+            }"
+            @click="dateFilter.selectDate(day.date)"
+          >
+            {{ day.dayNumber }}
+          </div>
+        </div>
+        
+        <!-- Кнопки действий -->
+        <div class="calendar-footer">
+          <button class="action-button cancel" @click="dateFilter.hideCalendar">Cancel</button>
+          <button class="action-button confirm" @click="dateFilter.confirmSelection">Confirm</button>
+        </div>
+      </div>
+      
+      <!-- Выбор месяца -->
+      <div v-else-if="dateFilter.currentPeriod === 'monthly'" class="calendar month-calendar">
+        <div class="months-grid">
+          <div 
+            v-for="(month, index) in dateFilter.monthNames" 
+            :key="index" 
+            class="month-cell"
+            :class="{ 'selected': dateFilter.isSelectedMonth(index) }"
+            @click="dateFilter.selectMonth(index)"
+          >
+            {{ month.substring(0, 3) }}
+          </div>
+        </div>
+      </div>
+      
+      <!-- Выбор года -->
+      <div v-else-if="dateFilter.currentPeriod === 'yearly'" class="calendar year-calendar">
+        <div class="years-grid">
+          <div 
+            v-for="year in dateFilter.yearsList" 
+            :key="year" 
+            class="year-cell"
+            :class="{ 'selected': dateFilter.isSelectedYear(year) }"
+            @click="dateFilter.selectYear(year)"
+          >
+            {{ year }}
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue';
-import { NDatePicker } from 'naive-ui';
+import { watch } from 'vue';
+import { useDateFilter, type DateFilterState } from '@/composables/useDateFilter';
 
-// Функция для получения начала текущего месяца
-const getCurrentMonthStart = () => {
-  const now = new Date();
-  return new Date(now.getFullYear(), now.getMonth(), 1);
+// Директива для закрытия календаря при клике вне него
+const vClickOutside = {
+  mounted(el: HTMLElement, binding: any) {
+    el._clickOutside = (event: MouseEvent) => {
+      if (!(el === event.target || el.contains(event.target as Node))) {
+        binding.value(event);
+      }
+    };
+    document.addEventListener('click', el._clickOutside);
+  },
+  unmounted(el: any) {
+    document.removeEventListener('click', el._clickOutside);
+  }
 };
 
-// Функция для получения начала текущего года
-const getCurrentYearStart = () => {
-  const now = new Date();
-  return new Date(now.getFullYear(), 0, 1);
-};
+const props = defineProps<{
+  modelValue: DateFilterState;
+}>();
 
-// Функция для проверки, входит ли дата в соседний месяц
-const isDateDisabled = (ts: number) => {
-  if (!rangeValue.value || !rangeValue.value[0]) return false;
-  
-  const date = new Date(ts);
-  const firstDate = new Date(rangeValue.value[0]);
-  
-  // Сравниваем месяцы - запрещаем выбор дат из другого месяца
-  return date.getMonth() !== firstDate.getMonth();
-};
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: DateFilterState): void;
+}>();
 
-// Функция для получения дефолтной даты в зависимости от периода
-const getDefaultDateForPeriod = (period) => {
-  switch (period) {
-    case 'daily': {
-      // Для daily возвращаем диапазон - сегодня и 7 дней назад
-      const today = new Date();
-      const weekAgo = new Date();
-      weekAgo.setDate(weekAgo.getDate() - 7);
-      return [weekAgo, today];
+// Используем composable для логики работы с датами
+const dateFilter = useDateFilter(
+  props.modelValue,
+  (value) => { emit('update:modelValue', value); }
+);
+
+// Следим за изменениями в modelValue извне
+watch(() => props.modelValue, (newValue) => {
+  if (newValue && JSON.stringify(newValue) !== JSON.stringify({
+    period: dateFilter.currentPeriod.value,
+    date: dateFilter.currentPeriod.value !== 'daily' ? dateFilter.selectedDate.value : undefined,
+    dateRange: dateFilter.currentPeriod.value === 'daily' ? dateFilter.dateRange.value : undefined
+  })) {
+    // Обновляем состояние если внешнее значение изменилось
+    if (newValue.period) {
+      dateFilter.setPeriod(newValue.period);
     }
-    case 'monthly':
-      return getCurrentMonthStart();
-    case 'yearly':
-      return getCurrentYearStart();
-    default:
-      return new Date();
-  }
-};
-
-// Используем defineProps без обращения к внешним переменным
-const props = defineProps({
-  modelValue: {
-    type: Object,
-    default: () => ({
-      period: 'monthly',
-      date: new Date(), // Для режимов monthly/yearly
-      dateRange: [new Date(new Date().setDate(new Date().getDate() - 7)), new Date()] // Диапазон для daily
-    })
-  }
-});
-
-const emit = defineEmits(['update:modelValue']);
-
-// Вычисляем начальное значение для picker на основе props
-const initialPickerValue = () => {
-  if (props.modelValue.date) {
-    return new Date(props.modelValue.date);
-  }
-  return getCurrentMonthStart();
-};
-
-// Состояние DatePicker
-const pickerValue = ref(initialPickerValue());
-
-// Начальное значение для диапазона в режиме Daily
-const initialRangeValue = () => {
-  if (props.modelValue.dateRange && Array.isArray(props.modelValue.dateRange) && props.modelValue.dateRange.length === 2) {
-    return [new Date(props.modelValue.dateRange[0]), new Date(props.modelValue.dateRange[1])];
-  }
-  // По умолчанию: от недели назад до сегодня
-  const today = new Date();
-  const weekAgo = new Date();
-  weekAgo.setDate(weekAgo.getDate() - 7);
-  return [weekAgo, today];
-};
-
-const rangeValue = ref(initialRangeValue());
-const showPicker = ref(false);
-
-// Тип DatePicker в зависимости от выбранного периода
-const pickerType = computed(() => {
-  switch (props.modelValue.period) {
-    case 'daily':
-      return 'daterange';
-    case 'monthly':
-      return 'month';
-    case 'yearly':
-      return 'year';
-    default:
-      return 'date';
-  }
-});
-
-// Форматирование даты в зависимости от периода
-const formattedDate = computed(() => {
-  if (!props.modelValue.date) return '';
-  
-  const date = new Date(props.modelValue.date);
-  
-  switch (props.modelValue.period) {
-    case 'monthly': {
-      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
-                         'July', 'August', 'September', 'October', 'November', 'December'];
-      return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
-    }
-    case 'yearly': {
-      return `${date.getFullYear()}`;
-    }
-    default:
-      return date.toLocaleDateString();
-  }
-});
-
-// Форматирование диапазона дат для режима Daily
-const formattedDateRange = computed(() => {
-  if (!props.modelValue.dateRange || !Array.isArray(props.modelValue.dateRange) || props.modelValue.dateRange.length !== 2) {
-    return 'Select range';
-  }
-  
-  const startDate = new Date(props.modelValue.dateRange[0]);
-  const endDate = new Date(props.modelValue.dateRange[1]);
-  
-  // Форматирование дат в формате ДД.ММ.ГГГГ
-  const formatDate = (date) => {
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    return `${day < 10 ? '0' + day : day}.${month < 10 ? '0' + month : month}.${date.getFullYear()}`;
-  };
-  
-  return `${formatDate(startDate)} - ${formatDate(endDate)}`;
-});
-
-// Обработчики событий
-const updatePeriod = (period) => {
-  // Установка дефолтных значений для выбранного периода
-  if (period === 'daily') {
-    // Для daily устанавливаем диапазон дат
-    const defaultRange = getDefaultDateForPeriod(period);
-    emit('update:modelValue', {
-      ...props.modelValue,
-      period,
-      dateRange: defaultRange
-    });
-  } else {
-    // Для остальных режимов устанавливаем соответствующую дату
-    const defaultDate = getDefaultDateForPeriod(period);
-    emit('update:modelValue', {
-      ...props.modelValue,
-      period,
-      date: defaultDate
-    });
-  }
-  
-  // Показываем календарь при смене периода
-  setTimeout(() => {
-    showPicker.value = true;
-  }, 100);
-};
-
-const navigateDate = (direction) => {
-  // Навигация для месяц/год режимов
-  const date = new Date(props.modelValue.date);
-  
-  switch (props.modelValue.period) {
-    case 'monthly':
-      date.setMonth(date.getMonth() + direction);
-      break;
-    case 'yearly':
-      date.setFullYear(date.getFullYear() + direction);
-      break;
-  }
-  
-  emit('update:modelValue', {
-    ...props.modelValue,
-    date
-  });
-};
-
-const navigateDateRange = (direction) => {
-  // Навигация для диапазона дат (daily режим)
-  if (!props.modelValue.dateRange || !Array.isArray(props.modelValue.dateRange) || props.modelValue.dateRange.length !== 2) {
-    return;
-  }
-  
-  const startDate = new Date(props.modelValue.dateRange[0]);
-  const endDate = new Date(props.modelValue.dateRange[1]);
-  
-  // Вычисляем разницу в днях между датами
-  const diffTime = Math.abs(endDate - startDate);
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
-  // Смещаем даты на количество дней
-  startDate.setDate(startDate.getDate() + direction * diffDays);
-  endDate.setDate(endDate.getDate() + direction * diffDays);
-  
-  emit('update:modelValue', {
-    ...props.modelValue,
-    dateRange: [startDate, endDate]
-  });
-};
-
-const onSelectDate = (value) => {
-  if (value) {
-    emit('update:modelValue', {
-      ...props.modelValue,
-      date: new Date(value)
-    });
     
-    // Закрываем селектор после выбора даты
-    setTimeout(() => {
-      showPicker.value = false;
-    }, 100);
+    if (newValue.period === 'daily' && newValue.dateRange) {
+      dateFilter.dateRange.value = [new Date(newValue.dateRange[0]), new Date(newValue.dateRange[1])];
+    } else if (newValue.date) {
+      dateFilter.selectedDate.value = new Date(newValue.date);
+    }
   }
-};
-
-const onConfirmDateRange = () => {
-  if (rangeValue.value && Array.isArray(rangeValue.value) && rangeValue.value.length === 2) {
-    emit('update:modelValue', {
-      ...props.modelValue,
-      dateRange: [new Date(rangeValue.value[0]), new Date(rangeValue.value[1])]
-    });
-    
-    // Закрываем селектор после подтверждения
-    setTimeout(() => {
-      showPicker.value = false;
-    }, 100);
-  }
-};
-
-// Обновление значений при изменении внешних данных
-watch(() => props.modelValue.date, (newDate) => {
-  if (newDate) {
-    pickerValue.value = new Date(newDate);
-  }
-});
-
-watch(() => props.modelValue.dateRange, (newRange) => {
-  if (newRange && Array.isArray(newRange) && newRange.length === 2) {
-    rangeValue.value = [new Date(newRange[0]), new Date(newRange[1])];
-  }
-});
-
-// Автоматически показывать календарь при переключении режима
-watch(() => props.modelValue.period, (newPeriod) => {
-  // Подождем немного перед открытием, чтобы компонент успел обновиться
-  setTimeout(() => {
-    showPicker.value = true;
-  }, 100);
-});
-
-// При инициализации установим дефолтную дату для выбранного периода
-onMounted(() => {
-  // Убедимся, что у нас установлен правильный период по умолчанию (месяц)
-  if (!props.modelValue.period || props.modelValue.period !== 'monthly') {
-    updatePeriod('monthly');
-  }
-  
-  // Если нет даты для месяц/год режимов
-  if ((props.modelValue.period === 'monthly' || props.modelValue.period === 'yearly') && !props.modelValue.date) {
-    const defaultDate = getDefaultDateForPeriod(props.modelValue.period);
-    emit('update:modelValue', {
-      ...props.modelValue,
-      date: defaultDate
-    });
-  }
-  
-  // Если выбран daily режим, но не установлен диапазон
-  if (props.modelValue.period === 'daily' && 
-      (!props.modelValue.dateRange || !Array.isArray(props.modelValue.dateRange) || props.modelValue.dateRange.length !== 2)) {
-    const defaultRange = getDefaultDateForPeriod('daily');
-    emit('update:modelValue', {
-      ...props.modelValue,
-      dateRange: defaultRange
-    });
-  }
-});
+}, { deep: true });
 </script>
 
 <style scoped>
 .date-filter {
-  position: relative;
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  width: 100%;
-  gap: 12px;
-  justify-content: space-between;
+  justify-content: center;
+  align-self: stretch;
+  position: relative;
 }
 
-.periods-container {
-  display: flex;
-  justify-content: flex-start;
+.filter-container {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 11px;
+  border-radius: 32px;
 }
 
 .fast-date {
   display: flex;
-  padding: 2px 10px;
+  height: 28px;
+  padding: 0 10px;
+  background: #949496;
   border-radius: 28px;
   align-items: center;
   gap: 3px;
-  background: #949496;
-}
-
-.selector-container {
-  display: flex;
-  justify-content: center;
-  width: 100%;
 }
 
 .date-option {
-  height: 28px;
+  height: 24px;
   padding: 0 7px;
   border-radius: 34px;
   display: flex;
@@ -400,6 +203,7 @@ onMounted(() => {
   font-weight: 600;
   line-height: 12px;
   background: #949496;
+  overflow: hidden;
   cursor: pointer;
 }
 
@@ -417,8 +221,7 @@ onMounted(() => {
   align-items: center;
   gap: 10px;
   cursor: pointer;
-  min-width: 150px;
-  max-width: calc(100vw - 40px); /* Ограничение по ширине экрана */
+  overflow: hidden;
 }
 
 .date-nav {
@@ -439,67 +242,155 @@ onMounted(() => {
   text-overflow: ellipsis;
 }
 
-/* Стили для DatePicker */
-:deep(.n-date-picker-trigger) {
-  width: auto;
-}
-
-/* Ограничение ширины календаря */
-:deep(.n-date-panel-month),
-:deep(.n-date-panel-year),
-:deep(.n-date-panel-date) {
+/* Календарь */
+.calendar-container {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 8px;
+  background: #333;
+  border-radius: 8px;
   width: 280px;
   max-width: calc(100vw - 32px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  overflow: hidden;
 }
 
-:deep(.n-date-panel-daterange) {
-  width: 280px !important;
-  max-width: calc(100vw - 32px) !important;
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #444;
+  color: white;
 }
 
-:deep(.n-date-panel-month-calendar),
-:deep(.n-date-panel-date-calendar) {
-  width: 280px !important;
-  max-width: 100% !important;
+.calendar-title {
+  font-size: 14px;
+  font-weight: 600;
 }
 
-:deep(.n-date-panel-calendar-month),
-:deep(.n-date-panel-calendar-year),
-:deep(.n-date-panel-calendar-date) {
-  max-width: 100% !important;
+.nav-button {
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px 8px;
 }
 
-:deep(.n-date-panel-month .n-date-panel-month__cell.n-date-panel-date--selected) {
+.calendar {
+  padding: 8px;
+}
+
+/* Daily календарь */
+.weekday-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 8px;
+}
+
+.weekday {
+  text-align: center;
+  font-size: 12px;
+  color: #ccc;
+  padding: 4px 0;
+}
+
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.day-cell {
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 13px;
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.day-cell:hover {
+  background-color: #555;
+}
+
+.day-cell.outside-month {
+  color: #777;
+}
+
+.day-cell.today {
+  font-weight: bold;
+  box-shadow: inset 0 0 0 1px #53B794;
+}
+
+.day-cell.selected-start,
+.day-cell.selected-end {
   background-color: #53B794;
+  color: white;
 }
 
-:deep(.n-date-panel-year .n-date-panel-year__cell.n-date-panel-date--selected) {
+.day-cell.in-range {
+  background-color: rgba(83, 183, 148, 0.2);
+}
+
+/* Месячный и годовой календари */
+.months-grid, .years-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.month-cell, .year-cell {
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 13px;
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.month-cell:hover, .year-cell:hover {
+  background-color: #555;
+}
+
+.month-cell.selected, .year-cell.selected {
   background-color: #53B794;
+  color: white;
 }
 
-:deep(.n-date-panel-date .n-date-panel-date__cell.n-date-panel-date--selected) {
+/* Кнопки действий */
+.calendar-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.action-button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.action-button.cancel {
+  background-color: #666;
+  color: white;
+}
+
+.action-button.confirm {
   background-color: #53B794;
-}
-
-:deep(.n-date-panel-daterange .n-date-panel-date__cell.n-date-panel-date--selected) {
-  background-color: #53B794;
-}
-
-:deep(.n-date-panel-date__cell.n-date-panel-date--selected-start),
-:deep(.n-date-panel-date__cell.n-date-panel-date--selected-end) {
-  background-color: #53B794 !important;
-}
-
-:deep(.n-date-panel-date__cell.in-range) {
-  background-color: rgba(83, 183, 148, 0.2) !important;
-}
-
-:deep(.n-button--primary-type) {
-  background-color: #53B794 !important;
-  border-color: #53B794 !important;
-}
-
-:deep(.n-date-panel) {
-  z-index: 1000 !important;
+  color: white;
 }
 </style>
