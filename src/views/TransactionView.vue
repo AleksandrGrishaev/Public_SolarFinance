@@ -30,12 +30,12 @@
           @update:destination-account-id="destinationAccount = $event"
         />
         
-        <!-- Слайдер всегда остается, но может быть невидимым -->
+        <!-- Слайдер отображается только если есть правила распределения в книге и это не перевод -->
         <percentage-slider 
-          :owners="systemStore.allOwners" 
+          :owners="distributionOwners" 
           v-model="distributionPercentage"
           :total-amount="parseFloat(amount) || 0"
-          :class="{ 'invisible': selectedType === 'transfer' }"
+          :class="{ 'invisible': !shouldShowDistribution }"
         />
       </div>
             
@@ -144,6 +144,41 @@ const showCategorySelector = ref(false);
 const showCategoryList = ref(false);
 const selectedCategory = ref(null);
 
+// Вычисляемое свойство для определения показывать ли слайдер распределения
+const shouldShowDistribution = computed(() => {
+  // Для переводов не показываем
+  if (selectedType.value === 'transfer') return false;
+  
+  // Проверяем наличие правил распределения в выбранной книге
+  const book = bookStore.getBookById(selectedBook.value);
+  return book && book.distributionRules && book.distributionRules.length > 0;
+});
+
+// Получение данных владельцев для распределения
+const distributionOwners = computed(() => {
+  const book = bookStore.getBookById(selectedBook.value);
+  if (!book || !book.distributionRules) return [];
+  
+  // Получаем данные пользователей для слайдера на основе правил распределения
+  return book.distributionRules.map(rule => {
+    const owner = systemStore.getOwnerById(rule.ownerId);
+    return {
+      id: rule.ownerId,
+      name: owner ? owner.name : 'Unknown',
+      percentage: rule.percentage
+    };
+  });
+});
+
+// Обновляем процент распределения при изменении книги
+watch(selectedBook, (newBookId) => {
+  const book = bookStore.getBookById(newBookId);
+  if (book && book.distributionRules && book.distributionRules.length >= 2) {
+    // Устанавливаем процент первого владельца из правил
+    distributionPercentage.value = book.distributionRules[0].percentage;
+  }
+});
+
 // Вычисляемое свойство для получения символа валюты
 const currentCurrencySymbol = computed(() => {
   // По умолчанию используем $ если не найдем валюту
@@ -236,7 +271,10 @@ const saveTransaction = () => {
   if (selectedType.value === 'transfer') {
     transactionData.destinationAccount = destinationAccount.value;
   } else {
-    transactionData.distribution = distributionPercentage.value;
+    // Добавляем информацию о распределении только если оно доступно
+    if (shouldShowDistribution.value) {
+      transactionData.distribution = distributionPercentage.value;
+    }
     transactionData.category = selectedCategory.value;
   }
   

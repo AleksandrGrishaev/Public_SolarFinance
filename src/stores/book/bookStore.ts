@@ -2,6 +2,7 @@
 import { defineStore } from 'pinia';
 import { BookService } from './bookService';
 import type { Book, BookType } from './types';
+import { useUserStore } from '../user';
 
 export const useBookStore = defineStore('book', {
   state: () => ({
@@ -13,6 +14,9 @@ export const useBookStore = defineStore('book', {
   getters: {
     // Сервис для работы с книгами
     bookService: () => new BookService(),
+    
+    // Пользовательское хранилище
+    userStore: () => useUserStore(),
     
     // Получение всех активных книг
     activeBooks(): Book[] {
@@ -29,6 +33,19 @@ export const useBookStore = defineStore('book', {
       return (ownerId: string) => this.books.filter(book => book.ownerIds.includes(ownerId));
     },
     
+    // Получение книг, доступных текущему пользователю
+    userAccessibleBooks(): Book[] {
+      const currentUserId = this.userStore.currentUser?.id;
+      
+      if (!currentUserId) {
+        return this.activeBooks;
+      }
+      
+      return this.books.filter(book => 
+        book.isActive && book.ownerIds.includes(currentUserId)
+      );
+    },
+    
     // Получение книги по ID
     getBookById(): (id: string) => Book | undefined {
       return (id: string) => this.books.find(book => book.id === id);
@@ -37,6 +54,14 @@ export const useBookStore = defineStore('book', {
     // Формат книг для селектора в интерфейсе
     booksForSelector(): { id: string, name: string }[] {
       return this.activeBooks.map(book => ({
+        id: book.id,
+        name: book.name
+      }));
+    },
+    
+    // Формат доступных пользователю книг для селектора
+    userBooksForSelector(): { id: string, name: string }[] {
+      return this.userAccessibleBooks.map(book => ({
         id: book.id,
         name: book.name
       }));

@@ -1,9 +1,9 @@
-<!-- /Users/peaker/dev/solar-finance/src/components/transactions/PercentageSlider.vue -->
+<!-- src/components/transactions/PercentageSlider.vue -->
 <template>
   <div class="percentage-share-element">
     <div class="owner owner-1">
       <div class="owner-percentage">
-        <span class="owner-name">{{ owners[0].name }}</span>
+        <span class="owner-name">{{ owners[0]?.name || 'Owner 1' }}</span>
         <span class="percentage">{{ percentageValues[0] }}%</span>
         <span class="amount-value">{{ formattedAmountValues[0] }}</span>
       </div>
@@ -25,7 +25,7 @@
     
     <div class="owner owner-2">
       <div class="owner-percentage">
-        <span class="owner-name">{{ owners[1].name }}</span>
+        <span class="owner-name">{{ owners[1]?.name || 'Owner 2' }}</span>
         <span class="percentage">{{ percentageValues[1] }}%</span>
         <span class="amount-value">{{ formattedAmountValues[1] }}</span>
       </div>
@@ -39,7 +39,11 @@ import { computed } from 'vue';
 const props = defineProps({
   owners: {
     type: Array,
-    required: true
+    required: true,
+    default: () => [
+      { name: 'Owner 1', id: 'owner1', percentage: 50 },
+      { name: 'Owner 2', id: 'owner2', percentage: 50 }
+    ]
   },
   modelValue: {
     type: Number,
@@ -48,6 +52,10 @@ const props = defineProps({
   totalAmount: {
     type: Number,
     default: 0
+  },
+  currency: {
+    type: String,
+    default: '$'
   }
 });
 
@@ -70,15 +78,17 @@ const amountValues = computed(() => {
 const formattedAmountValues = computed(() => {
   return amountValues.value.map(amount => {
     // Округляем до двух знаков после запятой и форматируем
-    return amount.toFixed(2) + '$';
+    return amount.toFixed(2) + props.currency;
   });
 });
 
 // Создаем динамический CSS градиент для слайдера в зависимости от значения
 const sliderGradient = computed(() => {
   const percentage = props.modelValue;
+  const color1 = props.owners[0]?.color || 'white';
+  const color2 = props.owners[1]?.color || '#6499A7';
   return {
-    background: `linear-gradient(to right, white 0%, white ${percentage}%, #6499A7 ${percentage}%, #6499A7 100%)`
+    background: `linear-gradient(to right, ${color1} 0%, ${color1} ${percentage}%, ${color2} ${percentage}%, ${color2} 100%)`
   };
 });
 

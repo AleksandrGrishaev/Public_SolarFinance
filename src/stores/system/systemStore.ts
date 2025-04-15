@@ -5,77 +5,97 @@ import type { TransactionType, Currency, Owner } from './types';
 
 export const useSystemStore = defineStore('system', {
   state: () => ({
-    transactionTypes: [...TRANSACTION_TYPES],
-    filterTransactionTypes: [...FILTER_TRANSACTION_TYPES],
-    currencies: [...CURRENCIES],
-    owners: [...DEFAULT_OWNERS]  // Временное решение, пока не будет полного хранилища владельцев
+    transactionTypes: TRANSACTION_TYPES as TransactionType[],
+    filterTransactionTypes: FILTER_TRANSACTION_TYPES as TransactionType[],
+    currencies: CURRENCIES as Currency[],
+    owners: DEFAULT_OWNERS as Owner[]
   }),
   
   getters: {
     /**
-     * Все типы транзакций
+     * Получение всех типов транзакций
      */
     allTransactionTypes(): TransactionType[] {
       return this.transactionTypes;
     },
     
     /**
-     * Типы транзакций для фильтров (без переводов)
+     * Получение типов транзакций для фильтров
      */
     allFilterTransactionTypes(): TransactionType[] {
       return this.filterTransactionTypes;
     },
     
     /**
-     * Все валюты
+     * Получение всех валют
      */
     allCurrencies(): Currency[] {
       return this.currencies;
     },
     
     /**
-     * Валюта по умолчанию
+     * Получение валюты по умолчанию
      */
-    defaultCurrency(): Currency {
-      return this.currencies.find(c => c.isDefault) || this.currencies[0];
-    },
-    
-    /**
-     * Владельцы (временное решение)
-     */
-    allOwners(): Owner[] {
-      return this.owners;
+    defaultCurrency(): Currency | undefined {
+      return this.currencies.find(currency => currency.isDefault);
     },
     
     /**
      * Получение валюты по коду
      */
     getCurrencyByCode(): (code: string) => Currency | undefined {
-      return (code: string) => this.currencies.find(c => c.code === code);
+      return (code: string) => this.currencies.find(currency => currency.code === code);
     },
     
     /**
-     * Получение типа транзакции по ID
+     * Получение всех владельцев
      */
-    getTransactionTypeById(): (id: string) => TransactionType | undefined {
-      return (id: string) => this.transactionTypes.find(t => t.id === id);
+    allOwners(): Owner[] {
+      return this.owners;
+    },
+    
+    /**
+     * Получение владельца по ID
+     */
+    getOwnerById(): (id: string) => Owner | undefined {
+      return (id: string) => this.owners.find(owner => owner.id === id);
     }
   },
   
   actions: {
     /**
+     * Добавление нового типа транзакции
+     */
+    addTransactionType(type: TransactionType) {
+      if (!this.transactionTypes.some(t => t.id === type.id)) {
+        this.transactionTypes.push(type);
+      }
+    },
+    
+    /**
+     * Добавление новой валюты
+     */
+    addCurrency(currency: Currency) {
+      if (!this.currencies.some(c => c.code === currency.code)) {
+        this.currencies.push(currency);
+      }
+    },
+    
+    /**
      * Установка валюты по умолчанию
      */
-    setDefaultCurrency(code: string): void {
-      // Сначала убираем флаг у текущей валюты по умолчанию
-      this.currencies.forEach(c => {
-        c.isDefault = false;
+    setDefaultCurrency(code: string) {
+      this.currencies.forEach(currency => {
+        currency.isDefault = currency.code === code;
       });
-      
-      // Устанавливаем новую валюту по умолчанию
-      const currency = this.currencies.find(c => c.code === code);
-      if (currency) {
-        currency.isDefault = true;
+    },
+    
+    /**
+     * Добавление нового владельца
+     */
+    addOwner(owner: Owner) {
+      if (!this.owners.some(o => o.id === owner.id)) {
+        this.owners.push(owner);
       }
     }
   }
