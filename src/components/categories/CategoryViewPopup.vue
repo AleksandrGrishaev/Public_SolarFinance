@@ -224,7 +224,7 @@ const handleDateFilterChange = (value) => {
   applyFilters();
 };
 
-// Исправленная функция applyFilters в CategoryViewPopup.vue
+// Фильтрация
 const applyFilters = () => {
   if (!props.categoryId) return;
   

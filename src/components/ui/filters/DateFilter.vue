@@ -273,7 +273,7 @@ defineExpose({
   align-items: center;
   width: 100%;
   gap: 12px;
-  justify-content: space-between;
+  justify-content: center;
   margin-bottom: 16px; /* Увеличен отступ для календаря */
   padding-bottom: 8px; /* Дополнительный отступ снизу */
 }
@@ -313,7 +313,7 @@ defineExpose({
 
 .date-selector {
   height: 28px;
-  padding: 0 16px;
+  padding: 2px 12px;
   background: #949496;
   border-radius: 34px;
   display: flex;
@@ -329,17 +329,17 @@ defineExpose({
 
 .date-nav {
   color: white;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
-  line-height: 12px;
+  line-height: 11px;
   cursor: pointer;
 }
 
 .date-value {
   color: white;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
-  line-height: 12px;
+  line-height: 14px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
