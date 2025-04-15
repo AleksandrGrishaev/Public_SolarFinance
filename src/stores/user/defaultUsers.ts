@@ -1,4 +1,4 @@
-// src/stores/user/defaultUsers.ts
+// src/stores/user/defaultUsers.ts - обновленная версия
 import type { User } from './types';
 
 /**
@@ -19,7 +19,8 @@ export const defaultUsers: User[] = [
     updatedAt: new Date(),
     settings: {
       theme: 'system',
-      language: 'ru'
+      language: 'en',
+      baseCurrency: 'USD' // Базовая валюта пользователя - USD
     }
   },
   { 
@@ -34,7 +35,8 @@ export const defaultUsers: User[] = [
     updatedAt: new Date(),
     settings: {
       theme: 'light',
-      language: 'ru'
+      language: 'ru',
+      baseCurrency: 'RUB' // Базовая валюта пользователя - RUB
     }
   },
 ];

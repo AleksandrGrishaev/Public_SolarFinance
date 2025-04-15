@@ -4,6 +4,10 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 
+//Store
+import { useCurrencyStore } from './stores/currency';
+
+
 // Типы для глобального message provider
 declare global {
   interface Window {
@@ -20,6 +24,13 @@ app.use(pinia)
 
 // Инициализация роутера
 app.use(router)
+
+// Инициализация хранилища валют
+const currencyStore = useCurrencyStore();
+currencyStore.init().catch(error => {
+  console.error('Failed to initialize currency store:', error);
+});
+
 
 // Глобальный обработчик ошибок
 app.config.errorHandler = (err, instance, info) => {

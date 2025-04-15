@@ -15,5 +15,6 @@ export interface UserSettings {
   theme: 'light' | 'dark' | 'system';
   language: string;
   defaultBookId?: string;
+  baseCurrency: string; 
   // Другие настройки пользователя
 }

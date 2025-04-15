@@ -3,6 +3,9 @@ import { defineStore } from 'pinia';
 import { UserService } from './userService';
 import type { User, UserSettings } from './types';
 
+import { useCurrencyStore } from '../currency';
+
+
 export const useUserStore = defineStore('user', {
   state: () => ({
     currentUser: null as User | null,
@@ -154,6 +157,31 @@ export const useUserStore = defineStore('user', {
       console.log('[UserStore] User logged out, session data cleared');
     },
     
+/**
+ * Обновление базовой валюты пользователя
+ */
+async updateUserBaseCurrency(currencyCode: string): Promise<boolean> {
+  if (!this.currentUser) return false;
+  
+  // Проверяем, существует ли такая валюта
+  const currencyStore = useCurrencyStore();
+  const currency = currencyStore.getCurrency(currencyCode);
+  
+  if (!currency) {
+    console.warn(`[UserStore] Currency not found: ${currencyCode}`);
+    return false;
+  }
+  
+  // Обновляем настройки пользователя
+  this.updateUserSettings({
+    baseCurrency: currencyCode
+  });
+  
+  // Сохраняем изменения в базе данных
+  return await this.userService.updateUser(this.currentUser.id, {
+    settings: this.currentUser.settings
+  });
+},
     /**
      * Получение всех пользователей
      */
@@ -167,6 +195,7 @@ export const useUserStore = defineStore('user', {
     async addUser(newUser: Omit<User, 'id'>): Promise<User> {
       return await this.userService.addUser(newUser);
     },
+    
     
     /**
      * Обновление пользователя
@@ -182,4 +211,6 @@ export const useUserStore = defineStore('user', {
       return await this.userService.deleteUser(id);
     }
   }
+
+  
 });
