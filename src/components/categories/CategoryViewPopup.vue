@@ -1,4 +1,7 @@
-<!-- src/components/categories/CategoryViewPopup.vue -->
+.filter-group {
+  display: flex;
+  gap: 10px;
+}<!-- src/components/categories/CategoryViewPopup.vue -->
 <template>
   <BasePopup 
     v-model="isVisible" 
@@ -47,8 +50,23 @@
         
         <!-- Иконки действий -->
         <div class="action-icons">
-          <IconShare color="#A44942" size="24" />
-          <IconChartPie color="#53B794" size="24" />
+          <!-- Иконка "Share" с индикацией состояния isShared -->
+          <div 
+            class="action-icon-wrapper" 
+            :class="{ 'active': category?.isShared }"
+            @click="toggleSharing"
+          >
+            <IconShare :color="category?.isShared ? '#A44942' : '#7A7A7D'" size="20" />
+          </div>
+          
+          <!-- Иконка "Stats" с индикацией состояния useInStats -->
+          <div 
+            class="action-icon-wrapper" 
+            :class="{ 'active': category?.useInStats }"
+            @click="toggleStats"
+          >
+            <IconChartPie :color="category?.useInStats ? '#53B794' : '#7A7A7D'" size="20" />
+          </div>
         </div>
       </div>
       
@@ -202,6 +220,21 @@ const bookNames = computed(() => {
     return `${bookNames[0]}, ${bookNames[1]} +${bookNames.length - 2}`;
   }
 });
+
+// НОВЫЕ МЕТОДЫ ДЛЯ РАБОТЫ С SHARING И STATS
+const toggleSharing = () => {
+  if (!category.value) return;
+  
+  const newState = !category.value.isShared;
+  categoryStore.toggleCategoryShared(category.value.id, newState);
+};
+
+const toggleStats = () => {
+  if (!category.value) return;
+  
+  const newState = !category.value.useInStats;
+  categoryStore.toggleCategoryStats(category.value.id, newState);
+};
 
 // Фильтры по периоду
 const dateFilter = ref({
@@ -513,20 +546,23 @@ onUnmounted(() => {
 /* Фильтры и информация */
 .info-filters {
   display: flex;
+  align-items: center;
   justify-content: center;
-  align-items: flex-start;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
-  margin-top: 8px;
+  margin-top: 0px;
+  padding: 0 10px;
+  box-sizing: border-box;
 }
 
 .filter-badge {
-  height: 32px;
-  padding: 6px 10px 6px 13px;
-  background: #46484A;
+  height: 28px;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 28px;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
 }
 
@@ -545,7 +581,29 @@ onUnmounted(() => {
 
 .action-icons {
   display: flex;
-  gap: 5px;
+  gap: 10px;
+}
+
+.action-icon-wrapper {
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
+  margin: 0 2px;
+}
+
+.action-icon-wrapper:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.action-icon-wrapper.active {
+  opacity: 1;
 }
 
 .transactions-container {

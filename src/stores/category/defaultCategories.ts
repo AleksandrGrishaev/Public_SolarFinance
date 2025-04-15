@@ -23,7 +23,9 @@ const parentCategories: Category[] = [
     type: 'expense',
     order: 0,
     isActive: true,
-    books: ['my', 'family'] // Категория доступна в книгах "my" и "family"
+    books: ['my', 'family'], // Категория доступна в книгах "my" и "family"
+    isShared: true,
+    useInStats: true
   },
   { 
     id: 'food', 
@@ -33,7 +35,9 @@ const parentCategories: Category[] = [
     type: 'expense',
     order: 1,
     isActive: true,
-    books: ['my', 'family', 'wife'] // Доступна во всех книгах
+    books: ['my', 'family', 'wife'], // Доступна во всех книгах
+    isShared: true,
+    useInStats: true
   },
   { 
     id: 'transport', 
@@ -43,7 +47,9 @@ const parentCategories: Category[] = [
     type: 'expense',
     order: 2,
     isActive: true,
-    books: ['my']
+    books: ['my'],
+    isShared: false,
+    useInStats: true
   },
   { 
     id: 'entertainment', 
@@ -53,7 +59,9 @@ const parentCategories: Category[] = [
     type: 'expense',
     order: 3,
     isActive: true,
-    books: ['family']
+    books: ['family'],
+    isShared: true,
+    useInStats: false
   },
   { 
     id: 'salary', 
@@ -63,7 +71,9 @@ const parentCategories: Category[] = [
     type: 'income',
     order: 0,
     isActive: true,
-    books: ['my', 'wife']
+    books: ['my', 'wife'],
+    isShared: false,
+    useInStats: true
   },
   { 
     id: 'investment', 
@@ -73,7 +83,9 @@ const parentCategories: Category[] = [
     type: 'income',
     order: 1,
     isActive: true,
-    books: []
+    books: [],
+    isShared: false,
+    useInStats: true
   }
 ];
 
@@ -90,7 +102,9 @@ const childCategories: Category[] = [
     type: 'expense',
     order: 0,
     isActive: true,
-    books: ['my', 'family']
+    books: ['my', 'family'],
+    isShared: true,
+    useInStats: true
   },
   { 
     id: 'utilities', 
@@ -102,7 +116,9 @@ const childCategories: Category[] = [
     type: 'expense',
     order: 1,
     isActive: false,
-    books: ['my', 'wife']
+    books: ['my', 'wife'],
+    isShared: true,
+    useInStats: true
   },
   { 
     id: 'furniture', 
@@ -114,7 +130,9 @@ const childCategories: Category[] = [
     type: 'expense',
     order: 2,
     isActive: false,
-    books: []
+    books: [],
+    isShared: false,
+    useInStats: false
   },
   
   // Подкатегории для "Food"
@@ -128,7 +146,9 @@ const childCategories: Category[] = [
     type: 'expense',
     order: 0,
     isActive: false,
-    books: ['my', 'wife']
+    books: ['my', 'wife'],
+    isShared: true,
+    useInStats: true
   },
   { 
     id: 'restaurants', 
@@ -140,7 +160,9 @@ const childCategories: Category[] = [
     type: 'expense',
     order: 1,
     isActive: false,
-    books: ['family']
+    books: ['family'],
+    isShared: false,
+    useInStats: true
   },
   
   // Подкатегории для "Transport"
@@ -154,7 +176,9 @@ const childCategories: Category[] = [
     type: 'expense',
     order: 0,
     isActive: false,
-    books: ['my'] 
+    books: ['my'],
+    isShared: false,
+    useInStats: true
   },
   { 
     id: 'public_transport', 
@@ -166,7 +190,9 @@ const childCategories: Category[] = [
     type: 'expense',
     order: 1,
     isActive: false,
-    books: []
+    books: [],
+    isShared: false,
+    useInStats: false
   },
   
   // Подкатегории для "Salary"
@@ -180,7 +206,9 @@ const childCategories: Category[] = [
     type: 'income',
     order: 0,
     isActive: false,
-    books: ['my']
+    books: ['my'],
+    isShared: false,
+    useInStats: true
   },
   { 
     id: 'freelance', 
@@ -192,7 +220,9 @@ const childCategories: Category[] = [
     type: 'income',
     order: 1,
     isActive: false,
-    books: ['wife']
+    books: ['wife'],
+    isShared: false,
+    useInStats: true
   }
 ];
 
@@ -206,7 +236,9 @@ const standaloneCategories: Category[] = [
     type: 'expense',
     order: 5,
     isActive: false,
-    books: []
+    books: [],
+    isShared: false,
+    useInStats: false
   },
   { 
     id: 'education', 
@@ -216,7 +248,9 @@ const standaloneCategories: Category[] = [
     type: 'expense',
     order: 6,
     isActive: false,
-    books: ['family']
+    books: ['family'],
+    isShared: true,
+    useInStats: true
   },
   { 
     id: 'shopping', 
@@ -226,7 +260,9 @@ const standaloneCategories: Category[] = [
     type: 'expense',
     order: 7,
     isActive: false,
-    books: ['wife']
+    books: ['wife'],
+    isShared: false,
+    useInStats: true
   }
 ];
 

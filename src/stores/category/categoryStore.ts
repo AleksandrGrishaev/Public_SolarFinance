@@ -69,6 +69,26 @@ export const useCategoryStore = defineStore('category', {
     getCategoriesForBook(): (bookId: string) => Category[] {
       return (bookId: string) => this.categoryService.getCategoriesForBook(bookId);
     },
+    
+    // НОВЫЕ ГЕТТЕРЫ ДЛЯ SHARED И STATS
+    
+    getSharedCategories(): () => Category[] {
+      return () => this.categoryService.getSharedCategories();
+    },
+    
+    getSharedCategoriesForBookAndType(): (bookId: string, type: string) => Category[] {
+      return (bookId: string, type: string) => 
+        this.categoryService.getSharedCategoriesForBookAndType(bookId, type);
+    },
+    
+    getStatsCategories(): () => Category[] {
+      return () => this.categoryService.getStatsCategories();
+    },
+    
+    getStatsCategoriesForBookAndType(): (bookId: string, type: string) => Category[] {
+      return (bookId: string, type: string) => 
+        this.categoryService.getStatsCategoriesForBookAndType(bookId, type);
+    },
 
     // РАБОТА С РОДИТЕЛЯМИ И ДЕТЬМИ
     
@@ -127,6 +147,16 @@ export const useCategoryStore = defineStore('category', {
 
     toggleCategoryActive(categoryId: string, isActive: boolean): Category | null {
       return this.categoryService.toggleCategoryActive(categoryId, isActive);
+    },
+    
+    // НОВЫЕ ДЕЙСТВИЯ ДЛЯ SHARED И STATS
+    
+    toggleCategoryShared(categoryId: string, isShared: boolean): Category | null {
+      return this.categoryService.toggleCategoryShared(categoryId, isShared);
+    },
+    
+    toggleCategoryStats(categoryId: string, useInStats: boolean): Category | null {
+      return this.categoryService.toggleCategoryStats(categoryId, useInStats);
     },
 
     // ОПЕРАЦИИ С КНИГАМИ

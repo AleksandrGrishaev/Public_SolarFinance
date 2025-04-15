@@ -181,6 +181,62 @@ export class CategoryService {
       .sort((a, b) => (a.order || 0) - (b.order || 0));
   }
 
+  // НОВЫЕ МЕТОДЫ ДЛЯ РАБОТЫ С SHARING И CHARTS
+
+  // Получить все общие категории (isShared = true)
+  getSharedCategories(): Category[] {
+    return this.categories
+      .filter(category => category.isShared === true)
+      .sort((a, b) => (a.order || 0) - (b.order || 0));
+  }
+
+  // Получить общие категории для книги и типа транзакции
+  getSharedCategoriesForBookAndType(bookId: string, type: string): Category[] {
+    return this.categories.filter(category => 
+      category.books?.includes(bookId) && // Принадлежит книге
+      category.type === type &&          // Правильный тип
+      category.isActive !== false &&     // Не архивирована
+      category.isShared === true         // Общая категория
+    ).sort((a, b) => (a.order || 0) - (b.order || 0));
+  }
+
+  // Получить категории для статистики (useInStats = true)
+  getStatsCategories(): Category[] {
+    return this.categories
+      .filter(category => category.useInStats === true)
+      .sort((a, b) => (a.order || 0) - (b.order || 0));
+  }
+
+  // Получить категории для статистики для книги и типа транзакции
+  getStatsCategoriesForBookAndType(bookId: string, type: string): Category[] {
+    return this.categories.filter(category => 
+      category.books?.includes(bookId) && // Принадлежит книге
+      category.type === type &&          // Правильный тип
+      category.isActive !== false &&     // Не архивирована
+      category.useInStats === true       // Используется в статистике
+    ).sort((a, b) => (a.order || 0) - (b.order || 0));
+  }
+
+  // Включить/выключить общий доступ к категории
+  toggleCategoryShared(categoryId: string, isShared: boolean): Category | null {
+    const index = this.categories.findIndex(c => c.id === categoryId);
+    if (index !== -1) {
+      this.categories[index].isShared = isShared;
+      return this.categories[index];
+    }
+    return null;
+  }
+
+  // Включить/выключить использование категории в статистике
+  toggleCategoryStats(categoryId: string, useInStats: boolean): Category | null {
+    const index = this.categories.findIndex(c => c.id === categoryId);
+    if (index !== -1) {
+      this.categories[index].useInStats = useInStats;
+      return this.categories[index];
+    }
+    return null;
+  }
+
   // CRUD ОПЕРАЦИИ
 
   // Добавить новую категорию
