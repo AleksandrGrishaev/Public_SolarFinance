@@ -1,4 +1,4 @@
-<!-- src/components/ui/CustomDateFilter.vue -->
+<!-- src/components/ui/filters/DateFilter.vue -->
 <template>
   <div class="date-filter">
     <!-- Переключатели D-M-Y слева -->
@@ -113,7 +113,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, watch } from 'vue';
 import { useDateFilter } from '@/composables/useDateFilter';
 import { vClickOutside } from '@/directives/vClickOutside';
 
@@ -121,6 +121,8 @@ interface DateFilterModelValue {
   period?: 'daily' | 'monthly' | 'yearly';
   date?: Date;
   dateRange?: [Date, Date];
+  dateFrom?: Date;
+  dateTo?: Date;
 }
 
 const props = defineProps({
@@ -142,7 +144,11 @@ const emit = defineEmits<{
 const {
   // Состояние
   currentPeriod,
+  selectedDate,
+  dateRange,
   showCalendar,
+  currentViewDate,
+  tempRange,
   weekDays,
   monthNames,
   
@@ -170,6 +176,7 @@ const {
   selectMonth,
   selectYear,
   confirmSelection,
+  updateModelValue
 } = useDateFilter(props, emit);
 
 // Инициализация при монтировании
@@ -180,6 +187,11 @@ onMounted(() => {
     setPeriod(props.modelValue.period as 'daily' | 'monthly' | 'yearly');
   }
 });
+
+// Отладочный вывод для отслеживания изменений модели
+watch(() => props.modelValue, (newValue) => {
+  console.log('Model changed in DateFilter:', newValue);
+}, { deep: true });
 </script>
 
 <style scoped>

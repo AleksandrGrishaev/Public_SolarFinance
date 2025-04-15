@@ -5,6 +5,8 @@ interface DateFilterModelValue {
   period?: 'daily' | 'monthly' | 'yearly';
   date?: Date;
   dateRange?: [Date, Date];
+  dateFrom?: Date;
+  dateTo?: Date;
 }
 
 interface DateFilterProps {
@@ -357,10 +359,15 @@ export function useDateFilter(props: DateFilterProps, emit: EmitFunction) {
 
   const updateModelValue = (): void => {
     if (currentPeriod.value === 'daily') {
-      emit('update:modelValue', {
+      // Для режима по дням передаем как dateRange, так и dateFrom/dateTo
+      const model = {
         period: currentPeriod.value,
-        dateRange: dateRange.value
-      });
+        dateRange: dateRange.value,
+        dateFrom: dateRange.value[0],
+        dateTo: dateRange.value[1]
+      };
+      console.log('Emitting daily filter update:', model);
+      emit('update:modelValue', model);
     } else {
       emit('update:modelValue', {
         period: currentPeriod.value,

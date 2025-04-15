@@ -35,11 +35,15 @@ export const useTransactionStore = defineStore('transaction', {
       
       // Применяем фильтры
       if (filters.dateFrom) {
-        result = result.filter(t => new Date(t.date) >= filters.dateFrom!);
+        // Явное преобразование обеих дат в миллисекунды для точного сравнения
+        result = result.filter(t => 
+          new Date(t.date).getTime() >= new Date(filters.dateFrom!).getTime());
       }
       
       if (filters.dateTo) {
-        result = result.filter(t => new Date(t.date) <= filters.dateTo!);
+        // Явное преобразование обеих дат в миллисекунды для точного сравнения
+        result = result.filter(t => 
+          new Date(t.date).getTime() <= new Date(filters.dateTo!).getTime());
       }
       
       if (filters.types && filters.types.length > 0) {
