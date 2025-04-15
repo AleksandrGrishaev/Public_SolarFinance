@@ -1,71 +1,72 @@
-<!-- src/components/ui/DateFilter.vue -->
+<!-- src/components/ui/CustomDateFilter.vue -->
 <template>
   <div class="date-filter">
-    <!-- Контейнер для компактного отображения по центру -->
-    <div class="filter-container">
-      <!-- Переключатели D-M-Y -->
+    <!-- Переключатели D-M-Y слева -->
+    <div class="periods-container">
       <div class="fast-date">
         <div 
           class="date-option"
-          :class="{ 'active': dateFilter.currentPeriod === 'daily' }" 
-          @click="dateFilter.setPeriod('daily')"
+          :class="{ 'active': currentPeriod === 'daily' }" 
+          @click="setPeriod('daily')"
         >
           D
         </div>
         <div 
           class="date-option"
-          :class="{ 'active': dateFilter.currentPeriod === 'monthly' }" 
-          @click="dateFilter.setPeriod('monthly')"
+          :class="{ 'active': currentPeriod === 'monthly' }" 
+          @click="setPeriod('monthly')"
         >
           M
         </div>
         <div 
           class="date-option"
-          :class="{ 'active': dateFilter.currentPeriod === 'yearly' }" 
-          @click="dateFilter.setPeriod('yearly')"
+          :class="{ 'active': currentPeriod === 'yearly' }" 
+          @click="setPeriod('yearly')"
         >
           Y
         </div>
       </div>
-      
-      <!-- Селектор даты -->
-      <div class="date-selector" @click="dateFilter.toggleCalendar">
-        <div class="date-nav" @click.stop="dateFilter.navigateDate(-1)">&lt;</div>
-        <div class="date-value">{{ dateFilter.formattedDateValue }}</div>
-        <div class="date-nav" @click.stop="dateFilter.navigateDate(1)">&gt;</div>
-      </div>
+    </div>
+    
+    <!-- Селектор даты справа -->
+    <div class="date-selector" @click="toggleCalendar">
+      <div class="date-nav" @click.stop="navigateDate(-1)">&lt;</div>
+      <div class="date-value">{{ formattedDateValue }}</div>
+      <div class="date-nav" @click.stop="navigateDate(1)">&gt;</div>
     </div>
     
     <!-- Календарь -->
-    <div v-if="dateFilter.showCalendar" class="calendar-container" v-click-outside="dateFilter.hideCalendar">
+    <div v-if="showCalendar" class="calendar-container" v-click-outside="hideCalendar">
       <!-- Навигация по месяцам и годам -->
       <div class="calendar-header">
-        <button class="nav-button" @click="dateFilter.navigateMonth(-1)">&lt;</button>
-        <span class="calendar-title">{{ dateFilter.calendarTitle }}</span>
-        <button class="nav-button" @click="dateFilter.navigateMonth(1)">&gt;</button>
+        <button class="nav-button" @click="navigateMonth(-1)">&lt;&lt;</button>
+        <button class="nav-button" @click="navigateMonth(-1)">&lt;</button>
+        <span class="calendar-title">{{ calendarTitle }}</span>
+        <button class="nav-button" @click="navigateMonth(1)">&gt;</button>
+        <button class="nav-button" @click="navigateMonth(1)">&gt;&gt;</button>
       </div>
       
       <!-- Календарь для Daily -->
-      <div v-if="dateFilter.currentPeriod === 'daily'" class="calendar daily-calendar">
+      <div v-if="currentPeriod === 'daily'" class="calendar daily-calendar">
         <!-- Дни недели -->
         <div class="weekday-header">
-          <div v-for="day in dateFilter.weekDays" :key="day" class="weekday">{{ day }}</div>
+          <div v-for="day in weekDays" :key="day" class="weekday">{{ day }}</div>
         </div>
         
         <!-- Дни месяца -->
         <div class="days-grid">
           <div 
-            v-for="(day, index) in dateFilter.calendarDays" 
+            v-for="(day, index) in calendarDays" 
             :key="index" 
             class="day-cell"
             :class="{
               'outside-month': !day.currentMonth,
-              'selected-start': dateFilter.isSelectedStart(day.date),
-              'selected-end': dateFilter.isSelectedEnd(day.date),
-              'in-range': dateFilter.isInRange(day.date),
-              'today': dateFilter.isToday(day.date)
+              'selected-start': isSelectedStart(day.date),
+              'selected-end': isSelectedEnd(day.date),
+              'in-range': isInRange(day.date),
+              'today': isToday(day.date)
             }"
-            @click="dateFilter.selectDate(day.date)"
+            @click="selectDate(day.date)"
           >
             {{ day.dayNumber }}
           </div>
@@ -73,35 +74,35 @@
         
         <!-- Кнопки действий -->
         <div class="calendar-footer">
-          <button class="action-button cancel" @click="dateFilter.hideCalendar">Cancel</button>
-          <button class="action-button confirm" @click="dateFilter.confirmSelection">Confirm</button>
+          <button class="action-button cancel" @click="hideCalendar">Cancel</button>
+          <button class="action-button confirm" @click="confirmSelection">Confirm</button>
         </div>
       </div>
       
       <!-- Выбор месяца -->
-      <div v-else-if="dateFilter.currentPeriod === 'monthly'" class="calendar month-calendar">
+      <div v-else-if="currentPeriod === 'monthly'" class="calendar month-calendar">
         <div class="months-grid">
           <div 
-            v-for="(month, index) in dateFilter.monthNames" 
+            v-for="(month, index) in monthNames" 
             :key="index" 
             class="month-cell"
-            :class="{ 'selected': dateFilter.isSelectedMonth(index) }"
-            @click="dateFilter.selectMonth(index)"
+            :class="{ 'selected': isSelectedMonth(index) }"
+            @click="selectMonth(index)"
           >
-            {{ month.substring(0, 3) }}
+            {{ month }}
           </div>
         </div>
       </div>
       
       <!-- Выбор года -->
-      <div v-else-if="dateFilter.currentPeriod === 'yearly'" class="calendar year-calendar">
+      <div v-else-if="currentPeriod === 'yearly'" class="calendar year-calendar">
         <div class="years-grid">
           <div 
-            v-for="year in dateFilter.yearsList" 
+            v-for="year in yearsList" 
             :key="year" 
             class="year-cell"
-            :class="{ 'selected': dateFilter.isSelectedYear(year) }"
-            @click="dateFilter.selectYear(year)"
+            :class="{ 'selected': isSelectedYear(year) }"
+            @click="selectYear(year)"
           >
             {{ year }}
           </div>
@@ -112,87 +113,106 @@
 </template>
 
 <script setup lang="ts">
-import { watch } from 'vue';
-import { useDateFilter, type DateFilterState } from '@/composables/useDateFilter';
+import { onMounted } from 'vue';
+import { useDateFilter, vClickOutside } from '@/composables/useDateFilter';
 
-// Директива для закрытия календаря при клике вне него
-const vClickOutside = {
-  mounted(el: HTMLElement, binding: any) {
-    el._clickOutside = (event: MouseEvent) => {
-      if (!(el === event.target || el.contains(event.target as Node))) {
-        binding.value(event);
-      }
-    };
-    document.addEventListener('click', el._clickOutside);
-  },
-  unmounted(el: any) {
-    document.removeEventListener('click', el._clickOutside);
+interface DateFilterModelValue {
+  period?: 'daily' | 'monthly' | 'yearly';
+  date?: Date;
+  dateRange?: [Date, Date];
+}
+
+const props = defineProps({
+  modelValue: {
+    type: Object as () => DateFilterModelValue,
+    default: () => ({
+      period: 'monthly',
+      date: new Date(),
+      dateRange: [new Date(new Date().setDate(new Date().getDate() - 7)), new Date()]
+    })
   }
-};
-
-const props = defineProps<{
-  modelValue: DateFilterState;
-}>();
+});
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: DateFilterState): void;
+  (e: 'update:modelValue', value: DateFilterModelValue): void
 }>();
 
-// Используем composable для логики работы с датами
-const dateFilter = useDateFilter(
-  props.modelValue,
-  (value) => { emit('update:modelValue', value); }
-);
+// Используем composable
+const {
+  // Состояние
+  currentPeriod,
+  selectedDate,
+  dateRange,
+  showCalendar,
+  currentViewDate,
+  tempRange,
+  weekDays,
+  monthNames,
+  
+  // Вычисляемые свойства
+  calendarTitle,
+  yearsList,
+  formattedDateValue,
+  calendarDays,
+  
+  // Методы проверки
+  isSelectedStart,
+  isSelectedEnd,
+  isInRange,
+  isToday,
+  isSelectedMonth,
+  isSelectedYear,
+  
+  // Методы управления
+  setPeriod,
+  toggleCalendar,
+  hideCalendar,
+  navigateDate,
+  navigateMonth,
+  selectDate,
+  selectMonth,
+  selectYear,
+  confirmSelection,
+  updateModelValue
+} = useDateFilter(props, emit);
 
-// Следим за изменениями в modelValue извне
-watch(() => props.modelValue, (newValue) => {
-  if (newValue && JSON.stringify(newValue) !== JSON.stringify({
-    period: dateFilter.currentPeriod.value,
-    date: dateFilter.currentPeriod.value !== 'daily' ? dateFilter.selectedDate.value : undefined,
-    dateRange: dateFilter.currentPeriod.value === 'daily' ? dateFilter.dateRange.value : undefined
-  })) {
-    // Обновляем состояние если внешнее значение изменилось
-    if (newValue.period) {
-      dateFilter.setPeriod(newValue.period);
-    }
-    
-    if (newValue.period === 'daily' && newValue.dateRange) {
-      dateFilter.dateRange.value = [new Date(newValue.dateRange[0]), new Date(newValue.dateRange[1])];
-    } else if (newValue.date) {
-      dateFilter.selectedDate.value = new Date(newValue.date);
-    }
+// Инициализация при монтировании
+onMounted(() => {
+  if (!props.modelValue.period) {
+    setPeriod('monthly');
+  } else {
+    setPeriod(props.modelValue.period as 'daily' | 'monthly' | 'yearly');
   }
-}, { deep: true });
+});
 </script>
 
 <style scoped>
 .date-filter {
-  display: flex;
-  justify-content: center;
-  align-self: stretch;
   position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
+  justify-content: space-between;
 }
 
-.filter-container {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  gap: 11px;
-  border-radius: 32px;
+.periods-container {
+  display: flex;
+  justify-content: flex-start;
 }
 
 .fast-date {
   display: flex;
-  height: 28px;
-  padding: 0 10px;
-  background: #949496;
+  padding: 2px 10px;
   border-radius: 28px;
   align-items: center;
   gap: 3px;
+  background: #949496;
 }
 
 .date-option {
-  height: 24px;
+  height: 28px;
   padding: 0 7px;
   border-radius: 34px;
   display: flex;
@@ -203,7 +223,6 @@ watch(() => props.modelValue, (newValue) => {
   font-weight: 600;
   line-height: 12px;
   background: #949496;
-  overflow: hidden;
   cursor: pointer;
 }
 
@@ -221,7 +240,8 @@ watch(() => props.modelValue, (newValue) => {
   align-items: center;
   gap: 10px;
   cursor: pointer;
-  overflow: hidden;
+  min-width: 150px;
+  max-width: calc(100vw - 40px);
 }
 
 .date-nav {
@@ -246,8 +266,7 @@ watch(() => props.modelValue, (newValue) => {
 .calendar-container {
   position: absolute;
   top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
+  right: 0;
   margin-top: 8px;
   background: #333;
   border-radius: 8px;
