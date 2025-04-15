@@ -5,6 +5,7 @@
     :closeOnOverlayClick="true"
     :rightContent="true"
     @update:modelValue="handleClose"
+    :class="{ 'extended-popup': isCalendarVisible }"
   >
     <!-- Кастомный заголовок со слотом title -->
     <template #title>
@@ -30,7 +31,7 @@
       <div class="edit-button" @click="handleEdit">Edit</div>
     </template>
     
-    <div class="category-view-container">
+    <div class="category-view-container" :style="containerStyle">
       <!-- Фильтры и информация -->
       <div class="info-filters">
         <!-- Книга -->
@@ -51,11 +52,26 @@
         </div>
       </div>
       
-      <!-- Фильтр периода -->
-      <DateFilter v-model="dateFilter" @update:modelValue="handleDateFilterChange" />
+      <!-- Фильтр периода с обработчиком видимости календаря -->
+      <DateFilter 
+        v-model="dateFilter" 
+        @update:modelValue="handleDateFilterChange"
+        @calendar-visibility-change="handleCalendarVisibilityChange" 
+      />
       
-      <!-- Список транзакций -->
-      <div class="transactions-container" v-if="Object.keys(groupedTransactions).length > 0">
+      <!-- Подложка для маскирования контента под календарем -->
+      <div 
+        v-if="isCalendarVisible" 
+        class="calendar-overlay visible" 
+        @click="closeCalendar"
+      ></div>
+      
+      <!-- Список транзакций с условным отображением при открытом календаре -->
+      <div 
+        class="transactions-container" 
+        v-if="Object.keys(groupedTransactions).length > 0" 
+        :class="{ 'faded-content': isCalendarVisible }"
+      >
         <TransactionDateGroup 
           v-for="(transactions, dateKey) in groupedTransactions" 
           :key="dateKey"
@@ -134,6 +150,31 @@ const userStore = useUserStore();
 const isVisible = computed({
   get: () => props.modelValue,
   set: (value) => emit('update:modelValue', value)
+});
+
+// Состояние для отслеживания видимости календаря
+const isCalendarVisible = ref(false);
+
+// Обработчик события изменения видимости календаря
+const handleCalendarVisibilityChange = (isVisible) => {
+  console.log('Calendar visibility changed:', isVisible);
+  isCalendarVisible.value = isVisible;
+};
+
+// Метод для программного закрытия календаря
+const closeCalendar = () => {
+  // Здесь нужно вызвать метод закрытия календаря в DateFilter
+  // Для этого потребуется либо ref на компонент, либо использование события
+  isCalendarVisible.value = false;
+};
+
+// Динамические стили для контейнера
+const containerStyle = computed(() => {
+  // Если календарь видимый, убираем ограничения по высоте
+  return { 
+    minHeight: isCalendarVisible.value ? 'auto' : undefined,
+    maxHeight: isCalendarVisible.value ? 'none' : undefined
+  };
 });
 
 // Текущая категория
@@ -443,7 +484,16 @@ onUnmounted(() => {
   flex-direction: column;
   gap: 16px;
   width: 100%;
+  position: relative; /* Для корректного позиционирования календаря */
+  transition: min-height 0.3s ease, max-height 0.3s ease;
 }
+
+/* Новые стили для расширенного popup */
+:deep(.extended-popup .popup-content) {
+  max-height: none !important;
+  overflow: visible !important;
+}
+
 
 /* Стили для кастомного заголовка */
 .category-title-container {
@@ -523,6 +573,31 @@ onUnmounted(() => {
   flex-direction: column;
   gap: 16px;
   width: 100%;
+}
+
+/* Стили для затемнения контента под календарем */
+.calendar-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 80px; /* Настройте в зависимости от высоты DateFilter */
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 10;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.calendar-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Стиль для затемнения контента транзакций при открытом календаре */
+.transactions-container.faded-content {
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
 }
 
 /* Пустое состояние */

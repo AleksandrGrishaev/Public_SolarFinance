@@ -136,9 +136,12 @@ const props = defineProps({
   }
 });
 
+// Добавляем новое событие для уведомления о видимости календаря
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: DateFilterModelValue): void
+  (e: 'update:modelValue', value: DateFilterModelValue): void,
+  (e: 'calendar-visibility-change', isVisible: boolean): void
 }>();
+
 
 // Используем composable
 const {
@@ -168,16 +171,38 @@ const {
   
   // Методы управления
   setPeriod,
-  toggleCalendar,
-  hideCalendar,
+  toggleCalendar: originalToggleCalendar,
+  hideCalendar: originalHideCalendar,
   navigateDate,
   navigateMonth,
   selectDate,
   selectMonth,
   selectYear,
-  confirmSelection,
+  confirmSelection: originalConfirmSelection,
   updateModelValue
 } = useDateFilter(props, emit);
+
+// Переопределяем методы с дополнительной эмиссией события о видимости
+const toggleCalendar = () => {
+  originalToggleCalendar();
+  emit('calendar-visibility-change', showCalendar.value);
+};
+
+const hideCalendar = () => {
+  originalHideCalendar();
+  emit('calendar-visibility-change', false);
+};
+
+const confirmSelection = () => {
+  originalConfirmSelection();
+  emit('calendar-visibility-change', false);
+};
+
+// Предоставляем метод для внешнего закрытия календаря
+// Можно использовать при необходимости через ref
+const forceCloseCalendar = () => {
+  hideCalendar();
+};
 
 // Инициализация при монтировании
 onMounted(() => {
@@ -186,12 +211,20 @@ onMounted(() => {
   } else {
     setPeriod(props.modelValue.period as 'daily' | 'monthly' | 'yearly');
   }
+  
+  // Убедимся, что календарь закрыт при старте
+  emit('calendar-visibility-change', false);
 });
 
 // Отладочный вывод для отслеживания изменений модели
 watch(() => props.modelValue, (newValue) => {
   console.log('Model changed in DateFilter:', newValue);
 }, { deep: true });
+
+// Экспортируем метод для внешнего доступа
+defineExpose({
+  forceCloseCalendar
+});
 </script>
 
 <style scoped>
@@ -203,8 +236,9 @@ watch(() => props.modelValue, (newValue) => {
   width: 100%;
   gap: 12px;
   justify-content: space-between;
+  margin-bottom: 16px; /* Увеличен отступ для календаря */
+  padding-bottom: 8px; /* Дополнительный отступ снизу */
 }
-
 .periods-container {
   display: flex;
   justify-content: flex-start;
@@ -280,9 +314,24 @@ watch(() => props.modelValue, (newValue) => {
   border-radius: 8px;
   width: 280px;
   max-width: calc(100vw - 32px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 1000;
-  overflow: hidden;
+  overflow: visible;
+}
+/* Добавляем анимацию появления */
+.calendar-container {
+  animation: calendar-appear 0.2s ease-out;
+  transform-origin: top right;
+}
+
+@keyframes calendar-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .calendar-header {
