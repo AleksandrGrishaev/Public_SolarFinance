@@ -1,10 +1,10 @@
 # Details
 
-Date : 2025-04-15 11:55:08
+Date : 2025-04-15 12:26:12
 
 Directory /Users/peaker/dev/solar-finance/src
 
-Total : 68 files,  8555 codes, 535 comments, 1311 blanks, all 10401 lines
+Total : 73 files,  9074 codes, 624 comments, 1390 blanks, all 11088 lines
 
 [Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
@@ -16,7 +16,7 @@ Total : 68 files,  8555 codes, 535 comments, 1311 blanks, all 10401 lines
 | [src/about/WorkFlow/BaseStores.md](/src/about/WorkFlow/BaseStores.md) | Markdown | 169 | 0 | 52 | 221 |
 | [src/about/WorkFlow/MainPlan.md](/src/about/WorkFlow/MainPlan.md) | Markdown | 468 | 0 | 151 | 619 |
 | [src/about/WorkFlow/Mock.md](/src/about/WorkFlow/Mock.md) | Markdown | 1,306 | 0 | 68 | 1,374 |
-| [src/about/main.md](/src/about/main.md) | Markdown | 612 | 0 | 121 | 733 |
+| [src/about/main.md](/src/about/main.md) | Markdown | 647 | 0 | 121 | 768 |
 | [src/components/categories/CategoryAddPopup.vue](/src/components/categories/CategoryAddPopup.vue) | Vue | 359 | 9 | 45 | 413 |
 | [src/components/categories/CategoryFilterToggle.vue](/src/components/categories/CategoryFilterToggle.vue) | Vue | 59 | 1 | 10 | 70 |
 | [src/components/categories/CategoryIcon.vue](/src/components/categories/CategoryIcon.vue) | Vue | 83 | 1 | 14 | 98 |
@@ -26,9 +26,9 @@ Total : 68 files,  8555 codes, 535 comments, 1311 blanks, all 10401 lines
 | [src/components/categories/CategorySelector.vue](/src/components/categories/CategorySelector.vue) | Vue | 258 | 5 | 35 | 298 |
 | [src/components/navigation/NavMenu.vue](/src/components/navigation/NavMenu.vue) | Vue | 96 | 1 | 4 | 101 |
 | [src/components/transactions/AccountSelector.vue](/src/components/transactions/AccountSelector.vue) | Vue | 219 | 4 | 29 | 252 |
-| [src/components/transactions/BookSelector.vue](/src/components/transactions/BookSelector.vue) | Vue | 109 | 1 | 14 | 124 |
+| [src/components/transactions/BookSelector.vue](/src/components/transactions/BookSelector.vue) | Vue | 135 | 1 | 19 | 155 |
 | [src/components/transactions/NumberKeypad.vue](/src/components/transactions/NumberKeypad.vue) | Vue | 123 | 2 | 12 | 137 |
-| [src/components/transactions/PercentageSlider.vue](/src/components/transactions/PercentageSlider.vue) | Vue | 152 | 1 | 21 | 174 |
+| [src/components/transactions/PercentageSlider.vue](/src/components/transactions/PercentageSlider.vue) | Vue | 162 | 1 | 21 | 184 |
 | [src/components/transactions/TransactionTypeSelector.vue](/src/components/transactions/TransactionTypeSelector.vue) | Vue | 82 | 1 | 11 | 94 |
 | [src/components/ui/BasePopup.vue](/src/components/ui/BasePopup.vue) | Vue | 164 | 1 | 3 | 168 |
 | [src/components/ui/CreateCategoryButton.vue](/src/components/ui/CreateCategoryButton.vue) | Vue | 44 | 1 | 6 | 51 |
@@ -52,7 +52,7 @@ Total : 68 files,  8555 codes, 535 comments, 1311 blanks, all 10401 lines
 | [src/stores/account/index.ts](/src/stores/account/index.ts) | TypeScript | 4 | 2 | 1 | 7 |
 | [src/stores/account/types.ts](/src/stores/account/types.ts) | TypeScript | 17 | 1 | 2 | 20 |
 | [src/stores/book/bookService.ts](/src/stores/book/bookService.ts) | TypeScript | 77 | 24 | 12 | 113 |
-| [src/stores/book/bookStore.ts](/src/stores/book/bookStore.ts) | TypeScript | 112 | 29 | 21 | 162 |
+| [src/stores/book/bookStore.ts](/src/stores/book/bookStore.ts) | TypeScript | 129 | 32 | 26 | 187 |
 | [src/stores/book/defaultBooks.ts](/src/stores/book/defaultBooks.ts) | TypeScript | 40 | 5 | 1 | 46 |
 | [src/stores/book/index.ts](/src/stores/book/index.ts) | TypeScript | 4 | 2 | 1 | 7 |
 | [src/stores/book/types.ts](/src/stores/book/types.ts) | TypeScript | 18 | 1 | 2 | 21 |
@@ -64,9 +64,14 @@ Total : 68 files,  8555 codes, 535 comments, 1311 blanks, all 10401 lines
 | [src/stores/common/types.ts](/src/stores/common/types.ts) | TypeScript | 9 | 1 | 1 | 11 |
 | [src/stores/system/constants.ts](/src/stores/system/constants.ts) | TypeScript | 35 | 13 | 4 | 52 |
 | [src/stores/system/index.ts](/src/stores/system/index.ts) | TypeScript | 3 | 2 | 1 | 6 |
-| [src/stores/system/systemStore.ts](/src/stores/system/systemStore.ts) | TypeScript | 45 | 27 | 10 | 82 |
+| [src/stores/system/systemStore.ts](/src/stores/system/systemStore.ts) | TypeScript | 56 | 34 | 12 | 102 |
 | [src/stores/system/types.ts](/src/stores/system/types.ts) | TypeScript | 24 | 5 | 4 | 33 |
 | [src/stores/theme.ts](/src/stores/theme.ts) | TypeScript | 71 | 10 | 10 | 91 |
+| [src/stores/transaction/defaultTransactions.ts](/src/stores/transaction/defaultTransactions.ts) | TypeScript | 113 | 8 | 3 | 124 |
+| [src/stores/transaction/index.ts](/src/stores/transaction/index.ts) | TypeScript | 4 | 2 | 1 | 7 |
+| [src/stores/transaction/transactionService.ts](/src/stores/transaction/transactionService.ts) | TypeScript | 72 | 20 | 11 | 103 |
+| [src/stores/transaction/transactionStore.ts](/src/stores/transaction/transactionStore.ts) | TypeScript | 168 | 43 | 39 | 250 |
+| [src/stores/transaction/types.ts](/src/stores/transaction/types.ts) | TypeScript | 30 | 6 | 8 | 44 |
 | [src/stores/user/defaultUsers.ts](/src/stores/user/defaultUsers.ts) | TypeScript | 33 | 6 | 1 | 40 |
 | [src/stores/user/index.ts](/src/stores/user/index.ts) | TypeScript | 4 | 2 | 1 | 7 |
 | [src/stores/user/types.ts](/src/stores/user/types.ts) | TypeScript | 15 | 2 | 2 | 19 |
@@ -78,6 +83,6 @@ Total : 68 files,  8555 codes, 535 comments, 1311 blanks, all 10401 lines
 | [src/views/MoreView.vue](/src/views/MoreView.vue) | Vue | 229 | 7 | 32 | 268 |
 | [src/views/NotFoundView.vue](/src/views/NotFoundView.vue) | Vue | 32 | 1 | 4 | 37 |
 | [src/views/PinLoginView.vue](/src/views/PinLoginView.vue) | Vue | 223 | 5 | 37 | 265 |
-| [src/views/TransactionView.vue](/src/views/TransactionView.vue) | Vue | 342 | 5 | 57 | 404 |
+| [src/views/TransactionView.vue](/src/views/TransactionView.vue) | Vue | 375 | 5 | 62 | 442 |
 
 [Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)

@@ -4,24 +4,33 @@
     <Transition name="popup-fade">
       <div v-if="modelValue" class="popup-overlay" @click="closeOnOverlayClick && $emit('update:modelValue', false)">
         <div class="popup-container" :class="{ 'popup-open': modelValue }" @click.stop>
+          <!-- Заголовок попапа -->
           <div class="popup-header">
+            <!-- Левая часть (кнопка закрытия) -->
             <div class="close-icon-wrapper" @click="$emit('update:modelValue', false)">
-              <IconX class="icon-close" />
+              <slot name="leftIcon">
+                <IconX class="icon-close" />
+              </slot>
             </div>
             
+            <!-- Центральная часть (заголовок) -->
             <div class="popup-title">
               <slot name="title">{{ title }}</slot>
             </div>
             
+            <!-- Правая часть (кнопка действия) -->
             <div v-if="rightContent" class="right-content-wrapper">
               <slot name="rightContent"></slot>
             </div>
             <div v-else-if="rightIcon" class="right-icon-wrapper" @click="$emit('rightIconClick')">
               <component :is="rightIcon" class="icon-right" />
             </div>
-            <div v-else class="icon-placeholder"></div>
+            <div v-else class="icon-placeholder">
+              <slot name="rightIcon"></slot>
+            </div>
           </div>
           
+          <!-- Содержимое попапа -->
           <div class="popup-content">
             <slot></slot>
           </div>
@@ -32,6 +41,7 @@
 </template>
 <script setup lang="ts">
 import { IconX } from '@tabler/icons-vue';
+
 const props = defineProps({
   modelValue: {
     type: Boolean,
@@ -54,6 +64,7 @@ const props = defineProps({
     default: true
   }
 });
+
 defineEmits(['update:modelValue', 'rightIconClick']);
 </script>
 <style scoped>
@@ -86,7 +97,7 @@ defineEmits(['update:modelValue', 'rightIconClick']);
   position: fixed;
   left: 0;
   bottom: 0;
-  padding-bottom: 3vh; /* Добавлен отступ снизу в 5% */
+  padding-bottom: 3vh; /* Добавлен отступ снизу в 3% */
 }
 .popup-open {
   transform: translateY(0);
@@ -125,6 +136,9 @@ defineEmits(['update:modelValue', 'rightIconClick']);
 .icon-placeholder {
   width: 24px;
   height: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .popup-title {
   flex: 1;
@@ -133,6 +147,9 @@ defineEmits(['update:modelValue', 'rightIconClick']);
   font-size: 20px;
   font-weight: 500;
   line-height: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .popup-content {
   padding: 13px 16px 30px 16px;

@@ -86,6 +86,12 @@ src/stores/system/constants.ts
 src/stores/system/index.ts
 src/stores/system/systemStore.ts
 src/stores/system/types.ts
+src/stores/transaction
+src/stores/transaction/defaultTransactions.ts
+src/stores/transaction/index.ts
+src/stores/transaction/transactionService.ts
+src/stores/transaction/transactionStore.ts
+src/stores/transaction/types.ts
 src/stores/user
 src/stores/user/defaultUsers.ts
 src/stores/user/index.ts

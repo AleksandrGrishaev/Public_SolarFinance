@@ -114,6 +114,13 @@
     :initial-book-id="selectedBook"
     @save="handleSaveNewCategory"
   />
+
+  <!-- Category View Popup -->
+<CategoryViewPopup
+  v-model="showCategoryViewPopup"
+  :categoryId="selectedCategoryId"
+  @edit="handleCategoryMenu"
+/>
 </template>
 
 <script setup lang="ts">
@@ -127,6 +134,8 @@ import CategoryFilterToggle from './CategoryFilterToggle.vue';
 import CreateCategoryButton from '../ui/CreateCategoryButton.vue';
 import CategoryAddPopup from './CategoryAddPopup.vue';
 import { IconPlus } from '@tabler/icons-vue';
+import CategoryViewPopup from './CategoryViewPopup.vue';
+
 
 // Импортируем категории из нового хранилища
 import { useCategoryStore, Category } from '../../stores/category';
@@ -159,7 +168,8 @@ const selectedBook = ref(props.initialBook);
 const selectedType = ref(props.initialType);
 const showInactiveCategories = ref(false);
 const showAddCategoryPopup = ref(false);
-
+const showCategoryViewPopup = ref(false);
+const selectedCategoryId = ref('');
 // Категории с флагом активности и принадлежности к книге
 const categoriesWithActiveState = ref<(Category & { isInBook?: boolean })[]>([]);
 
@@ -343,7 +353,9 @@ function getInactiveChildCategories(parentId) {
 const selectCategory = (category) => {
   // Проверяем, что выбранная категория не имеет дочерних элементов
   if (!categoryStore.hasChildCategories(category.id)) {
-    emit('select', category);
+    // Открываем просмотр категории вместо эмита события
+    selectedCategoryId.value = category.id;
+    showCategoryViewPopup.value = true;
   } else {
     // Если категория имеет дочерние элементы, не позволяем её выбрать
     console.log("Категория с дочерними элементами не может быть выбрана");

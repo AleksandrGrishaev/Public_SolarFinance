@@ -1,0 +1,45 @@
+Date : 2025-04-15 12:26:12
+Directory : /Users/peaker/dev/solar-finance/src
+Total : 11 files,  519 codes, 89 comments, 79 blanks, all 687 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| TypeScript |          7 |        415 |         89 |         69 |        573 |
+| Vue        |          3 |         69 |          0 |         10 |         79 |
+| Markdown   |          1 |         35 |          0 |          0 |         35 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++----------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                             | files      | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                |         11 |        519 |         89 |         79 |        687 |
+| about                                                                            |          1 |         35 |          0 |          0 |         35 |
+| components                                                                       |          2 |         36 |          0 |          5 |         41 |
+| components/transactions                                                          |          2 |         36 |          0 |          5 |         41 |
+| stores                                                                           |          7 |        415 |         89 |         69 |        573 |
+| stores/book                                                                      |          1 |         17 |          3 |          5 |         25 |
+| stores/system                                                                    |          1 |         11 |          7 |          2 |         20 |
+| stores/transaction                                                               |          5 |        387 |         79 |         62 |        528 |
+| views                                                                            |          1 |         33 |          0 |          5 |         38 |
++----------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++----------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                         | language   | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| /Users/peaker/dev/solar-finance/src/about/main.md                                | Markdown   |         35 |          0 |          0 |         35 |
+| /Users/peaker/dev/solar-finance/src/components/transactions/BookSelector.vue     | Vue        |         26 |          0 |          5 |         31 |
+| /Users/peaker/dev/solar-finance/src/components/transactions/PercentageSlider.vue | Vue        |         10 |          0 |          0 |         10 |
+| /Users/peaker/dev/solar-finance/src/stores/book/bookStore.ts                     | TypeScript |         17 |          3 |          5 |         25 |
+| /Users/peaker/dev/solar-finance/src/stores/system/systemStore.ts                 | TypeScript |         11 |          7 |          2 |         20 |
+| /Users/peaker/dev/solar-finance/src/stores/transaction/defaultTransactions.ts    | TypeScript |        113 |          8 |          3 |        124 |
+| /Users/peaker/dev/solar-finance/src/stores/transaction/index.ts                  | TypeScript |          4 |          2 |          1 |          7 |
+| /Users/peaker/dev/solar-finance/src/stores/transaction/transactionService.ts     | TypeScript |         72 |         20 |         11 |        103 |
+| /Users/peaker/dev/solar-finance/src/stores/transaction/transactionStore.ts       | TypeScript |        168 |         43 |         39 |        250 |
+| /Users/peaker/dev/solar-finance/src/stores/transaction/types.ts                  | TypeScript |         30 |          6 |          8 |         44 |
+| /Users/peaker/dev/solar-finance/src/views/TransactionView.vue                    | Vue        |         33 |          0 |          5 |         38 |
+| Total                                                                            |            |        519 |         89 |         79 |        687 |
++----------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
