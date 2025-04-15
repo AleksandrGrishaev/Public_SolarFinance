@@ -28,7 +28,7 @@
     
     <!-- Правая кнопка (редактирование) с классом edit-button -->
     <template #rightContent>
-      <div class="edit-button" @click="handleEdit">Edit</div>
+      <div class="edit-button" @click="openEditPopup">Edit</div>
     </template>
     
     <div class="category-view-container">
@@ -87,6 +87,13 @@
         @transaction-click="handleTransactionClick"
       />
     </div>
+    
+    <!-- Попап редактирования категории -->
+    <CategoryEditPopup
+      v-model="isEditPopupVisible"
+      :category-id="categoryId"
+      @save="handleEditSave"
+    />
   </BasePopup>
 </template>
 
@@ -96,6 +103,7 @@ import BasePopup from '../ui/BasePopup.vue';
 import CategoryIcon from './CategoryIcon.vue';
 import CategoryDateFilters from './view/CategoryDateFilters.vue';
 import CategoryTransactionsList from './view/CategoryTransactionsList.vue';
+import CategoryEditPopup from './CategoryEditPopup.vue';
 import { 
   IconBook,
   IconShare,
@@ -134,6 +142,9 @@ const isVisible = computed({
   get: () => props.modelValue,
   set: (value) => emit('update:modelValue', value)
 });
+
+// Состояние видимости попапа редактирования
+const isEditPopupVisible = ref(false);
 
 // Состояние для отслеживания видимости календаря
 const isCalendarVisible = ref(false);
@@ -330,16 +341,24 @@ const handleTransactionClick = (transaction) => {
   // Здесь должен быть код для открытия детального просмотра транзакции
 };
 
+// Открытие попапа редактирования категории
+const openEditPopup = () => {
+  isEditPopupVisible.value = true;
+};
+
+// Обработчик сохранения после редактирования
+const handleEditSave = (updatedCategory) => {
+  console.log('Category updated:', updatedCategory);
+  
+  // После сохранения категории обновляем данные
+  applyFilters();
+};
+
 // Обработчики событий
 const handleClose = () => {
   // Сбрасываем фильтры при закрытии
   resetFilters();
   emit('update:modelValue', false);
-};
-
-const handleEdit = () => {
-  if (!category.value) return;
-  emit('edit', category.value);
 };
 
 // Сброс фильтров
