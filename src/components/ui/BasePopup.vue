@@ -3,7 +3,14 @@
   <Teleport to="body">
     <Transition name="popup-fade">
       <div v-if="modelValue" class="popup-overlay" @click="closeOnOverlayClick && $emit('update:modelValue', false)">
-        <div class="popup-container" :class="{ 'popup-open': modelValue }" @click.stop>
+        <div 
+          class="popup-container" 
+          :class="{ 
+            'popup-open': modelValue,
+            'popup-extended': extendedMode 
+          }" 
+          @click.stop
+        >
           <!-- Заголовок попапа -->
           <div class="popup-header">
             <!-- Левая часть (кнопка закрытия) -->
@@ -31,7 +38,7 @@
           </div>
           
           <!-- Содержимое попапа -->
-          <div class="popup-content">
+          <div class="popup-content" :class="{ 'content-extended': extendedMode }">
             <slot></slot>
           </div>
         </div>
@@ -62,6 +69,10 @@ const props = defineProps({
   closeOnOverlayClick: {
     type: Boolean,
     default: true
+  },
+  extendedMode: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -92,13 +103,19 @@ defineEmits(['update:modelValue', 'rightIconClick']);
   max-height: 90vh;
   overflow-y: auto;
   transform: translateY(100%);
-  transition: transform 0.3s ease-out;
+  transition: transform 0.3s ease-out, max-height 0.3s ease;
   box-sizing: border-box;
   position: fixed;
   left: 0;
   bottom: 0;
   padding-bottom: 3vh; /* Добавлен отступ снизу в 3% */
 }
+
+/* Специальный класс для режима с календарем */
+.popup-container.popup-extended {
+  max-height: 90vh; /* Увеличиваем максимальную высоту */
+}
+
 .popup-open {
   transform: translateY(0);
 }
@@ -158,7 +175,15 @@ defineEmits(['update:modelValue', 'rightIconClick']);
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative; /* Добавлено для правильного позиционирования календаря */
 }
+
+/* Специальный класс для контента при открытом календаре */
+.popup-content.content-extended {
+  overflow: visible !important;
+  padding-bottom: 180px; /* Добавляем дополнительное пространство снизу для календаря */
+}
+
 .icon-close {
   color: #A44942;
   width: 14px;
