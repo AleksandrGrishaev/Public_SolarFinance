@@ -1,5 +1,5 @@
 // src/composables/useDateFilter.ts
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch} from 'vue';
 
 interface DateFilterModelValue {
   period?: 'daily' | 'monthly' | 'yearly';
@@ -18,21 +18,6 @@ interface CalendarDay {
 }
 
 type EmitFunction = (event: 'update:modelValue', value: DateFilterModelValue) => void;
-
-// Директива для закрытия календаря при клике вне него
-export const vClickOutside = {
-  mounted(el: HTMLElement, binding: any) {
-    el._clickOutside = (event: Event) => {
-      if (!(el === event.target || el.contains(event.target as Node))) {
-        binding.value(event);
-      }
-    };
-    document.addEventListener('click', el._clickOutside);
-  },
-  unmounted(el: HTMLElement) {
-    document.removeEventListener('click', el._clickOutside);
-  }
-};
 
 export function useDateFilter(props: DateFilterProps, emit: EmitFunction) {
   // Состояние

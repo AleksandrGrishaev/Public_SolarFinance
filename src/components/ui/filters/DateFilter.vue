@@ -114,7 +114,8 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import { useDateFilter, vClickOutside } from '@/composables/useDateFilter';
+import { useDateFilter } from '@/composables/useDateFilter';
+import { vClickOutside } from '@/directives/vClickOutside';
 
 interface DateFilterModelValue {
   period?: 'daily' | 'monthly' | 'yearly';
@@ -141,11 +142,7 @@ const emit = defineEmits<{
 const {
   // Состояние
   currentPeriod,
-  selectedDate,
-  dateRange,
   showCalendar,
-  currentViewDate,
-  tempRange,
   weekDays,
   monthNames,
   
@@ -173,7 +170,6 @@ const {
   selectMonth,
   selectYear,
   confirmSelection,
-  updateModelValue
 } = useDateFilter(props, emit);
 
 // Инициализация при монтировании
