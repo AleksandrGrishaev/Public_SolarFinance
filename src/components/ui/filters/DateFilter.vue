@@ -1,4 +1,4 @@
-<!-- src/components/ui/filters/DateFilter.vue -->
+<!-- src/components/ui/filters/DateFilter.vue с ручной обработкой кликов -->
 <template>
   <div class="date-filter">
     <!-- Переключатели D-M-Y слева -->
@@ -35,8 +35,8 @@
       <div class="date-nav" @click.stop="navigateDate(1)">&gt;</div>
     </div>
     
-    <!-- Календарь -->
-    <div v-if="showCalendar" class="calendar-container" v-click-outside="hideCalendar">
+    <!-- Календарь с ручным управлением кликами -->
+    <div v-if="showCalendar" class="calendar-container" ref="calendarContainerRef">
       <!-- Навигация по месяцам и годам -->
       <div class="calendar-header">
         <button class="nav-button" @click="navigateMonth(-1)">&lt;&lt;</button>
@@ -113,9 +113,8 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, watch } from 'vue';
+import { onMounted, watch, ref, onUnmounted } from 'vue';
 import { useDateFilter } from '@/composables/useDateFilter';
-import { vClickOutside } from '@/directives/vClickOutside';
 
 interface DateFilterModelValue {
   period?: 'daily' | 'monthly' | 'yearly';
@@ -142,8 +141,11 @@ const emit = defineEmits<{
   (e: 'calendar-visibility-change', isVisible: boolean): void
 }>();
 
+// Ссылка на контейнер календаря
+const calendarContainerRef = ref(null);
+const dateFilterRef = ref(null);
 
-// Используем composable
+// Используем composable с расширенными функциями
 const {
   // Состояние
   currentPeriod,
@@ -199,12 +201,11 @@ const confirmSelection = () => {
 };
 
 // Предоставляем метод для внешнего закрытия календаря
-// Можно использовать при необходимости через ref
 const forceCloseCalendar = () => {
   hideCalendar();
 };
 
-// Инициализация при монтировании
+// Инициализация и управление кликами
 onMounted(() => {
   if (!props.modelValue.period) {
     setPeriod('monthly');
@@ -214,6 +215,43 @@ onMounted(() => {
   
   // Убедимся, что календарь закрыт при старте
   emit('calendar-visibility-change', false);
+  
+  // Добавляем глобальный обработчик кликов
+  const handleDocumentClick = (event: MouseEvent) => {
+    // Если календарь не виден, игнорируем
+    if (!showCalendar.value || !calendarContainerRef.value) return;
+    
+    const calendar = calendarContainerRef.value as HTMLElement;
+    const target = event.target as HTMLElement;
+    
+    // Пропускаем, если клик внутри календаря
+    if (calendar.contains(target)) return;
+    
+    // Проверяем, не является ли целью переключатель даты или его дочерние элементы
+    const isDateSelector = 
+      target.classList.contains('date-selector') || 
+      target.closest('.date-selector') ||
+      target.classList.contains('date-option') || 
+      target.closest('.date-option') ||
+      target.classList.contains('date-nav') || 
+      target.closest('.date-nav') ||
+      target.classList.contains('date-value') || 
+      target.closest('.date-value');
+    
+    // Если клик не на дате-селекторе, закрываем календарь
+    if (!isDateSelector) {
+      console.log('Click outside calendar detected, closing calendar');
+      hideCalendar();
+    }
+  };
+  
+  // Прикрепляем прослушиватель с фазой захвата
+  document.addEventListener('click', handleDocumentClick, true);
+  
+  // Удаляем прослушиватель при размонтировании
+  onUnmounted(() => {
+    document.removeEventListener('click', handleDocumentClick, true);
+  });
 });
 
 // Отладочный вывод для отслеживания изменений модели
@@ -239,6 +277,7 @@ defineExpose({
   margin-bottom: 16px; /* Увеличен отступ для календаря */
   padding-bottom: 8px; /* Дополнительный отступ снизу */
 }
+
 .periods-container {
   display: flex;
   justify-content: flex-start;
@@ -284,6 +323,8 @@ defineExpose({
   cursor: pointer;
   min-width: 150px;
   max-width: calc(100vw - 40px);
+  position: relative;
+  z-index: 10; /* Повышаем z-index для корректной работы кликов */
 }
 
 .date-nav {
@@ -316,9 +357,7 @@ defineExpose({
   max-width: calc(100vw - 32px);
   z-index: 1000;
   overflow: visible;
-}
-/* Добавляем анимацию появления */
-.calendar-container {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
   animation: calendar-appear 0.2s ease-out;
   transform-origin: top right;
 }
