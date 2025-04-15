@@ -181,7 +181,7 @@ defineEmits(['update:modelValue', 'rightIconClick']);
 /* Специальный класс для контента при открытом календаре */
 .popup-content.content-extended {
   overflow: visible !important;
-  padding-bottom: 180px; /* Добавляем дополнительное пространство снизу для календаря */
+  padding-bottom: 250px; /* Добавляем дополнительное пространство снизу для календаря */
 }
 
 .icon-close {

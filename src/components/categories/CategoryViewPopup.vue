@@ -1,7 +1,4 @@
-.filter-group {
-  display: flex;
-  gap: 10px;
-}<!-- src/components/categories/CategoryViewPopup.vue -->
+<!-- src/components/categories/CategoryViewPopup.vue -->
 <template>
   <BasePopup 
     v-model="isVisible" 
@@ -70,48 +67,25 @@
         </div>
       </div>
       
-      <!-- Фильтр периода с обработчиком видимости календаря -->
-      <DateFilter 
-        ref="dateFilterRef"
-        v-model="dateFilter" 
-        @update:modelValue="handleDateFilterChange"
-        @calendar-visibility-change="handleCalendarVisibilityChange" 
+      <!-- Компонент для работы с фильтрами дат -->
+      <CategoryDateFilters
+        ref="dateFiltersRef"
+        :date-filter="dateFilter"
+        :is-visible="isVisible"
+        :category-id="categoryId"
+        @update:date-filter="dateFilter = $event"
+        @calendar-visibility-change="handleCalendarVisibilityChange"
+        @apply-filters="applyFilters"
       />
       
-      <!-- Список транзакций -->
-      <div 
-        class="transactions-container" 
-        v-if="Object.keys(groupedTransactions).length > 0"
-      >
-        <TransactionDateGroup 
-          v-for="(transactions, dateKey) in groupedTransactions" 
-          :key="dateKey"
-          :date="dateKey"
-          :totalAmount="getDateTotal(transactions)"
-          :currency="transactions[0]?.currency || 'Rp'"
-        >
-          <TransactionItem
-            v-for="transaction in transactions"
-            :key="transaction.id"
-            :transaction="transaction"
-            :title="getTransactionTitle(transaction)"
-            :subtitle="getTransactionSubtitle(transaction)"
-            :accountName="getAccountName(transaction)"
-            :iconName="getTransactionIconName(transaction)"
-            :iconColor="category?.color || '#D9D9D9'"
-            :withBorder="transactions.indexOf(transaction) < transactions.length - 1"
-            @click="handleTransactionClick(transaction)"
-          />
-        </TransactionDateGroup>
-      </div>
-      
-      <!-- Пустое состояние при отсутствии транзакций -->
-      <div v-else class="empty-state">
-        <div class="empty-icon">
-          <IconReceipt2 size="48" color="#949496" />
-        </div>
-        <div class="empty-text">No transactions found for this period</div>
-      </div>
+      <!-- Компонент списка транзакций -->
+      <CategoryTransactionsList
+        :grouped-transactions="groupedTransactions"
+        :category-color="category?.color || '#D9D9D9'"
+        :book-store="bookStore"
+        :user-store="userStore"
+        @transaction-click="handleTransactionClick"
+      />
     </div>
   </BasePopup>
 </template>
@@ -120,14 +94,12 @@
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import BasePopup from '../ui/BasePopup.vue';
 import CategoryIcon from './CategoryIcon.vue';
-import DateFilter from '../ui/filters/DateFilter.vue';
-import TransactionDateGroup from '../transactions/ViewTransaction/TransactionDateGroup.vue';
-import TransactionItem from '../transactions/ViewTransaction/TransactionItem.vue';
+import CategoryDateFilters from './view/CategoryDateFilters.vue';
+import CategoryTransactionsList from './view/CategoryTransactionsList.vue';
 import { 
   IconBook,
   IconShare,
   IconChartPie,
-  IconReceipt2,
 } from '@tabler/icons-vue';
 
 import { useCategoryStore } from '../../stores/category';
@@ -166,8 +138,8 @@ const isVisible = computed({
 // Состояние для отслеживания видимости календаря
 const isCalendarVisible = ref(false);
 
-// Ссылка на компонент DateFilter
-const dateFilterRef = ref(null);
+// Ссылка на компонент фильтров дат
+const dateFiltersRef = ref(null);
 
 // Обработчик события изменения видимости календаря
 const handleCalendarVisibilityChange = (isVisible) => {
@@ -177,8 +149,8 @@ const handleCalendarVisibilityChange = (isVisible) => {
 
 // Метод для программного закрытия календаря
 const closeCalendar = () => {
-  if (dateFilterRef.value && typeof dateFilterRef.value.forceCloseCalendar === 'function') {
-    dateFilterRef.value.forceCloseCalendar();
+  if (dateFiltersRef.value) {
+    dateFiltersRef.value.forceCloseCalendar();
   }
   isCalendarVisible.value = false;
 };
@@ -221,7 +193,7 @@ const bookNames = computed(() => {
   }
 });
 
-// НОВЫЕ МЕТОДЫ ДЛЯ РАБОТЫ С SHARING И STATS
+// Методы для работы с sharing и stats
 const toggleSharing = () => {
   if (!category.value) return;
   
@@ -245,17 +217,6 @@ const dateFilter = ref({
 
 // Хранение отфильтрованных транзакций
 const categoryTransactions = ref<Transaction[]>([]);
-
-// Обработчик изменения фильтра дат
-const handleDateFilterChange = (value) => {
-  console.log('CategoryViewPopup received date filter:', value);
-  console.log('Filter period:', value.period);
-  console.log('Filter date:', value.date);
-  console.log('Filter dateRange:', value.dateRange);
-  console.log('Filter dateFrom:', value.dateFrom);
-  console.log('Filter dateTo:', value.dateTo);
-  applyFilters();
-};
 
 // Фильтрация
 const applyFilters = () => {
@@ -363,69 +324,10 @@ const groupedTransactions = computed(() => {
   );
 });
 
-// Получение общей суммы за день
-const getDateTotal = (transactions) => {
-  return transactions.reduce((sum, transaction) => sum + transaction.amount, 0);
-};
-
-// Получение заголовка транзакции
-const getTransactionTitle = (transaction) => {
-  // Используем описание транзакции или название книги
-  if (transaction.description) {
-    return transaction.description;
-  }
-  
-  // Получаем название книги из BookStore
-  const book = bookStore.getBookById(transaction.bookId);
-  return book ? book.name : 'Unknown';
-};
-
-// Получение подзаголовка транзакции
-const getTransactionSubtitle = (transaction) => {
-  // Получаем имя пользователя из UserStore
-  const user = userStore.getUserById?.(transaction.executedByOwnerId);
-  // Если getUserById не существует или не вернул пользователя, используем запасной вариант
-  if (user) {
-    return user.name || 'Unknown';
-  }
-  
-  // Запасной вариант
-  const userMap = {
-    'user_1': 'Me',
-    'user_2': 'Wife'
-  };
-  return userMap[transaction.executedByOwnerId] || 'Unknown';
-};
-
-// Получение имени счета
-const getAccountName = (transaction) => {
-  // Запасной вариант для названий счетов
-  const accountMap = {
-    'card1': 'Card',
-    'card2': 'Family Card',
-    'card3': 'Wife Card',
-    'bank1': 'Bank',
-    'bank2': 'Bank 2',
-    'cash1': 'Cash'
-  };
-  
-  if (transaction.type === 'expense') {
-    return accountMap[transaction.sourceEntityId] || 'Unknown';
-  } else {
-    return accountMap[transaction.destinationEntityId] || 'Unknown';
-  }
-};
-
-// Получение имени иконки для транзакции
-const getTransactionIconName = (transaction) => {
-  // Иконки по типу транзакции
-  const typeIconMap = {
-    'expense': 'shopping',
-    'income': 'coin',
-    'transfer': 'credit-card'
-  };
-  
-  return typeIconMap[transaction.type] || 'wallet';
+// Обработчики событий
+const handleTransactionClick = (transaction) => {
+  console.log('Transaction clicked:', transaction);
+  // Здесь должен быть код для открытия детального просмотра транзакции
 };
 
 // Обработчики событий
@@ -438,11 +340,6 @@ const handleClose = () => {
 const handleEdit = () => {
   if (!category.value) return;
   emit('edit', category.value);
-};
-
-const handleTransactionClick = (transaction) => {
-  console.log('Transaction clicked:', transaction);
-  // Здесь должен быть код для открытия детального просмотра транзакции
 };
 
 // Сброс фильтров
@@ -476,15 +373,6 @@ watch(() => props.modelValue, (isVisible) => {
     applyFilters();
   }
 });
-
-// Отслеживаем изменения в самом объекте dateFilter
-watch(() => dateFilter.value, (newValue, oldValue) => {
-  console.log('DateFilter object changed:', newValue);
-  console.log('Previous value was:', oldValue);
-  if (props.modelValue && props.categoryId) {
-    applyFilters();
-  }
-}, { deep: true });
 
 // Инициализация
 onMounted(() => {
@@ -604,43 +492,5 @@ onUnmounted(() => {
 
 .action-icon-wrapper.active {
   opacity: 1;
-}
-
-.transactions-container {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  width: 100%;
-}
-
-/* Пустое состояние */
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  padding: 32px 0;
-  text-align: center;
-}
-
-.empty-icon {
-  width: 48px;
-  height: 48px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.empty-text {
-  color: #949496;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 24px;
-}
-
-/* Стили для календаря - эти стили могут быть переопределены в DateFilter.vue */
-:deep(.calendar-container) {
-  z-index: 1000;
 }
 </style>
