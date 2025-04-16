@@ -22,8 +22,9 @@
           v-model="selectedType" 
         />
         
+        <!-- Используем фильтрованные счета на основе выбранной книги -->
         <account-selector 
-          :accounts="accountStore.activeAccounts" 
+          :accounts="filteredAccounts" 
           v-model="selectedAccount"
           :is-transfer="selectedType === 'transfer'"
           :destination-account-id="destinationAccount"
@@ -87,11 +88,13 @@ import { useCategoryStore } from '../stores/category';
 import { useAccountStore } from '../stores/account';
 import { useBookStore } from '../stores/book';
 import { useSystemStore } from '../stores/system';
+import { useCurrencyStore } from '../stores/currency'; // Импорт хранилища валют
 
 const categoryStore = useCategoryStore();
 const accountStore = useAccountStore();
 const bookStore = useBookStore();
 const systemStore = useSystemStore();
+const currencyStore = useCurrencyStore(); // Инициализируем хранилище валют
 
 // Состояние загрузки
 const isLoading = ref(true);
@@ -104,20 +107,44 @@ const initAllStores = async () => {
     // Инициализируем все хранилища параллельно
     await Promise.all([
       bookStore.isInitialized ? Promise.resolve() : bookStore.init(),
-      accountStore.isInitialized ? Promise.resolve() : accountStore.init()
+      accountStore.isInitialized ? Promise.resolve() : accountStore.init(),
+      currencyStore.init ? currencyStore.init() : Promise.resolve()
     ]);
     
     // Устанавливаем начальное значение selectedBook, если оно не соответствует ни одной из имеющихся книг
-    if (bookStore.books.length > 0 && !bookStore.books.some(book => book.id === selectedBook.value)) {
-      selectedBook.value = bookStore.books[0].id;
+    if (bookStore.books.length > 0) {
+      if (!bookStore.books.some(book => book.id === selectedBook.value)) {
+        selectedBook.value = bookStore.books[0].id;
+      }
+    } else {
+      console.warn('No books available in store');
     }
     
-    // Устанавливаем начальное значение selectedAccount, если оно не соответствует ни одному из имеющихся счетов
-    if (accountStore.accounts.length > 0 && !accountStore.accounts.some(account => account.id === selectedAccount.value)) {
+    // Проверяем, есть ли отфильтрованные счета
+    if (filteredAccounts.value.length > 0) {
+      // Проверяем, есть ли выбранный счет среди отфильтрованных
+      if (!filteredAccounts.value.some(account => account.id === selectedAccount.value)) {
+        // Если нет, выбираем первый доступный
+        selectedAccount.value = filteredAccounts.value[0].id;
+      }
+    } else if (accountStore.activeAccounts.length > 0) {
+      // Если нет отфильтрованных счетов, но есть активные, выбираем первый активный
+      selectedAccount.value = accountStore.activeAccounts[0].id;
+    } else if (accountStore.accounts.length > 0) {
+      // Если нет активных счетов, но есть счета в хранилище, выбираем первый счет
       selectedAccount.value = accountStore.accounts[0].id;
+    } else {
+      console.warn('No accounts available in store');
     }
     
     console.log('All stores initialized successfully');
+    
+    // Отладочная информация
+    console.log('Selected book:', selectedBook.value);
+    console.log('All accounts count:', accountStore.accounts.length);
+    console.log('Active accounts count:', accountStore.activeAccounts.length);
+    console.log('Filtered accounts count:', filteredAccounts.value.length);
+    console.log('Filtered accounts:', filteredAccounts.value.map(a => a.id));
   } catch (error) {
     console.error('Error initializing stores:', error);
   } finally {
@@ -143,6 +170,48 @@ const distributionPercentage = ref(50);
 const showCategorySelector = ref(false);
 const showCategoryList = ref(false);
 const selectedCategory = ref(null);
+
+// Фильтруем счета по выбранной книге
+const filteredAccounts = computed(() => {
+  // Если магазины не инициализированы, вернуть пустой массив
+  if (!accountStore.isInitialized || !bookStore.isInitialized) {
+    return [];
+  }
+  
+  // Если нет активных счетов, вернуть пустой массив
+  if (!accountStore.activeAccounts.length) {
+    return [];
+  }
+  
+  // Если тип транзакции перевод, показываем все счета
+  if (selectedType.value === 'transfer') {
+    return accountStore.activeAccounts;
+  }
+  
+  // Если выбранная книга не существует, возвращаем все активные счета
+  const selectedBookExists = bookStore.books.some(book => book.id === selectedBook.value);
+  if (!selectedBookExists) {
+    return accountStore.activeAccounts;
+  }
+  
+  // Иначе фильтруем счета по выбранной книге
+  return accountStore.activeAccounts.filter(account => {
+    // Проверяем наличие счета в выбранной книге через bookIds
+    if (account.bookIds && account.bookIds.includes(selectedBook.value)) {
+      return true;
+    }
+    
+    // Если у счета нет привязки к книгам, ищем по владельцу книги
+    if (!account.bookIds || account.bookIds.length === 0) {
+      const book = bookStore.getBookById(selectedBook.value);
+      if (book && book.ownerIds && book.ownerIds.includes(account.ownerId)) {
+        return true;
+      }
+    }
+    
+    return false;
+  });
+});
 
 // Вычисляемое свойство для определения показывать ли слайдер распределения
 const shouldShowDistribution = computed(() => {
@@ -170,8 +239,17 @@ const distributionOwners = computed(() => {
   });
 });
 
-// Обновляем процент распределения при изменении книги
+// Наблюдатель за изменением книги
 watch(selectedBook, (newBookId) => {
+  // Проверяем, есть ли выбранный счет в новой книге
+  const isAccountInNewBook = filteredAccounts.value.some(account => account.id === selectedAccount.value);
+  
+  // Если счет не найден в новой книге, выбираем первый доступный
+  if (!isAccountInNewBook && filteredAccounts.value.length > 0) {
+    selectedAccount.value = filteredAccounts.value[0].id;
+  }
+  
+  // Обновляем процент распределения
   const book = bookStore.getBookById(newBookId);
   if (book && book.distributionRules && book.distributionRules.length >= 2) {
     // Устанавливаем процент первого владельца из правил
@@ -179,24 +257,37 @@ watch(selectedBook, (newBookId) => {
   }
 });
 
-// Вычисляемое свойство для получения символа валюты
+// Наблюдатель за изменением отфильтрованных счетов
+watch(filteredAccounts, (newAccounts) => {
+  if (newAccounts.length > 0 && !newAccounts.some(account => account.id === selectedAccount.value)) {
+    selectedAccount.value = newAccounts[0].id;
+  }
+}, { immediate: true });
+
+// Вычисляемое свойство для получения символа валюты с использованием currencyStore
 const currentCurrencySymbol = computed(() => {
-  // По умолчанию используем $ если не найдем валюту
-  const defaultSymbol = '$';
-  
-  // Сначала пытаемся получить валюту из выбранного счета
-  if (selectedAccount.value) {
-    const account = accountStore.getAccountById(selectedAccount.value);
-    if (account) {
-      const currency = systemStore.getCurrencyByCode(account.currency);
-      if (currency) {
-        return currency.symbol;
-      }
-    }
+  // Если счет не выбран или не удалось получить данные, возвращаем символ валюты по умолчанию
+  if (!selectedAccount.value) {
+    return currencyStore.getCurrency(currencyStore.appBaseCurrency)?.symbol || '$';
   }
   
-  // Если не удалось определить валюту счета, используем валюту по умолчанию
-  return systemStore.defaultCurrency?.symbol || defaultSymbol;
+  // Получаем выбранный счет
+  const account = accountStore.getAccountById(selectedAccount.value);
+  if (!account) {
+    return currencyStore.getCurrency(currencyStore.appBaseCurrency)?.symbol || '$';
+  }
+  
+  // Получаем код валюты из счета
+  const currencyCode = account.currency;
+  
+  // Пытаемся получить валюту из хранилища валют
+  const currency = currencyStore.getCurrency(currencyCode);
+  if (currency) {
+    return currency.symbol;
+  }
+  
+  // Если валюта не найдена в хранилище, используем символ из счета или символ по умолчанию
+  return account.symbol || currencyStore.getCurrency(currencyStore.appBaseCurrency)?.symbol || '$';
 });
 
 // Вычисляемое свойство для получения категорий
@@ -209,15 +300,25 @@ const filteredCategories = computed(() => {
   return categoryStore.getCategoriesForBookAndType(selectedBook.value, selectedType.value);
 });
 
-
 // Устанавливаем наблюдение за изменением типа транзакции
 watch(selectedType, (newType) => {
   // Если тип изменился на "transfer", убедимся что оба счета различны
-  if (newType === 'transfer' && selectedAccount.value === destinationAccount.value && accountStore.accounts.length > 1) {
-    // Устанавливаем другой счет в качестве получателя
-    const otherAccount = accountStore.accounts.find(acc => acc.id !== selectedAccount.value);
-    if (otherAccount) {
-      destinationAccount.value = otherAccount.id;
+  if (newType === 'transfer' && accountStore.accounts.length > 1) {
+    if (selectedAccount.value === destinationAccount.value) {
+      // Устанавливаем другой счет в качестве получателя
+      const otherAccounts = accountStore.accounts.filter(acc => 
+        acc.id !== selectedAccount.value && acc.isActive
+      );
+      
+      if (otherAccounts.length > 0) {
+        destinationAccount.value = otherAccounts[0].id;
+      } else {
+        // Если нет других активных счетов, используем первый неактивный, отличный от выбранного
+        const anyOtherAccount = accountStore.accounts.find(acc => acc.id !== selectedAccount.value);
+        if (anyOtherAccount) {
+          destinationAccount.value = anyOtherAccount.id;
+        }
+      }
     }
   }
   
@@ -258,18 +359,39 @@ const handleAddTransaction = () => {
   saveTransaction();
 };
 
+// Получаем код валюты для выбранного счета
+const getAccountCurrencyCode = (accountId: string): string => {
+  const account = accountStore.getAccountById(accountId);
+  if (!account) return currencyStore.appBaseCurrency;
+  
+  return account.currency;
+};
+
 const saveTransaction = () => {
   // Here we would save the transaction to the store/backend
+  const sourceAccount = accountStore.getAccountById(selectedAccount.value);
+  if (!sourceAccount) {
+    console.error('Cannot save transaction: source account not found');
+    return;
+  }
+  
   const transactionData = {
     amount: parseFloat(amount.value),
     book: selectedBook.value,
     type: selectedType.value,
-    account: selectedAccount.value
+    account: selectedAccount.value,
+    currency: sourceAccount.currency
   };
   
   // Добавляем дополнительную информацию в зависимости от типа транзакции
   if (selectedType.value === 'transfer') {
     transactionData.destinationAccount = destinationAccount.value;
+    
+    // Добавляем информацию о валюте счета-получателя
+    const destAccount = accountStore.getAccountById(destinationAccount.value);
+    if (destAccount) {
+      transactionData.destinationCurrency = destAccount.currency;
+    }
   } else {
     // Добавляем информацию о распределении только если оно доступно
     if (shouldShowDistribution.value) {
@@ -286,8 +408,12 @@ const saveTransaction = () => {
 };
 
 const handleCategorySelect = (category) => {
-  selectedCategory.value = category;
-  saveTransaction();
+  if (category) {
+    selectedCategory.value = category;
+    saveTransaction();
+  } else {
+    console.warn('Attempted to select null category');
+  }
 };
 
 const handleAddCategory = () => {
@@ -304,9 +430,11 @@ const handleOpenCategoryList = () => {
 
 const handleCategoryListSelect = (category) => {
   // Выбор категории из списка возвращает нас к первому попапу
-  selectedCategory.value = category;
-  showCategoryList.value = false;
-  showCategorySelector.value = true;
+  if (category) {
+    selectedCategory.value = category;
+    showCategoryList.value = false;
+    showCategorySelector.value = true;
+  }
 };
 
 const handleAddCategoryFromList = (data) => {
@@ -327,6 +455,11 @@ const handleCategoriesReordered = (reorderedCategories) => {
 
 // Обработка изменения активности категории
 const handleToggleActiveCategory = ({ category, isActive, bookId }) => {
+  if (!category || !bookId) {
+    console.warn('Invalid category toggle parameters', { category, isActive, bookId });
+    return;
+  }
+  
   console.log(`Category ${category.name} is now ${isActive ? 'active' : 'inactive'} in book ${bookId}`);
   
   // Используем методы store для обновления
