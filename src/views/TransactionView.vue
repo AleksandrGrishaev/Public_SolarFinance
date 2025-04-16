@@ -6,9 +6,25 @@
     </div>
     
     <div class="body-container" v-else>
+      <!-- Секция отображения суммы с поддержкой конвертации валют -->
       <div class="amount-section">
-        <div class="currency-symbol">{{ currentCurrencySymbol }}</div>
-        <div class="amount-input">{{ amount }}</div>
+        <!-- Стандартное отображение для обычных транзакций -->
+        <div v-if="!isTransferWithDifferentCurrencies" class="standard-amount">
+          <div class="currency-symbol">{{ sourceCurrencySymbol }}</div>
+          <div class="amount-input">{{ amount }}</div>
+        </div>
+        
+        <!-- Отображение с конвертацией для переводов между разными валютами -->
+        <div v-else class="currency-conversion">
+          <div class="source-amount">
+            <div class="currency-symbol">{{ sourceCurrencySymbol }}</div>
+            <div class="amount-input">{{ amount }}</div>
+          </div>
+          <div class="destination-amount">
+            <div class="dest-currency-symbol">{{ destinationCurrencySymbol }}</div>
+            <div class="dest-amount-input">{{ convertedAmount }}</div>
+          </div>
+        </div>
       </div>
       
       <div class="filter-group">
@@ -28,7 +44,7 @@
           v-model="selectedAccount"
           :is-transfer="selectedType === 'transfer'"
           :destination-account-id="destinationAccount"
-          @update:destination-account-id="destinationAccount = $event"
+          @update:destination-account-id="handleDestinationAccountChange"
         />
         
         <!-- Слайдер отображается только если есть правила распределения в книге и это не перевод -->
@@ -39,7 +55,7 @@
           :class="{ 'invisible': !shouldShowDistribution }"
         />
       </div>
-            
+      
       <div class="keypad-container">
         <number-keypad 
           @input="handleKeypadInput" 
@@ -74,7 +90,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, watch } from 'vue';
 import BookSelector from '../components/transactions/BookSelector.vue';
 import TransactionTypeSelector from '../components/transactions/TransactionTypeSelector.vue';
 import AccountSelector from '../components/transactions/AccountSelector.vue';
@@ -83,8 +99,10 @@ import NumberKeypad from '../components/transactions/NumberKeypad.vue';
 import CategorySelector from '../components/categories/CategorySelector.vue';
 import CategoryListPopup from '../components/categories/CategoryListPopup.vue';
 
-// Импортируем хук useTransaction из индекса composables
+// Импортируем хуки
 import { useTransaction } from '../composables/transaction';
+import { useAccount } from '../composables/transaction/useAccount';
+import { useCurrency } from '../composables/transaction/useCurrency';
 
 // Определяем события для emit
 const emit = defineEmits(['update:showMenu']);
@@ -101,7 +119,6 @@ const {
   selectedAccount,
   destinationAccount,
   filteredAccounts,
-  currentCurrencySymbol,
   
   // From useCategory
   showCategorySelector,
@@ -130,10 +147,35 @@ const {
   handleToggleActiveCategory
 } = useTransaction(emit);
 
+// Инициализируем хук для работы с валютами
+const {
+  sourceCurrencySymbol,
+  destinationCurrencySymbol,
+  isTransferWithDifferentCurrencies,
+  convertedAmount,
+  initCurrencyStore
+} = useCurrency(selectedAccount, destinationAccount, selectedType, amount);
+
+// Обработчик изменения аккаунта назначения
+const handleDestinationAccountChange = (accountId: string) => {
+  destinationAccount.value = accountId;
+};
+
 // Инициализируем хранилища и сообщаем макету, что нужно показать меню
 onMounted(async () => {
   emit('update:showMenu', true);
   await initAllStores();
+  
+  // Инициализируем хранилище валют
+  await initCurrencyStore();
+});
+
+// Следим за изменениями типа транзакции для обновления интерфейса
+watch(() => selectedType.value, (newType) => {
+  // При смене типа транзакции с перевода на другой тип, сбрасываем сумму
+  if (newType !== 'transfer' && isTransferWithDifferentCurrencies.value) {
+    amount.value = '0';
+  }
 });
 </script>
 
@@ -192,11 +234,39 @@ onMounted(async () => {
 
 .amount-section {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   /* Верхний и нижний отступы для amount-section */
   padding: 20px 0 25px;
+}
+
+/* Стандартное отображение суммы */
+.standard-amount {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   gap: 10px;
+}
+
+/* Стили для конвертации валют */
+.currency-conversion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 11px;
+}
+
+.source-amount {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+}
+
+.destination-amount {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
 }
 
 .currency-symbol {
@@ -211,6 +281,20 @@ onMounted(async () => {
   font-size: 72px;
   font-weight: 300;
   line-height: 72px;
+}
+
+.dest-currency-symbol {
+  color: #949496;
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 24px;
+}
+
+.dest-amount-input {
+  color: #949496;
+  font-size: 40px;
+  font-weight: 300;
+  line-height: 51px;
 }
 
 .filter-group {

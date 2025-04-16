@@ -9,7 +9,7 @@ import { useBookStore } from '../../stores/book';
 import { useCurrencyStore } from '../../stores/currency';
 
 /**
- * Основной хук для работы с транзакциями
+ * Основной хук для работы с транзакциями, объединяющий все дочерние хуки
  */
 export function useTransaction(emit: (event: string, ...args: any[]) => void) {
   // Stores
@@ -30,8 +30,6 @@ export function useTransaction(emit: (event: string, ...args: any[]) => void) {
     selectedAccount, 
     destinationAccount, 
     filteredAccounts, 
-    currentCurrencySymbol, 
-    getAccountCurrencyCode,
     setupInitialAccounts 
   } = useAccount(selectedBook, selectedType);
 
@@ -56,7 +54,7 @@ export function useTransaction(emit: (event: string, ...args: any[]) => void) {
     distributionOwners
   } = useDistribution(selectedBook, selectedType);
 
-  // Инициализируем все хранилища сразу при создании компонента
+  // Инициализируем все хранилища при создании компонента
   const initAllStores = async () => {
     try {
       isLoading.value = true;
@@ -73,10 +71,6 @@ export function useTransaction(emit: (event: string, ...args: any[]) => void) {
         console.log('[useTransaction] Initializing account store...');
         await accountStore.init();
         console.log('[useTransaction] Account store initialized with', accountStore.accounts.length, 'accounts');
-      }
-      
-      if (currencyStore.init) {
-        await currencyStore.init();
       }
       
       // Устанавливаем начальное значение selectedBook, если оно не соответствует ни одной из имеющихся книг
@@ -99,8 +93,6 @@ export function useTransaction(emit: (event: string, ...args: any[]) => void) {
       isLoading.value = false;
     }
   };
-
-  // Методы для обработки клавиатурного ввода уже определены в useKeypad
 
   // Обработчик добавления транзакции
   const handleAddTransaction = () => {
@@ -170,7 +162,6 @@ export function useTransaction(emit: (event: string, ...args: any[]) => void) {
     selectedAccount,
     destinationAccount,
     filteredAccounts,
-    currentCurrencySymbol,
     
     // From useCategory
     showCategorySelector,
