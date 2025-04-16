@@ -61,6 +61,29 @@
           <span class="settings-value">1.0.0</span>
         </div>
         
+<!-- Debug Tools - только для разработки -->
+<div class="settings-item">
+  <div class="settings-item-label">
+    <n-icon size="20" class="settings-icon">
+      <icon-code />
+    </n-icon>
+    <span>Инструменты разработчика</span>
+  </div>
+  <n-button 
+    size="small" 
+    @click="router.push('/debug')"
+    type="info"
+    ghost
+  >
+    <template #icon>
+      <n-icon>
+        <icon-database />
+      </n-icon>
+    </template>
+    Debug
+  </n-button>
+</div>
+
         <!-- Logout Button -->
         <n-button 
           class="logout-button" 
@@ -96,7 +119,9 @@ import {
   IconMoon, 
   IconInfoCircle, 
   IconLogout,
-  IconLanguage
+  IconLanguage,
+  IconCode,
+  IconDatabase
 } from '@tabler/icons-vue';
 import { useUserStore } from '@/stores/user';
 import { useThemeStore } from '@/stores/theme';

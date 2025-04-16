@@ -64,6 +64,22 @@ const routes: Array<RouteRecordRaw> = [
       }
     ]
   },
+  // DebugStore
+  {
+    path: '/debug',
+    component: IosLayout,
+    children: [
+      {
+        path: '',
+        name: 'debug',
+        component: () => import('@/views/DebugStoreView.vue'),
+        meta: {
+          requiresAuth: true,
+          title: 'Debug Stores'
+        }
+      }
+    ]
+  },
   // 404 Not Found
   {
     path: '/:pathMatch(.*)*',
