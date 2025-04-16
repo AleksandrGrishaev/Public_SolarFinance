@@ -309,7 +309,7 @@ watch([selectedAccount, destinationAccount, convertedAmount], () => {
 }
 
 .book-selector {
-  margin: 16px 0;
+  margin: -2px 0;
 }
 
 .amount-display {
@@ -323,7 +323,7 @@ watch([selectedAccount, destinationAccount, convertedAmount], () => {
   display: flex;
   flex-direction: column;
   /* Промежуток между фильтрами 16px */
-  gap: 16px;
+  gap: 20px;
   width: 100%;
   /* Зафиксируем позицию, чтобы избежать смещения при изменении размера блоков */
   position: relative;
