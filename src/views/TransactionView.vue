@@ -16,13 +16,35 @@
         
         <!-- Отображение с конвертацией для переводов между разными валютами -->
         <div v-else class="currency-conversion">
-          <div class="source-amount">
-            <div class="currency-symbol">{{ sourceCurrencySymbol }}</div>
-            <div class="amount-input">{{ amount }}</div>
+          <!-- Исходная сумма (активная по умолчанию) -->
+          <div 
+            class="source-amount" 
+            :class="{ 'active': isSourceAmountActive, 'inactive': !isSourceAmountActive }"
+            @click="switchToSourceAmount"
+          >
+            <div class="currency-symbol" :class="{ 'active': isSourceAmountActive, 'inactive': !isSourceAmountActive }">
+              {{ sourceCurrencySymbol }}
+            </div>
+            <div class="amount-input" :class="{ 'active': isSourceAmountActive, 'inactive': !isSourceAmountActive }">
+              {{ amount }}
+            </div>
           </div>
-          <div class="destination-amount">
-            <div class="dest-currency-symbol">{{ destinationCurrencySymbol }}</div>
-            <div class="dest-amount-input">{{ convertedAmount }}</div>
+          
+          <!-- Разделитель между суммами -->
+          <div class="conversion-arrow">→</div>
+          
+          <!-- Конвертированная сумма (неактивная по умолчанию) -->
+          <div 
+            class="destination-amount" 
+            :class="{ 'active': !isSourceAmountActive, 'inactive': isSourceAmountActive }"
+            @click="switchToDestinationAmount"
+          >
+            <div class="currency-symbol" :class="{ 'active': !isSourceAmountActive, 'inactive': isSourceAmountActive }">
+              {{ destinationCurrencySymbol }}
+            </div>
+            <div class="amount-input" :class="{ 'active': !isSourceAmountActive, 'inactive': isSourceAmountActive }">
+              {{ isSourceAmountActive ? convertedAmount : manualDestinationAmount }}
+            </div>
           </div>
         </div>
       </div>
@@ -90,7 +112,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, watch } from 'vue';
+import { onMounted, watch, ref } from 'vue';
 import BookSelector from '../components/transactions/BookSelector.vue';
 import TransactionTypeSelector from '../components/transactions/TransactionTypeSelector.vue';
 import AccountSelector from '../components/transactions/AccountSelector.vue';
@@ -107,7 +129,11 @@ import { useCurrency } from '../composables/transaction/useCurrency';
 // Определяем события для emit
 const emit = defineEmits(['update:showMenu']);
 
-// Инициализируем основной хук
+// Состояние для управления вводом суммы
+const isSourceAmountActive = ref(true);
+const manualDestinationAmount = ref('0');
+
+// Инициализируем основной хук, но не деструктурируем методы, которые будем переопределять
 const {
   // State
   isLoading,
@@ -131,10 +157,8 @@ const {
   shouldShowDistribution,
   distributionOwners,
   
-  // Methods
+  // Methods (не включаем handleKeypadInput и deleteLastDigit)
   initAllStores,
-  handleKeypadInput,
-  deleteLastDigit,
   handleAddTransaction,
   
   // Category handlers
@@ -146,6 +170,11 @@ const {
   handleCategoriesReordered,
   handleToggleActiveCategory
 } = useTransaction(emit);
+
+// Отдельно получаем методы, которые будем переопределять
+const transactionHelpers = useTransaction(emit);
+const originalHandleKeypadInput = transactionHelpers.handleKeypadInput;
+const originalDeleteLastDigit = transactionHelpers.deleteLastDigit;
 
 // Инициализируем хук для работы с валютами
 const {
@@ -161,6 +190,55 @@ const handleDestinationAccountChange = (accountId: string) => {
   destinationAccount.value = accountId;
 };
 
+// Переключение к вводу исходной суммы
+const switchToSourceAmount = () => {
+  isSourceAmountActive.value = true;
+};
+
+// Переключение к вводу суммы назначения
+const switchToDestinationAmount = () => {
+  isSourceAmountActive.value = false;
+  
+  // При первом переключении установим текущее конвертированное значение
+  if (manualDestinationAmount.value === '0') {
+    manualDestinationAmount.value = convertedAmount.value;
+  }
+};
+
+// Создаем собственные улучшенные обработчики
+const handleKeypadInput = (value: string) => {
+  if (isTransferWithDifferentCurrencies.value && !isSourceAmountActive.value) {
+    // Если вводим сумму назначения
+    if (value === '.' && manualDestinationAmount.value.includes('.')) {
+      return;
+    }
+    
+    if (manualDestinationAmount.value === '0' && value !== '.') {
+      manualDestinationAmount.value = value;
+    } else {
+      manualDestinationAmount.value += value;
+    }
+  } else {
+    // Используем оригинальный обработчик для суммы источника
+    originalHandleKeypadInput(value);
+  }
+};
+
+// Создаем собственный обработчик удаления
+const deleteLastDigit = () => {
+  if (isTransferWithDifferentCurrencies.value && !isSourceAmountActive.value) {
+    // Для суммы назначения
+    if (manualDestinationAmount.value.length > 1) {
+      manualDestinationAmount.value = manualDestinationAmount.value.slice(0, -1);
+    } else {
+      manualDestinationAmount.value = '0';
+    }
+  } else {
+    // Для суммы источника
+    originalDeleteLastDigit();
+  }
+};
+
 // Инициализируем хранилища и сообщаем макету, что нужно показать меню
 onMounted(async () => {
   emit('update:showMenu', true);
@@ -172,9 +250,20 @@ onMounted(async () => {
 
 // Следим за изменениями типа транзакции для обновления интерфейса
 watch(() => selectedType.value, (newType) => {
+  // При смене типа транзакции сбрасываем к стандартному режиму
+  isSourceAmountActive.value = true;
+  manualDestinationAmount.value = '0';
+  
   // При смене типа транзакции с перевода на другой тип, сбрасываем сумму
   if (newType !== 'transfer' && isTransferWithDifferentCurrencies.value) {
     amount.value = '0';
+  }
+});
+
+// Сброс ручной суммы при изменении валют или счетов
+watch([selectedAccount, destinationAccount, convertedAmount], () => {
+  if (isTransferWithDifferentCurrencies.value) {
+    manualDestinationAmount.value = convertedAmount.value;
   }
 });
 </script>
@@ -239,6 +328,8 @@ watch(() => selectedType.value, (newType) => {
   justify-content: center;
   /* Верхний и нижний отступы для amount-section */
   padding: 20px 0 25px;
+  /* Фиксированная высота, чтобы предотвратить "прыжки" интерфейса */
+  min-height: 180px;
 }
 
 /* Стандартное отображение суммы */
@@ -254,47 +345,46 @@ watch(() => selectedType.value, (newType) => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 11px;
+  gap: 15px;
+  /* Использовать абсолютное позиционирование, чтобы не влиять на другие элементы */
+  position: relative;
+  width: 100%;
 }
 
-.source-amount {
+.source-amount, .destination-amount {
   display: flex;
   align-items: flex-start;
-  gap: 5px;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.destination-amount {
-  display: flex;
-  align-items: flex-start;
-  gap: 5px;
+.conversion-arrow {
+  color: #949496;
+  font-size: 24px;
+}
+
+/* Стили для активной суммы */
+.currency-symbol.active, .amount-input.active {
+  color: white;
+}
+
+.currency-symbol.inactive, .amount-input.inactive {
+  color: #949496;
 }
 
 .currency-symbol {
-  color: white;
   font-size: 28px;
   font-weight: 300;
   line-height: 28px;
+  transition: color 0.2s ease;
 }
 
 .amount-input {
-  color: white;
-  font-size: 72px;
+  font-size: 64px;
   font-weight: 300;
-  line-height: 72px;
-}
-
-.dest-currency-symbol {
-  color: #949496;
-  font-size: 16px;
-  font-weight: 300;
-  line-height: 24px;
-}
-
-.dest-amount-input {
-  color: #949496;
-  font-size: 40px;
-  font-weight: 300;
-  line-height: 51px;
+  line-height: 64px;
+  transition: color 0.2s ease;
 }
 
 .filter-group {
@@ -303,6 +393,8 @@ watch(() => selectedType.value, (newType) => {
   /* Промежуток между фильтрами 16px */
   gap: 16px;
   width: 100%;
+  /* Зафиксируем позицию, чтобы избежать смещения при изменении размера блоков */
+  position: relative;
 }
 
 /* Делаем элемент невидимым, но сохраняем его размеры */
