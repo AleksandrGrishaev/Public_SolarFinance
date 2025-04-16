@@ -77,11 +77,14 @@
                 </n-descriptions>
   
                 <n-divider title-placement="left">Детали пользователя</n-divider>
-                <n-collapse>
-                  <n-collapse-item title="Полные данные">
+                <n-tabs type="line">
+                  <n-tab-pane name="user-data" tab="Пользователь">
                     <n-code language="json">{{ formatJson(userStore.currentUser) }}</n-code>
-                  </n-collapse-item>
-                </n-collapse>
+                  </n-tab-pane>
+                  <n-tab-pane name="raw" tab="Raw JSON">
+                    <n-code language="json">{{ formatJson(userStore.$state) }}</n-code>
+                  </n-tab-pane>
+                </n-tabs>
               </n-card>
             </template>
   
@@ -118,6 +121,9 @@
                         :bordered="false"
                         :pagination="{ pageSize: 5 }"
                       />
+                    </n-tab-pane>
+                    <n-tab-pane name="raw" tab="Raw JSON">
+                      <n-code :code="formatJson(bookStore.$state)" language="json" />
                     </n-tab-pane>
                   </n-tabs>
                 </n-space>
@@ -162,6 +168,9 @@
                         </n-collapse-item>
                       </n-collapse>
                     </n-tab-pane>
+                    <n-tab-pane name="raw" tab="Raw JSON">
+                      <n-code :code="formatJson(accountStore.$state)" language="json" />
+                    </n-tab-pane>
                   </n-tabs>
                 </n-space>
               </n-card>
@@ -204,6 +213,9 @@
                         </n-collapse-item>
                       </n-collapse>
                     </n-tab-pane>
+                    <n-tab-pane name="raw" tab="Raw JSON">
+                      <n-code :code="formatJson(transactionStore.$state)" language="json" />
+                    </n-tab-pane>
                   </n-tabs>
                 </n-space>
               </n-card>
@@ -216,12 +228,19 @@
                     Всего категорий: {{ categoryStore.categories.length }}
                   </n-alert>
   
-                  <n-data-table
-                    :columns="categoryColumns"
-                    :data="categoryStore.categories"
-                    :bordered="false"
-                    :pagination="{ pageSize: 10 }"
-                  />
+                  <n-tabs type="line">
+                    <n-tab-pane name="all" tab="Все категории">
+                      <n-data-table
+                        :columns="categoryColumns"
+                        :data="categoryStore.categories"
+                        :bordered="false"
+                        :pagination="{ pageSize: 10 }"
+                      />
+                    </n-tab-pane>
+                    <n-tab-pane name="raw" tab="Raw JSON">
+                      <n-code :code="formatJson(categoryStore.$state)" language="json" />
+                    </n-tab-pane>
+                  </n-tabs>
                 </n-space>
               </n-card>
             </template>
@@ -252,6 +271,14 @@
                         :pagination="{ pageSize: 10 }"
                       />
                     </n-tab-pane>
+                    <n-tab-pane name="raw" tab="Raw JSON">
+                      <n-code :code="formatJson({
+                        currencies: currencyStore.currencies,
+                        exchangeRates: currencyStore.exchangeRates,
+                        appBaseCurrency: currencyStore.appBaseCurrency,
+                        userBaseCurrency: currencyStore.userBaseCurrency
+                      })" language="json" />
+                    </n-tab-pane>
                   </n-tabs>
                 </n-space>
               </n-card>
@@ -277,6 +304,15 @@
                   <n-button @click="themeStore.setDarkTheme">Темная тема</n-button>
                   <n-button @click="themeStore.toggleTheme">Переключить</n-button>
                 </n-button-group>
+                
+                <n-divider />
+                
+                <n-card title="Raw JSON">
+                  <n-code :code="formatJson({
+                    isDark: themeStore.isDark,
+                    themeName: themeStore.themeName
+                  })" language="json" />
+                </n-card>
               </n-card>
             </template>
   
@@ -288,11 +324,18 @@
   
                 <n-divider />
   
-                <n-collapse>
-                  <n-collapse-item v-for="key in localStorageKeys" :key="key" :title="key">
-                    <n-code language="json">{{ formatLocalStorageItem(key) }}</n-code>
-                  </n-collapse-item>
-                </n-collapse>
+                <n-tabs type="line">
+                  <n-tab-pane name="keys" tab="По ключам">
+                    <n-collapse>
+                      <n-collapse-item v-for="key in localStorageKeys" :key="key" :title="key">
+                        <n-code language="json">{{ formatLocalStorageItem(key) }}</n-code>
+                      </n-collapse-item>
+                    </n-collapse>
+                  </n-tab-pane>
+                  <n-tab-pane name="raw" tab="Raw JSON">
+                    <n-code language="json">{{ formatRawLocalStorage() }}</n-code>
+                  </n-tab-pane>
+                </n-tabs>
               </n-card>
             </template>
           </div>
@@ -442,6 +485,25 @@
       // Если не удалось распарсить, возвращаем как строку
       return localStorage.getItem(key) || '';
     }
+  };
+  
+  // Форматирование всего содержимого localStorage
+  const formatRawLocalStorage = (): string => {
+    const storage: Record<string, any> = {};
+    
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key) {
+        try {
+          const value = localStorage.getItem(key);
+          storage[key] = value ? JSON.parse(value) : null;
+        } catch (e) {
+          storage[key] = localStorage.getItem(key);
+        }
+      }
+    }
+    
+    return JSON.stringify(storage, null, 2);
   };
   
   // Столбцы для таблицы книг
@@ -610,10 +672,35 @@
   
   <style scoped>
   .debug-store-view {
-    padding-bottom: 100px;
+    padding-bottom: 20px;
+    height: 100%;
   }
   
   .store-content {
     margin-top: 16px;
+  }
+  
+  /* Стили для корректной работы со скроллом */
+  :deep(.n-layout) {
+    height: 100%;
+    overflow: visible;
+  }
+  
+  :deep(.n-layout-scroll-container) {
+    overflow: visible;
+  }
+  
+  :deep(.n-layout-sider) {
+    height: 100%;
+    overflow-y: auto;
+  }
+  
+  :deep(.n-layout-sider-scroll-container) {
+    overflow-y: auto;
+  }
+  
+  :deep(.n-data-table .n-data-table-base-table-body) {
+    overflow: auto;
+    max-height: 70vh;
   }
   </style>

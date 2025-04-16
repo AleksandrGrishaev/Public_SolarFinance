@@ -3,6 +3,7 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 
 // Layouts
+import ConsoleLayout from '@/layouts/ConsoleLayout.vue'
 import EmptyLayout from '@/layouts/EmptyLayout.vue'
 import IosLayout from '@/layouts/IosLayout.vue'
 
@@ -67,7 +68,7 @@ const routes: Array<RouteRecordRaw> = [
   // DebugStore
   {
     path: '/debug',
-    component: IosLayout,
+    component: ConsoleLayout,
     children: [
       {
         path: '',
