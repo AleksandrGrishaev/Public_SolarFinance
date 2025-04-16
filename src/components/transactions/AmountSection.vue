@@ -3,40 +3,57 @@
     <div class="amount-section" :class="{ 'transfer-mode': isTransferWithDifferentCurrencies }">
       <!-- Стандартное отображение для обычных транзакций -->
       <div v-if="!isTransferWithDifferentCurrencies" class="standard-amount">
-        <div class="currency-symbol">{{ sourceCurrencySymbol }}</div>
-        <div class="amount-input">{{ amount }}</div>
+        <div class="currency-wrapper">
+          <div class="currency-symbol">{{ sourceCurrencySymbol }}</div>
+          <div class="amount-input">{{ amount }}</div>
+        </div>
       </div>
       
       <!-- Отображение с конвертацией для переводов между разными валютами -->
       <div v-else class="currency-conversion">
         <!-- Исходная сумма (активная по умолчанию) -->
         <div 
-          class="source-amount" 
+          class="source-amount"
           :class="{ 'active': isSourceAmountActive, 'inactive': !isSourceAmountActive }"
           @click="switchToSourceAmount"
         >
-          <div class="currency-symbol" :class="{ 'active': isSourceAmountActive, 'inactive': !isSourceAmountActive }">
-            {{ sourceCurrencySymbol }}
-          </div>
-          <div class="amount-input" :class="{ 'active': isSourceAmountActive, 'inactive': !isSourceAmountActive }">
-            {{ amount }}
+          <div class="currency-wrapper">
+            <div class="currency-symbol" :class="{ 'active': isSourceAmountActive, 'inactive': !isSourceAmountActive }">
+              {{ sourceCurrencySymbol }}
+            </div>
+            <div class="amount-input" :class="{ 'active': isSourceAmountActive, 'inactive': !isSourceAmountActive }">
+              {{ amount }}
+            </div>
           </div>
         </div>
         
-        <!-- Разделитель между суммами -->
-        <div class="conversion-arrow">→</div>
-        
         <!-- Конвертированная сумма (неактивная по умолчанию) -->
         <div 
-          class="destination-amount" 
+          class="destination-amount"
           :class="{ 'active': !isSourceAmountActive, 'inactive': isSourceAmountActive }"
           @click="switchToDestinationAmount"
         >
-          <div class="currency-symbol" :class="{ 'active': !isSourceAmountActive, 'inactive': isSourceAmountActive }">
-            {{ destinationCurrencySymbol }}
-          </div>
-          <div class="amount-input" :class="{ 'active': !isSourceAmountActive, 'inactive': isSourceAmountActive }">
-            {{ isSourceAmountActive ? convertedAmount : manualDestinationAmount }}
+          <div class="currency-wrapper">
+            <div 
+              class="currency-symbol" 
+              :class="{ 
+                'active': !isSourceAmountActive, 
+                'inactive': isSourceAmountActive,
+                'smaller-font': useSmallerDestinationFont
+              }"
+            >
+              {{ destinationCurrencySymbol }}
+            </div>
+            <div 
+              class="amount-input" 
+              :class="{ 
+                'active': !isSourceAmountActive, 
+                'inactive': isSourceAmountActive,
+                'smaller-font': useSmallerDestinationFont
+              }"
+            >
+              {{ isSourceAmountActive ? convertedAmount : manualDestinationAmount }}
+            </div>
           </div>
         </div>
       </div>
@@ -66,6 +83,10 @@
     isTransferWithDifferentCurrencies: {
       type: Boolean,
       default: false
+    },
+    useSmallerDestinationFont: {
+      type: Boolean,
+      default: false
     }
   });
   
@@ -83,12 +104,15 @@
   
   // Переключение к вводу суммы назначения
   const switchToDestinationAmount = () => {
+    // Если не активно, то при переключении сбрасываем сумму
+    if (!isSourceAmountActive.value) {
+      return; // Уже активно, ничего не делаем
+    }
+    
     isSourceAmountActive.value = false;
     
-    // При первом переключении установим текущее конвертированное значение
-    if (manualDestinationAmount.value === '0') {
-      manualDestinationAmount.value = props.convertedAmount;
-    }
+    // Сбрасываем сумму для более удобного ввода
+    manualDestinationAmount.value = '0';
     
     emit('destinationActive', manualDestinationAmount.value);
   };
@@ -118,13 +142,9 @@
     align-items: center;
     justify-content: center;
     width: 100%;
-    padding: 20px 0;
+    padding: 30px 0 20px;
     position: relative;
     transition: all 0.3s ease;
-  }
-  
-  .amount-section.transfer-mode {
-    padding: 0;
   }
   
   /* Стандартное отображение суммы */
@@ -132,8 +152,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    padding: 20px 0;
+    width: 100%;
   }
   
   /* Стили для конвертации валют */
@@ -141,24 +160,23 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 20px;
     width: 100%;
-    padding: 10px 0;
   }
   
   .source-amount, .destination-amount {
     display: flex;
-    align-items: center;
-    gap: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
     width: 100%;
     justify-content: center;
   }
   
-  .conversion-arrow {
-    color: #949496;
-    font-size: 24px;
+  /* Обертка для символа валюты и суммы для выравнивания */
+  .currency-wrapper {
+    display: flex;
+    align-items: flex-start;
+    position: relative;
   }
   
   /* Стили для активной/неактивной суммы */
@@ -174,13 +192,28 @@
     font-size: 28px;
     font-weight: 300;
     line-height: 28px;
-    transition: color 0.2s ease;
+    transition: all 0.2s ease;
+    position: relative;
+    top: 10px; /* Фиксированная позиция символа валюты */
+    margin-right: 5px;
   }
   
   .amount-input {
     font-size: 64px;
     font-weight: 300;
     line-height: 64px;
-    transition: color 0.2s ease;
+    transition: all 0.2s ease;
+  }
+  
+  /* Стили для меньшего шрифта в сумме назначения */
+  .amount-input.smaller-font {
+    font-size: 48px;
+    line-height: 48px;
+  }
+  
+  .currency-symbol.smaller-font {
+    font-size: 22px;
+    line-height: 22px;
+    top: 8px; /* Немного меньше отступ для меньшего символа */
   }
   </style>

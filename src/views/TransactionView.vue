@@ -7,55 +7,28 @@
     
     <div class="body-container" v-else>
       <!-- Секция отображения суммы с поддержкой конвертации валют -->
-      <div class="amount-section">
-        <!-- Стандартное отображение для обычных транзакций -->
-        <div v-if="!isTransferWithDifferentCurrencies" class="standard-amount">
-          <div class="currency-symbol">{{ sourceCurrencySymbol }}</div>
-          <div class="amount-input">{{ amount }}</div>
-        </div>
-        
-        <!-- Отображение с конвертацией для переводов между разными валютами -->
-        <div v-else class="currency-conversion">
-          <!-- Исходная сумма (активная по умолчанию) -->
-          <div 
-            class="source-amount" 
-            :class="{ 'active': isSourceAmountActive, 'inactive': !isSourceAmountActive }"
-            @click="switchToSourceAmount"
-          >
-            <div class="currency-symbol" :class="{ 'active': isSourceAmountActive, 'inactive': !isSourceAmountActive }">
-              {{ sourceCurrencySymbol }}
-            </div>
-            <div class="amount-input" :class="{ 'active': isSourceAmountActive, 'inactive': !isSourceAmountActive }">
-              {{ amount }}
-            </div>
-          </div>
-          
-          <!-- Разделитель между суммами -->
-          <div class="conversion-arrow">→</div>
-          
-          <!-- Конвертированная сумма (неактивная по умолчанию) -->
-          <div 
-            class="destination-amount" 
-            :class="{ 'active': !isSourceAmountActive, 'inactive': isSourceAmountActive }"
-            @click="switchToDestinationAmount"
-          >
-            <div class="currency-symbol" :class="{ 'active': !isSourceAmountActive, 'inactive': isSourceAmountActive }">
-              {{ destinationCurrencySymbol }}
-            </div>
-            <div class="amount-input" :class="{ 'active': !isSourceAmountActive, 'inactive': isSourceAmountActive }">
-              {{ isSourceAmountActive ? convertedAmount : manualDestinationAmount }}
-            </div>
-          </div>
-        </div>
-      </div>
+      <amount-section
+  ref="amountSectionRef"
+  :amount="amount"
+  :source-currency-symbol="sourceCurrencySymbol"
+  :destination-currency-symbol="destinationCurrencySymbol"
+  :converted-amount="convertedAmount"
+  :is-transfer-with-different-currencies="isTransferWithDifferentCurrencies"
+  :use-smaller-destination-font="true"
+  @source-active="handleSourceAmountActive"
+  @destination-active="handleDestinationAmountActive"
+  @update-destination-amount="handleUpdateDestinationAmount"
+  class="amount-display"
+/>
+      
+      <!-- Селектор книги, отображается, если это не перевод -->
+      <book-selector 
+        v-if="selectedType !== 'transfer'"
+        v-model="selectedBook"
+        class="book-selector"
+      />
       
       <div class="filter-group">
-        <!-- Селектор книги всегда на экране, но может быть невидимым -->
-        <book-selector 
-          v-model="selectedBook"
-          :class="{ 'invisible': selectedType === 'transfer' }"
-        />
-        
         <transaction-type-selector 
           v-model="selectedType" 
         />
@@ -112,7 +85,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, watch, ref } from 'vue';
+import { onMounted, watch, ref, computed } from 'vue';
 import BookSelector from '../components/transactions/BookSelector.vue';
 import TransactionTypeSelector from '../components/transactions/TransactionTypeSelector.vue';
 import AccountSelector from '../components/transactions/AccountSelector.vue';
@@ -120,6 +93,7 @@ import PercentageSlider from '../components/transactions/PercentageSlider.vue';
 import NumberKeypad from '../components/transactions/NumberKeypad.vue';
 import CategorySelector from '../components/categories/CategorySelector.vue';
 import CategoryListPopup from '../components/categories/CategoryListPopup.vue';
+import AmountSection from '../components/transactions/AmountSection.vue';
 
 // Импортируем хуки
 import { useTransaction } from '../composables/transaction';
@@ -132,8 +106,11 @@ const emit = defineEmits(['update:showMenu']);
 // Состояние для управления вводом суммы
 const isSourceAmountActive = ref(true);
 const manualDestinationAmount = ref('0');
+const amountSectionRef = ref(null);
 
 // Инициализируем основной хук, но не деструктурируем методы, которые будем переопределять
+const transactionState = useTransaction(emit);
+// Деструктурируем только нужные переменные и методы
 const {
   // State
   isLoading,
@@ -157,7 +134,7 @@ const {
   shouldShowDistribution,
   distributionOwners,
   
-  // Methods (не включаем handleKeypadInput и deleteLastDigit)
+  // Methods
   initAllStores,
   handleAddTransaction,
   
@@ -169,12 +146,7 @@ const {
   handleAddCategoryFromList,
   handleCategoriesReordered,
   handleToggleActiveCategory
-} = useTransaction(emit);
-
-// Отдельно получаем методы, которые будем переопределять
-const transactionHelpers = useTransaction(emit);
-const originalHandleKeypadInput = transactionHelpers.handleKeypadInput;
-const originalDeleteLastDigit = transactionHelpers.deleteLastDigit;
+} = transactionState;
 
 // Инициализируем хук для работы с валютами
 const {
@@ -190,23 +162,23 @@ const handleDestinationAccountChange = (accountId: string) => {
   destinationAccount.value = accountId;
 };
 
-// Переключение к вводу исходной суммы
-const switchToSourceAmount = () => {
+// Обработчики для режима редактирования разных сумм
+const handleSourceAmountActive = () => {
   isSourceAmountActive.value = true;
 };
 
-// Переключение к вводу суммы назначения
-const switchToDestinationAmount = () => {
+const handleDestinationAmountActive = (value: string) => {
   isSourceAmountActive.value = false;
-  
-  // При первом переключении установим текущее конвертированное значение
-  if (manualDestinationAmount.value === '0') {
-    manualDestinationAmount.value = convertedAmount.value;
-  }
+  manualDestinationAmount.value = value;
 };
 
-// Создаем собственные улучшенные обработчики
+const handleUpdateDestinationAmount = (value: string) => {
+  manualDestinationAmount.value = value;
+};
+
+// Переопределяем обработчик ввода с клавиатуры
 const handleKeypadInput = (value: string) => {
+  // Проверяем, нужно ли обрабатывать ввод для второй суммы
   if (isTransferWithDifferentCurrencies.value && !isSourceAmountActive.value) {
     // Если вводим сумму назначения
     if (value === '.' && manualDestinationAmount.value.includes('.')) {
@@ -218,13 +190,18 @@ const handleKeypadInput = (value: string) => {
     } else {
       manualDestinationAmount.value += value;
     }
+    
+    // Обновляем значение в компоненте AmountSection
+    if (amountSectionRef.value) {
+      amountSectionRef.value.updateManualAmount(manualDestinationAmount.value);
+    }
   } else {
     // Используем оригинальный обработчик для суммы источника
-    originalHandleKeypadInput(value);
+    transactionState.handleKeypadInput(value);
   }
 };
 
-// Создаем собственный обработчик удаления
+// Переопределяем обработчик удаления
 const deleteLastDigit = () => {
   if (isTransferWithDifferentCurrencies.value && !isSourceAmountActive.value) {
     // Для суммы назначения
@@ -233,9 +210,14 @@ const deleteLastDigit = () => {
     } else {
       manualDestinationAmount.value = '0';
     }
+    
+    // Обновляем значение в компоненте
+    if (amountSectionRef.value) {
+      amountSectionRef.value.updateManualAmount(manualDestinationAmount.value);
+    }
   } else {
     // Для суммы источника
-    originalDeleteLastDigit();
+    transactionState.deleteLastDigit();
   }
 };
 
@@ -264,6 +246,11 @@ watch(() => selectedType.value, (newType) => {
 watch([selectedAccount, destinationAccount, convertedAmount], () => {
   if (isTransferWithDifferentCurrencies.value) {
     manualDestinationAmount.value = convertedAmount.value;
+    
+    // Обновляем значение в компоненте
+    if (amountSectionRef.value && amountSectionRef.value.updateManualAmount) {
+      amountSectionRef.value.updateManualAmount(convertedAmount.value);
+    }
   }
 });
 </script>
@@ -311,7 +298,7 @@ watch([selectedAccount, destinationAccount, convertedAmount], () => {
   width: 100%;
   height: 100%;
   /* Добавляем отступы согласно требованиям */
-  padding: 74px 16px 0;
+  padding: 16px 16px 0;
   box-sizing: border-box;
   /* Используем распределение пространства для flex-контейнера */
   justify-content: flex-end;
@@ -321,70 +308,15 @@ watch([selectedAccount, destinationAccount, convertedAmount], () => {
   gap: 15px;
 }
 
-.amount-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  /* Верхний и нижний отступы для amount-section */
-  padding: 20px 0 25px;
-  /* Фиксированная высота, чтобы предотвратить "прыжки" интерфейса */
-  min-height: 180px;
+.book-selector {
+  margin: 16px 0;
 }
 
-/* Стандартное отображение суммы */
-.standard-amount {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-
-/* Стили для конвертации валют */
-.currency-conversion {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
-  /* Использовать абсолютное позиционирование, чтобы не влиять на другие элементы */
-  position: relative;
+.amount-display {
   width: 100%;
-}
-
-.source-amount, .destination-amount {
   display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.conversion-arrow {
-  color: #949496;
-  font-size: 24px;
-}
-
-/* Стили для активной суммы */
-.currency-symbol.active, .amount-input.active {
-  color: white;
-}
-
-.currency-symbol.inactive, .amount-input.inactive {
-  color: #949496;
-}
-
-.currency-symbol {
-  font-size: 28px;
-  font-weight: 300;
-  line-height: 28px;
-  transition: color 0.2s ease;
-}
-
-.amount-input {
-  font-size: 64px;
-  font-weight: 300;
-  line-height: 64px;
-  transition: color 0.2s ease;
+  justify-content: center;
+  margin-top: 74px; /* Отступ сверху экрана */
 }
 
 .filter-group {
