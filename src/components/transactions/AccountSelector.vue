@@ -7,7 +7,7 @@
         {{ selectedAccount.symbol }}
       </div>
       <div class="account-name">
-        {{ selectedAccount.name }}
+        {{ truncateName(selectedAccount.name) }}
       </div>
       <div class="choose-button" @click="toggleAccountSelection('source')">
         <svg width="9" height="6" viewBox="0 0 9 6" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -23,7 +23,7 @@
           {{ selectedAccount.symbol }}
         </div>
         <div class="account-name">
-          {{ selectedAccount.name }}
+          {{ truncateName(selectedAccount.name) }}
         </div>
       </div>
       
@@ -36,7 +36,7 @@
           {{ destinationAccount.symbol }}
         </div>
         <div class="account-name">
-          {{ destinationAccount.name }}
+          {{ truncateName(destinationAccount.name) }}
         </div>
       </div>
     </div>
@@ -121,6 +121,13 @@ const displayableAccounts = computed(() => {
   return props.accounts.filter(account => account.id !== props.modelValue);
 });
 
+// Функция для ограничения длины названия счета
+const truncateName = (name: string) => {
+  const maxLength = 15;
+  if (name.length <= maxLength) return name;
+  return name.substring(0, maxLength - 3) + '...';
+};
+
 const toggleAccountSelection = (mode = 'source') => {
   selectionMode.value = mode;
   showAccountSelection.value = !showAccountSelection.value;
@@ -185,6 +192,8 @@ const selectAccount = (accountId) => {
   align-items: center;
   height: 100%;
   cursor: pointer;
+  max-width: 150px; /* Ограничиваем ширину каждого счета */
+  overflow: hidden;
 }
 
 .transfer-arrow {
@@ -215,6 +224,8 @@ const selectAccount = (accountId) => {
   font-weight: 500;
   line-height: 24px;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .choose-button {

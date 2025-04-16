@@ -1,10 +1,10 @@
 # Details
 
-Date : 2025-04-16 07:48:45
+Date : 2025-04-16 09:20:36
 
 Directory /Users/peaker/dev/solar-finance/src
 
-Total : 87 files,  12125 codes, 797 comments, 1855 blanks, all 14777 lines
+Total : 89 files,  13274 codes, 876 comments, 2010 blanks, all 16160 lines
 
 [Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
@@ -48,18 +48,19 @@ Total : 87 files,  12125 codes, 797 comments, 1855 blanks, all 14777 lines
 | [src/components/ui/inputs/ToggleSwitch.vue](/src/components/ui/inputs/ToggleSwitch.vue) | Vue | 47 | 1 | 7 | 55 |
 | [src/composables/useDateFilter.ts](/src/composables/useDateFilter.ts) | TypeScript | 330 | 43 | 64 | 437 |
 | [src/data/categories.ts](/src/data/categories.ts) | TypeScript | 110 | 11 | 26 | 147 |
+| [src/layouts/ConsoleLayout.vue](/src/layouts/ConsoleLayout.vue) | Vue | 70 | 3 | 9 | 82 |
 | [src/layouts/EmptyLayout.vue](/src/layouts/EmptyLayout.vue) | Vue | 15 | 0 | 2 | 17 |
 | [src/layouts/IosLayout.vue](/src/layouts/IosLayout.vue) | Vue | 63 | 1 | 10 | 74 |
 | [src/main.ts](/src/main.ts) | TypeScript | 23 | 9 | 10 | 42 |
-| [src/router/index.ts](/src/router/index.ts) | TypeScript | 108 | 14 | 10 | 132 |
+| [src/router/index.ts](/src/router/index.ts) | TypeScript | 124 | 15 | 10 | 149 |
 | [src/services/BaseCrudService.ts](/src/services/BaseCrudService.ts) | TypeScript | 54 | 22 | 11 | 87 |
 | [src/services/api/ApiService.ts](/src/services/api/ApiService.ts) | TypeScript | 6 | 1 | 4 | 11 |
 | [src/services/api/LocalStorageApiService.ts](/src/services/api/LocalStorageApiService.ts) | TypeScript | 76 | 30 | 32 | 138 |
 | [src/stores/account/accountService.ts](/src/stores/account/accountService.ts) | TypeScript | 90 | 27 | 13 | 130 |
-| [src/stores/account/accountStore.ts](/src/stores/account/accountStore.ts) | TypeScript | 128 | 34 | 24 | 186 |
-| [src/stores/account/defaultAccounts.ts](/src/stores/account/defaultAccounts.ts) | TypeScript | 101 | 6 | 0 | 107 |
+| [src/stores/account/accountStore.ts](/src/stores/account/accountStore.ts) | TypeScript | 364 | 103 | 86 | 553 |
+| [src/stores/account/defaultAccounts.ts](/src/stores/account/defaultAccounts.ts) | TypeScript | 108 | 6 | 0 | 114 |
 | [src/stores/account/index.ts](/src/stores/account/index.ts) | TypeScript | 4 | 2 | 1 | 7 |
-| [src/stores/account/types.ts](/src/stores/account/types.ts) | TypeScript | 16 | 1 | 2 | 19 |
+| [src/stores/account/types.ts](/src/stores/account/types.ts) | TypeScript | 17 | 1 | 1 | 19 |
 | [src/stores/book/bookService.ts](/src/stores/book/bookService.ts) | TypeScript | 77 | 24 | 12 | 113 |
 | [src/stores/book/bookStore.ts](/src/stores/book/bookStore.ts) | TypeScript | 129 | 32 | 26 | 187 |
 | [src/stores/book/defaultBooks.ts](/src/stores/book/defaultBooks.ts) | TypeScript | 40 | 5 | 1 | 46 |
@@ -94,9 +95,10 @@ Total : 87 files,  12125 codes, 797 comments, 1855 blanks, all 14777 lines
 | [src/types/base.ts](/src/types/base.ts) | TypeScript | 5 | 0 | 0 | 5 |
 | [src/views/AccountsView.vue](/src/views/AccountsView.vue) | Vue | 22 | 1 | 3 | 26 |
 | [src/views/DashboardView.vue](/src/views/DashboardView.vue) | Vue | 221 | 4 | 19 | 244 |
-| [src/views/MoreView.vue](/src/views/MoreView.vue) | Vue | 229 | 7 | 32 | 268 |
+| [src/views/DebugStoreView.vue](/src/views/DebugStoreView.vue) | Vue | 643 | 4 | 59 | 706 |
+| [src/views/MoreView.vue](/src/views/MoreView.vue) | Vue | 252 | 8 | 33 | 293 |
 | [src/views/NotFoundView.vue](/src/views/NotFoundView.vue) | Vue | 32 | 1 | 4 | 37 |
 | [src/views/PinLoginView.vue](/src/views/PinLoginView.vue) | Vue | 223 | 5 | 37 | 265 |
-| [src/views/TransactionView.vue](/src/views/TransactionView.vue) | Vue | 375 | 5 | 62 | 442 |
+| [src/views/TransactionView.vue](/src/views/TransactionView.vue) | Vue | 528 | 6 | 87 | 621 |
 
 [Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)

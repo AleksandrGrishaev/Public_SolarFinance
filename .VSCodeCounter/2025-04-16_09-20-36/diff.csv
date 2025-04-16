@@ -1,0 +1,10 @@
+"filename", "language", "TypeScript", "Vue", "comment", "blank", "total"
+"/Users/peaker/dev/solar-finance/src/layouts/ConsoleLayout.vue", "Vue", 0, 70, 3, 9, 82
+"/Users/peaker/dev/solar-finance/src/router/index.ts", "TypeScript", 16, 0, 1, 0, 17
+"/Users/peaker/dev/solar-finance/src/stores/account/accountStore.ts", "TypeScript", 236, 0, 69, 62, 367
+"/Users/peaker/dev/solar-finance/src/stores/account/defaultAccounts.ts", "TypeScript", 7, 0, 0, 0, 7
+"/Users/peaker/dev/solar-finance/src/stores/account/types.ts", "TypeScript", 1, 0, 0, -1, 0
+"/Users/peaker/dev/solar-finance/src/views/DebugStoreView.vue", "Vue", 0, 643, 4, 59, 706
+"/Users/peaker/dev/solar-finance/src/views/MoreView.vue", "Vue", 0, 23, 1, 1, 25
+"/Users/peaker/dev/solar-finance/src/views/TransactionView.vue", "Vue", 0, 153, 1, 25, 179
+"Total", "-", 260, 889, 79, 155, 1383

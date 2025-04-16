@@ -1,24 +1,24 @@
 # Summary
 
-Date : 2025-04-16 07:48:45
+Date : 2025-04-16 09:20:36
 
 Directory /Users/peaker/dev/solar-finance/src
 
-Total : 87 files,  12125 codes, 797 comments, 1855 blanks, all 14777 lines
+Total : 89 files,  13274 codes, 876 comments, 2010 blanks, all 16160 lines
 
 Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
 ## Languages
 | language | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| Vue | 38 | 6,125 | 125 | 850 | 7,100 |
-| TypeScript | 44 | 3,346 | 672 | 585 | 4,603 |
+| Vue | 40 | 7,014 | 134 | 944 | 8,092 |
+| TypeScript | 44 | 3,606 | 742 | 646 | 4,994 |
 | Markdown | 5 | 2,654 | 0 | 420 | 3,074 |
 
 ## Directories
 | path | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| . | 87 | 12,125 | 797 | 1,855 | 14,777 |
+| . | 89 | 13,274 | 876 | 2,010 | 16,160 |
 | . (Files) | 2 | 131 | 9 | 21 | 161 |
 | about | 5 | 2,654 | 0 | 420 | 3,074 |
 | about (Files) | 2 | 711 | 0 | 149 | 860 |
@@ -38,14 +38,14 @@ Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-
 | components/ui/inputs | 6 | 410 | 6 | 58 | 474 |
 | composables | 1 | 330 | 43 | 64 | 437 |
 | data | 1 | 110 | 11 | 26 | 147 |
-| layouts | 2 | 78 | 1 | 12 | 91 |
-| router | 1 | 108 | 14 | 10 | 132 |
+| layouts | 3 | 148 | 4 | 21 | 173 |
+| router | 1 | 124 | 15 | 10 | 149 |
 | services | 3 | 136 | 53 | 47 | 236 |
 | services (Files) | 1 | 54 | 22 | 11 | 87 |
 | services/api | 2 | 82 | 31 | 36 | 149 |
-| stores | 36 | 2,634 | 542 | 428 | 3,604 |
+| stores | 36 | 2,878 | 611 | 489 | 3,978 |
 | stores (Files) | 1 | 71 | 10 | 10 | 91 |
-| stores/account | 5 | 339 | 70 | 40 | 449 |
+| stores/account | 5 | 583 | 139 | 101 | 823 |
 | stores/book | 5 | 268 | 64 | 42 | 374 |
 | stores/category | 5 | 671 | 104 | 120 | 895 |
 | stores/common | 1 | 9 | 1 | 1 | 11 |
@@ -54,6 +54,6 @@ Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-
 | stores/transaction | 5 | 501 | 81 | 62 | 644 |
 | stores/user | 5 | 297 | 98 | 63 | 458 |
 | types | 1 | 5 | 0 | 0 | 5 |
-| views | 6 | 1,102 | 23 | 157 | 1,282 |
+| views | 7 | 1,921 | 29 | 242 | 2,192 |
 
 Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
