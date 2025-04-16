@@ -8,18 +8,18 @@
     <div class="body-container" v-else>
       <!-- Секция отображения суммы с поддержкой конвертации валют -->
       <amount-section
-  ref="amountSectionRef"
-  :amount="amount"
-  :source-currency-symbol="sourceCurrencySymbol"
-  :destination-currency-symbol="destinationCurrencySymbol"
-  :converted-amount="convertedAmount"
-  :is-transfer-with-different-currencies="isTransferWithDifferentCurrencies"
-  :use-smaller-destination-font="true"
-  @source-active="handleSourceAmountActive"
-  @destination-active="handleDestinationAmountActive"
-  @update-destination-amount="handleUpdateDestinationAmount"
-  class="amount-display"
-/>
+        ref="amountSectionRef"
+        :amount="amount"
+        :source-currency-symbol="sourceCurrencySymbol"
+        :destination-currency-symbol="destinationCurrencySymbol"
+        :converted-amount="convertedAmount"
+        :is-transfer-with-different-currencies="isTransferWithDifferentCurrencies"
+        :use-smaller-destination-font="true"
+        @source-active="handleSourceAmountActive"
+        @destination-active="handleDestinationAmountActive"
+        @update-destination-amount="handleUpdateDestinationAmount"
+        class="amount-display"
+      />
       
       <!-- Селектор книги, отображается, если это не перевод -->
       <book-selector 
@@ -47,6 +47,7 @@
           :owners="distributionOwners" 
           v-model="distributionPercentage"
           :total-amount="parseFloat(amount) || 0"
+          :currency="sourceCurrencySymbol"
           :class="{ 'invisible': !shouldShowDistribution }"
         />
       </div>
@@ -309,7 +310,7 @@ watch([selectedAccount, destinationAccount, convertedAmount], () => {
 }
 
 .book-selector {
-  margin: -2px 0;
+  margin: 0; /* Уменьшаем отступ с 16px до 8px */
 }
 
 .amount-display {
@@ -322,8 +323,8 @@ watch([selectedAccount, destinationAccount, convertedAmount], () => {
 .filter-group {
   display: flex;
   flex-direction: column;
-  /* Промежуток между фильтрами 16px */
-  gap: 20px;
+  /* Увеличиваем промежуток между фильтрами с 16px до 24px */
+  gap: 24px;
   width: 100%;
   /* Зафиксируем позицию, чтобы избежать смещения при изменении размера блоков */
   position: relative;

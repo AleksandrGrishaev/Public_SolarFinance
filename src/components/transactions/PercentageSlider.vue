@@ -3,7 +3,7 @@
   <div class="percentage-share-element">
     <div class="owner owner-1">
       <div class="owner-percentage">
-        <span class="owner-name">{{ owners[0]?.name || 'Owner 1' }}</span>
+        <span class="owner-name">{{ owners && owners.length > 0 ? owners[0].name : 'Unknown' }}</span>
         <span class="percentage">{{ percentageValues[0] }}%</span>
         <span class="amount-value">{{ formattedAmountValues[0] }}</span>
       </div>
@@ -25,7 +25,7 @@
     
     <div class="owner owner-2">
       <div class="owner-percentage">
-        <span class="owner-name">{{ owners[1]?.name || 'Owner 2' }}</span>
+        <span class="owner-name">{{ owners && owners.length > 1 ? owners[1].name : 'Unknown' }}</span>
         <span class="percentage">{{ percentageValues[1] }}%</span>
         <span class="amount-value">{{ formattedAmountValues[1] }}</span>
       </div>
@@ -34,15 +34,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted, watch } from 'vue';
 
 const props = defineProps({
   owners: {
     type: Array,
     required: true,
     default: () => [
-      { name: 'Owner 1', id: 'owner1', percentage: 50 },
-      { name: 'Owner 2', id: 'owner2', percentage: 50 }
+      { name: 'Unknown', id: 'owner1', percentage: 50 },
+      { name: 'Unknown', id: 'owner2', percentage: 50 }
     ]
   },
   modelValue: {
@@ -60,6 +60,15 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['update:modelValue']);
+
+// Логгирование для отладки
+onMounted(() => {
+  console.log('[PercentageSlider] Mounted with owners:', props.owners);
+});
+
+watch(() => props.owners, (newOwners) => {
+  console.log('[PercentageSlider] Owners changed:', newOwners);
+}, { deep: true });
 
 const percentageValues = computed(() => {
   return [props.modelValue, 100 - props.modelValue];
@@ -85,8 +94,9 @@ const formattedAmountValues = computed(() => {
 // Создаем динамический CSS градиент для слайдера в зависимости от значения
 const sliderGradient = computed(() => {
   const percentage = props.modelValue;
-  const color1 = props.owners[0]?.color || 'white';
-  const color2 = props.owners[1]?.color || '#6499A7';
+  // Используем белый цвет и #6499A7 как запасные цвета, если не указаны в owners
+  const color1 = props.owners && props.owners.length > 0 && props.owners[0].color ? props.owners[0].color : 'white';
+  const color2 = props.owners && props.owners.length > 1 && props.owners[1].color ? props.owners[1].color : '#6499A7';
   return {
     background: `linear-gradient(to right, ${color1} 0%, ${color1} ${percentage}%, ${color2} ${percentage}%, ${color2} 100%)`
   };
