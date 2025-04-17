@@ -3,10 +3,8 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
-
-//Store
-import { useCurrencyStore } from './stores/currency';
-
+import { appInitService } from './services/system/AppInitService'
+import { messageService } from './services/system/MessageService'
 
 // Типы для глобального message provider
 declare global {
@@ -25,18 +23,23 @@ app.use(pinia)
 // Инициализация роутера
 app.use(router)
 
-// Инициализация хранилища валют
-const currencyStore = useCurrencyStore();
-currencyStore.init().catch(error => {
-  console.error('Failed to initialize currency store:', error);
-});
-
-
 // Глобальный обработчик ошибок
 app.config.errorHandler = (err, instance, info) => {
   console.error('Global error:', err)
   console.error('Error info:', info)
+  // Оповещаем пользователя об ошибке через messageService, если он доступен
+  if (messageService.hasProvider) {
+    messageService.error('Произошла ошибка в приложении. Пожалуйста, обновите страницу.')
+  }
 }
 
-// Монтирование приложения
+// Монтируем приложение
 app.mount('#app')
+
+// Запускаем инициализацию приложения после монтирования
+appInitService.initializeApp().catch(error => {
+  console.error('Failed to initialize application:', error)
+  if (messageService.hasProvider) {
+    messageService.error('Ошибка инициализации приложения')
+  }
+})

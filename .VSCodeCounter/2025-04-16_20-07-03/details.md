@@ -1,10 +1,10 @@
 # Details
 
-Date : 2025-04-16 09:20:36
+Date : 2025-04-16 20:07:03
 
 Directory /Users/peaker/dev/solar-finance/src
 
-Total : 89 files,  13274 codes, 876 comments, 2010 blanks, all 16160 lines
+Total : 97 files,  13843 codes, 1057 comments, 2117 blanks, all 17017 lines
 
 [Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
@@ -30,10 +30,11 @@ Total : 89 files,  13274 codes, 876 comments, 2010 blanks, all 16160 lines
 | [src/components/categories/view/CategoryTransactionsList.vue](/src/components/categories/view/CategoryTransactionsList.vue) | Vue | 150 | 3 | 18 | 171 |
 | [src/components/currency/CurrencySelector.vue](/src/components/currency/CurrencySelector.vue) | Vue | 146 | 0 | 23 | 169 |
 | [src/components/navigation/NavMenu.vue](/src/components/navigation/NavMenu.vue) | Vue | 96 | 1 | 4 | 101 |
-| [src/components/transactions/AccountSelector.vue](/src/components/transactions/AccountSelector.vue) | Vue | 219 | 4 | 29 | 252 |
+| [src/components/transactions/AccountSelector.vue](/src/components/transactions/AccountSelector.vue) | Vue | 229 | 4 | 30 | 263 |
+| [src/components/transactions/AmountSection.vue](/src/components/transactions/AmountSection.vue) | Vue | 190 | 5 | 24 | 219 |
 | [src/components/transactions/BookSelector.vue](/src/components/transactions/BookSelector.vue) | Vue | 135 | 1 | 19 | 155 |
 | [src/components/transactions/NumberKeypad.vue](/src/components/transactions/NumberKeypad.vue) | Vue | 123 | 2 | 12 | 137 |
-| [src/components/transactions/PercentageSlider.vue](/src/components/transactions/PercentageSlider.vue) | Vue | 162 | 1 | 21 | 184 |
+| [src/components/transactions/PercentageSlider.vue](/src/components/transactions/PercentageSlider.vue) | Vue | 170 | 1 | 23 | 194 |
 | [src/components/transactions/TransactionTypeSelector.vue](/src/components/transactions/TransactionTypeSelector.vue) | Vue | 82 | 1 | 11 | 94 |
 | [src/components/transactions/ViewTransaction/TransactionDateGroup.vue](/src/components/transactions/ViewTransaction/TransactionDateGroup.vue) | Vue | 90 | 3 | 14 | 107 |
 | [src/components/transactions/ViewTransaction/TransactionItem.vue](/src/components/transactions/ViewTransaction/TransactionItem.vue) | Vue | 228 | 4 | 31 | 263 |
@@ -46,6 +47,13 @@ Total : 89 files,  13274 codes, 876 comments, 2010 blanks, all 16160 lines
 | [src/components/ui/inputs/TextInput.vue](/src/components/ui/inputs/TextInput.vue) | Vue | 54 | 1 | 7 | 62 |
 | [src/components/ui/inputs/ToggleButtonGroup.vue](/src/components/ui/inputs/ToggleButtonGroup.vue) | Vue | 64 | 1 | 7 | 72 |
 | [src/components/ui/inputs/ToggleSwitch.vue](/src/components/ui/inputs/ToggleSwitch.vue) | Vue | 47 | 1 | 7 | 55 |
+| [src/composables/transaction/index.ts](/src/composables/transaction/index.ts) | TypeScript | 6 | 2 | 1 | 9 |
+| [src/composables/transaction/useAccount.ts](/src/composables/transaction/useAccount.ts) | TypeScript | 132 | 37 | 27 | 196 |
+| [src/composables/transaction/useCategory.ts](/src/composables/transaction/useCategory.ts) | TypeScript | 74 | 22 | 17 | 113 |
+| [src/composables/transaction/useCurrency.ts](/src/composables/transaction/useCurrency.ts) | TypeScript | 148 | 48 | 34 | 230 |
+| [src/composables/transaction/useDistribution.ts](/src/composables/transaction/useDistribution.ts) | TypeScript | 53 | 17 | 11 | 81 |
+| [src/composables/transaction/useKeypad.ts](/src/composables/transaction/useKeypad.ts) | TypeScript | 38 | 22 | 7 | 67 |
+| [src/composables/transaction/useTransaction.ts](/src/composables/transaction/useTransaction.ts) | TypeScript | 139 | 27 | 27 | 193 |
 | [src/composables/useDateFilter.ts](/src/composables/useDateFilter.ts) | TypeScript | 330 | 43 | 64 | 437 |
 | [src/data/categories.ts](/src/data/categories.ts) | TypeScript | 110 | 11 | 26 | 147 |
 | [src/layouts/ConsoleLayout.vue](/src/layouts/ConsoleLayout.vue) | Vue | 70 | 3 | 9 | 82 |
@@ -99,6 +107,6 @@ Total : 89 files,  13274 codes, 876 comments, 2010 blanks, all 16160 lines
 | [src/views/MoreView.vue](/src/views/MoreView.vue) | Vue | 252 | 8 | 33 | 293 |
 | [src/views/NotFoundView.vue](/src/views/NotFoundView.vue) | Vue | 32 | 1 | 4 | 37 |
 | [src/views/PinLoginView.vue](/src/views/PinLoginView.vue) | Vue | 223 | 5 | 37 | 265 |
-| [src/views/TransactionView.vue](/src/views/TransactionView.vue) | Vue | 528 | 6 | 87 | 621 |
+| [src/views/TransactionView.vue](/src/views/TransactionView.vue) | Vue | 299 | 7 | 43 | 349 |
 
 [Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)

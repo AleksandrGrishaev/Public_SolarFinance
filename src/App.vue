@@ -4,13 +4,15 @@
       <n-dialog-provider>
         <n-notification-provider>
           <n-message-provider>
-            <div class="app-container" :class="{ 'dark-theme': themeStore.isDark }">
-              <router-view v-slot="{ Component }">
-                <transition name="fade" mode="out-in">
-                  <component :is="Component" />
-                </transition>
-              </router-view>
-            </div>
+            <message-provider>
+              <div class="app-container" :class="{ 'dark-theme': themeStore.isDark }">
+                <router-view v-slot="{ Component }">
+                  <transition name="fade" mode="out-in">
+                    <component :is="Component" />
+                  </transition>
+                </router-view>
+              </div>
+            </message-provider>
           </n-message-provider>
         </n-notification-provider>
       </n-dialog-provider>
@@ -19,51 +21,19 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
 import { 
   darkTheme,
   NConfigProvider, 
   NLoadingBarProvider, 
   NDialogProvider, 
   NNotificationProvider,
-  NMessageProvider,
-  useMessage
+  NMessageProvider
 } from 'naive-ui';
 import { useThemeStore } from './stores/theme';
-import { useUserStore } from './stores/user'; // Исправленный импорт (без слеша в конце)
+import MessageProvider from './components/system/MessageProvider.vue';
 
-// Получение хранилища темы и пользователя
+// Получение хранилища темы
 const themeStore = useThemeStore();
-const userStore = useUserStore();
-
-// Инициализация приложения
-onMounted(async () => {
-  // Инициализируем глобальный message provider
-  window.$message = useMessage();
-  console.log('[App] Global message provider initialized');
-  
-  // Инициализируем хранилище пользователей
-  await userStore.init();
-  console.log('[App] User store initialized, authenticated:', userStore.isAuthenticated);
-  
-  // Применяем тему из настроек пользователя, если он авторизован
-  if (userStore.isAuthenticated && userStore.userSettings?.theme) {
-    const userTheme = userStore.userSettings.theme;
-    if (userTheme === 'dark') {
-      themeStore.setDarkTheme(); // Обновлено согласно вашей реализации ThemeStore
-    } else if (userTheme === 'light') {
-      themeStore.setLightTheme(); // Обновлено согласно вашей реализации ThemeStore
-    } else {
-      // Если установлено 'system', используем системные настройки
-      themeStore.initTheme();
-    }
-    console.log('[App] Applied theme from user settings:', userTheme);
-  } else {
-    // Если пользователь не авторизован, инициализируем тему по системным настройкам
-    themeStore.initTheme();
-    console.log('[App] Theme initialized:', themeStore.isDark ? 'dark' : 'light');
-  }
-});
 </script>
 
 <style>
