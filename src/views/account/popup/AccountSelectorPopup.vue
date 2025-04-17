@@ -28,15 +28,26 @@
           :style="gridCellStyle"
           @click="selectAccount(account)"
         >
-          <div class="account-name">{{ truncateName(account.name) }}</div>
           <!-- Account icon inside cell -->
           <div 
             class="account-icon"
             :style="[iconStyle, { backgroundColor: account.color || '#808080' }]"
           >
-            {{ account.symbol || getCurrencySymbol(account.currency) }}
+            <!-- Если есть иконка, рендерим её -->
+            <component 
+              v-if="account.icon && getTablerIcon(account.icon)" 
+              :is="getTablerIcon(account.icon)" 
+              :size="Math.round(layoutState.itemSize * 0.6)" 
+              color="white" 
+              stroke-width="1.5"
+            />
+            <!-- Иначе используем символ валюты -->
+            <template v-else>
+              {{ account.symbol || getCurrencySymbol(account.currency) }}
+            </template>
           </div>
           <div class="account-balance">{{ formatAccountBalance(account, 5) }}</div>
+          <div class="account-name">{{ truncateName(account.name) }}</div>
         </div>
         
         <!-- Add account cell -->
@@ -45,7 +56,6 @@
           :style="gridCellStyle"
           @click="handleAddAccount"
         >
-          <div class="account-name">Add</div>
           <div 
             class="add-button"
             :style="iconStyle"
@@ -56,6 +66,8 @@
               class="plus-icon"
             />
           </div>
+          <div class="account-balance">&nbsp;</div>
+          <div class="account-name">Add</div>
         </div>
         
         <!-- Filler items for last row alignment -->
@@ -80,11 +92,24 @@
 import { computed, ref, onMounted, onUpdated, nextTick, watch } from 'vue';
 import BasePopup from '../../../components/ui/BasePopup.vue';
 import { IconEdit, IconPlus } from '@tabler/icons-vue';
+import * as TablerIcons from '@tabler/icons-vue';
 import { useCurrencyStore } from '../../../stores/currency';
 import { useFormatBalance } from '../../../composables/transaction/useFormatBalance';
 
 // Initialize the balance formatting composable
 const { getCurrencySymbol, formatAccountBalance } = useFormatBalance();
+
+// Функция для получения иконки Tabler по имени
+const getTablerIcon = (iconName) => {
+  if (!iconName) return null;
+  
+  // Если начинается с "Icon", используем как есть
+  const lookupName = iconName.startsWith('Icon') 
+    ? iconName 
+    : `Icon${iconName.charAt(0).toUpperCase()}${iconName.slice(1)}`;
+  
+  return TablerIcons[lookupName] || null;
+};
 
 // Debug mode
 const debugMode = ref(false);
@@ -93,7 +118,7 @@ const debugMode = ref(false);
 const gridRef = ref(null);
 
 // Constant for gaps - minimum gap is 4px
-const GAP_SIZE = 4;
+const GAP_SIZE =12; // Увеличили с 4px до 12px для большего расстояния
 
 // Adaptive layout state
 const layoutState = ref({
@@ -164,7 +189,7 @@ const fillerItemsCount = computed(() => {
 // Grid cell style
 const gridCellStyle = computed(() => {
   // Reduce cell width by 1px to ensure proper placement
-  const cellWidth = layoutState.value.calculatedItemWidth - 1;
+  const cellWidth = layoutState.value.calculatedItemWidth - 3;
   
   return { 
     width: `${cellWidth}px`,
@@ -332,9 +357,11 @@ const handleEditClick = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 6px; /* Вернули к меньшему значению для более компактного вида с новым порядком элементов */
   cursor: pointer;
   box-sizing: border-box;
+  margin-bottom: 12px; /* Сохраняем отступ снизу */
+  margin-top: 8px;
 }
 
 /* Invisible filler elements */
@@ -376,23 +403,21 @@ const handleEditClick = () => {
 }
 
 .account-name {
-  color: white;
-  font-size: 12px;
-  line-height: 16px;
+  color: #ffffff; /* Изменили цвет на более светло-серый для названия */
+  font-size: 10px;
+  line-height: 12px;
   text-align: center;
   width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin-bottom: 4px;
 }
 
 .account-balance {
   color: #AEAEAE;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 14px;
   text-align: center;
-  margin-top: 4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
