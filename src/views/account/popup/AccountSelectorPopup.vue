@@ -86,18 +86,31 @@
       </div>
     </div>
   </BasePopup>
+  
+  <!-- Popup для управления аккаунтами в книгах -->
+  <BookAccountsPopup
+    v-model="showBookAccountsPopup"
+    :initialBookId="selectedBookId"
+    @add-account="handleAddAccountFromBookPopup"
+    @edit-account="handleEditAccount"
+  />
 </template>
 
 <script setup lang="ts">
 import { computed, ref, onMounted, onUpdated, nextTick, watch } from 'vue';
 import BasePopup from '../../../components/ui/BasePopup.vue';
+import BookAccountsPopup from './BookAccountsPopup.vue';
 import { IconEdit, IconPlus } from '@tabler/icons-vue';
 import * as TablerIcons from '@tabler/icons-vue';
 import { useCurrencyStore } from '../../../stores/currency';
 import { useFormatBalance } from '../../../composables/transaction/useFormatBalance';
+import { useBookStore } from '../../../stores/book';
 
 // Initialize the balance formatting composable
 const { getCurrencySymbol, formatAccountBalance } = useFormatBalance();
+
+// Инициализация хранилища книг
+const bookStore = useBookStore();
 
 // Функция для получения иконки Tabler по имени
 const getTablerIcon = (iconName) => {
@@ -118,7 +131,7 @@ const debugMode = ref(false);
 const gridRef = ref(null);
 
 // Constant for gaps - minimum gap is 4px
-const GAP_SIZE =12; // Увеличили с 4px до 12px для большего расстояния
+const GAP_SIZE = 12; // Увеличили с 4px до 12px для большего расстояния
 
 // Adaptive layout state
 const layoutState = ref({
@@ -130,6 +143,10 @@ const layoutState = ref({
 
 // Browser window width
 const windowWidth = ref(window.innerWidth);
+
+// Состояние дополнительных popup'ов
+const showBookAccountsPopup = ref(false);
+const selectedBookId = ref(null);
 
 const props = defineProps({
   modelValue: {
@@ -143,6 +160,10 @@ const props = defineProps({
   transactionType: {
     type: String,
     default: 'expense'
+  },
+  bookId: { // Добавлен новый prop для идентификации книги
+    type: String,
+    default: null
   }
 });
 
@@ -294,6 +315,14 @@ onMounted(() => {
     nextTick(calculateLayout);
   }
   window.addEventListener('resize', handleResize);
+  
+  // Если передан ID книги, сохраняем его для использования
+  if (props.bookId) {
+    selectedBookId.value = props.bookId;
+  } else if (bookStore.books.length > 0) {
+    // Если книга не указана явно, используем первую доступную
+    selectedBookId.value = bookStore.books[0].id;
+  }
 });
 
 onUpdated(() => {
@@ -322,10 +351,21 @@ const handleAddAccount = () => {
   isVisible.value = false;
 };
 
-// Edit accounts
+// Edit accounts - открываем новый BookAccountsPopup
 const handleEditClick = () => {
-  emit('edit');
+  // Закрываем текущий попап и открываем попап управления аккаунтами в книгах
   isVisible.value = false;
+  showBookAccountsPopup.value = true;
+};
+
+// Добавление нового аккаунта из BookAccountsPopup
+const handleAddAccountFromBookPopup = (bookId) => {
+  emit('add', bookId);
+};
+
+// Редактирование аккаунта из BookAccountsPopup
+const handleEditAccount = (account) => {
+  emit('edit', account);
 };
 </script>
 
