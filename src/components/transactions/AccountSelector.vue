@@ -4,7 +4,18 @@
     <!-- For regular transactions (not transfer) -->
     <div v-if="!isTransfer" class="single-account" @click="showAccountSelector('source')">
       <div class="account-icon" :style="{ backgroundColor: selectedAccount.color || '#5B8FF9' }">
-        {{ selectedAccount.symbol || getCurrencySymbol(selectedAccount.currency) }}
+        <!-- Если есть иконка, рендерим её -->
+        <component 
+          v-if="selectedAccount.icon && getTablerIcon(selectedAccount.icon)" 
+          :is="getTablerIcon(selectedAccount.icon)" 
+          size="14" 
+          color="white" 
+          stroke-width="1.5"
+        />
+        <!-- Иначе используем символ валюты -->
+        <template v-else>
+          {{ selectedAccount.symbol || getCurrencySymbol(selectedAccount.currency) }}
+        </template>
       </div>
       <div class="account-name">
         {{ truncateName(selectedAccount.name) }}
@@ -20,7 +31,18 @@
     <div v-else class="transfer-accounts">
       <div class="account-box" @click="showAccountSelector('source')">
         <div class="account-icon" :style="{ backgroundColor: selectedAccount.color || '#5B8FF9' }">
-          {{ selectedAccount.symbol || getCurrencySymbol(selectedAccount.currency) }}
+          <!-- Если есть иконка, рендерим её -->
+          <component 
+            v-if="selectedAccount.icon && getTablerIcon(selectedAccount.icon)" 
+            :is="getTablerIcon(selectedAccount.icon)" 
+            size="14" 
+            color="white" 
+            stroke-width="1.5"
+          />
+          <!-- Иначе используем символ валюты -->
+          <template v-else>
+            {{ selectedAccount.symbol || getCurrencySymbol(selectedAccount.currency) }}
+          </template>
         </div>
         <div class="account-name">
           {{ truncateName(selectedAccount.name) }}
@@ -33,7 +55,18 @@
       
       <div class="account-box" @click="showAccountSelector('destination')">
         <div class="account-icon" :style="{ backgroundColor: destinationAccount.color || '#61DDAA' }">
-          {{ destinationAccount.symbol || getCurrencySymbol(destinationAccount.currency) }}
+          <!-- Если есть иконка, рендерим её -->
+          <component 
+            v-if="destinationAccount.icon && getTablerIcon(destinationAccount.icon)" 
+            :is="getTablerIcon(destinationAccount.icon)" 
+            size="14" 
+            color="white" 
+            stroke-width="1.5"
+          />
+          <!-- Иначе используем символ валюты -->
+          <template v-else>
+            {{ destinationAccount.symbol || getCurrencySymbol(destinationAccount.currency) }}
+          </template>
         </div>
         <div class="account-name">
           {{ truncateName(destinationAccount.name) }}
@@ -57,6 +90,7 @@ import { ref, computed } from 'vue';
 import type { Account } from '../../stores/account/types';
 import AccountSelectorPopup from '../../views/account/popup/AccountSelectorPopup.vue';
 import { useCurrencyStore } from '../../stores/currency';
+import * as TablerIcons from '@tabler/icons-vue';
 
 const props = defineProps({
   accounts: {
@@ -83,6 +117,18 @@ const accountSelectorVisible = ref(false);
 const selectionMode = ref('source'); // 'source' or 'destination'
 
 const currencyStore = useCurrencyStore();
+
+// Функция для получения иконки Tabler по имени
+const getTablerIcon = (iconName) => {
+  if (!iconName) return null;
+  
+  // Если начинается с "Icon", используем как есть
+  const lookupName = iconName.startsWith('Icon') 
+    ? iconName 
+    : `Icon${iconName.charAt(0).toUpperCase()}${iconName.slice(1)}`;
+  
+  return TablerIcons[lookupName] || null;
+};
 
 const selectedAccount = computed(() => {
   return props.accounts.find(account => account.id === props.modelValue) || props.accounts[0] || { 
