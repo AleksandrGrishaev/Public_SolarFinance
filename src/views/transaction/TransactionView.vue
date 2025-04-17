@@ -385,13 +385,19 @@ const saveRegularTransaction = async () => {
     };
     
     // Добавляем правила распределения, если есть
-    if (shouldShowDistribution.value && Object.keys(distributionPercentage.value).length > 0) {
-      transactionData.distributionRules = Object.entries(distributionPercentage.value)
-        .map(([ownerId, percentage]) => ({
-          ownerId,
-          percentage: Number(percentage)
-        }));
+    if (shouldShowDistribution.value && distributionOwners.value.length > 0) {
+  // Используем значение из слайдера и создаем два правила
+  transactionData.distributionRules = [
+    {
+      ownerId: distributionOwners.value[0].id,
+      percentage: distributionPercentage.value
+    },
+    {
+      ownerId: distributionOwners.value[1].id,
+      percentage: 100 - distributionPercentage.value
     }
+  ];
+}
     
     // Сохраняем транзакцию
     await transactionStore.addTransaction(transactionData);
