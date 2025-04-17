@@ -34,6 +34,7 @@
             :title="account.name"
             :active="accountsInBook.has(account.id)"
             :icon-background-color="account.color || '#808080'"
+              :disabled="!canEditAccount(account)"
             @select="selectAccount(account)"
             @toggle="(isActive) => toggleAccountInBook(account.id, isActive)"
             @menu="showAccountMenu(account)"
@@ -79,6 +80,7 @@
 import { ref, computed, onMounted, watch, onBeforeMount, nextTick } from 'vue';
 import { useAccountStore } from '../../../stores/account';
 import { useBookStore } from '../../../stores/book';
+import { useUserStore } from '../../../stores/user';
 import BasePopup from '../../../components/ui/BasePopup.vue';
 import ListItemWithToggle from '../../../components/ui/lists/ListItemWithToggle.vue';
 import BookSelector from '../../../components/ui/selectors/BookSelector.vue';
@@ -132,12 +134,27 @@ const isVisible = computed({
 // Инициализация хранилищ
 const accountStore = useAccountStore();
 const bookStore = useBookStore();
+const userStore = useUserStore();
+
 
 // Используем локальную переменную для хранения выбранной книги
 const localSelectedBook = ref('');
 
 // Используем Set для эффективного хранения и проверки аккаунтов в текущей книге
 const accountsInBook = ref(new Set<string>());
+
+// Проверка возможности редактирования счета
+const canEditAccount = (account) => {
+  const currentUserId = userStore.currentUser?.id;
+  if (!currentUserId || !account) return false;
+  
+  // Владелец может редактировать
+  if (account.ownerId === currentUserId) return true;
+  
+  // Проверяем наличие прав edit
+  return account.sharing && 
+         account.sharing[currentUserId] === 'edit';
+};
 
 // Обновляет список аккаунтов в текущей книге
 const updateAccountsInBook = () => {
@@ -231,17 +248,30 @@ watch(() => accountStore.accounts, () => {
 }, { deep: true });
 
 // Отсортированные аккаунты: сначала те что в книге, потом активные, затем неактивные
+// Отсортированные аккаунты: сначала те что в книге, потом активные, затем неактивные
 const sortedAccounts = computed(() => {
   // Получаем текущий выбранный ID книги
   const currentBookId = localSelectedBook.value;
   const currentAccountsInBook = accountsInBook.value;
+  const currentUserId = userStore.currentUser?.id;
   
   // Вывод для отладки
   console.log(`[BookAccountsPopup] Computing sortedAccounts: currentBookId=${currentBookId}, accounts in book=${currentAccountsInBook.size}`);
   
+  // Отфильтруем счета, к которым у пользователя есть доступ
+  const accessibleAccounts = accountStore.accounts.filter(account => {
+    // Владелец всегда имеет доступ
+    if (account.ownerId === currentUserId) return true;
+    
+    // Пользователь имеет доступ через sharing (view или edit)
+    return account.sharing && 
+           account.sharing[currentUserId] && 
+           ['view', 'edit'].includes(account.sharing[currentUserId]);
+  });
+  
   // Если нет выбранной книги, просто сортируем по активности
   if (!currentBookId) {
-    return [...accountStore.accounts].sort((a, b) => {
+    return [...accessibleAccounts].sort((a, b) => {
       // Сортируем по активности: активные вверху, неактивные внизу
       if (a.isActive && !b.isActive) return -1;
       if (!a.isActive && b.isActive) return 1;
@@ -256,9 +286,8 @@ const sortedAccounts = computed(() => {
   console.log(`[BookAccountsPopup] Accounts for book ${currentBookId} (from store):`, accountsByBook);
   
   // Если есть выбранная книга, используем полную сортировку
-  return [...accountStore.accounts].sort((a, b) => {
+  return [...accessibleAccounts].sort((a, b) => {
     // Надежно проверяем, принадлежит ли аккаунт выбранной книге
-    // Проверяем с помощью двух источников данных для надежности
     const aInBook = currentAccountsInBook.has(a.id) || 
                    (a.bookIds && a.bookIds.includes(currentBookId));
                    
@@ -315,7 +344,24 @@ const handleBookChange = async (newBookId) => {
 // Переключение аккаунта в книге
 const toggleAccountInBook = async (accountId, isChecked) => {
   if (!localSelectedBook.value) return;
+    // Добавляем проверку прав доступа
+    const account = accountStore.getAccountById(accountId);
+  if (!account) return;
   
+  const currentUserId = userStore.currentUser?.id;
+  
+  // Проверяем права доступа: 
+  // 1. Пользователь должен быть владельцем счета или
+  // 2. Иметь права 'edit' для этого счета
+  const canEdit = account.ownerId === currentUserId || 
+                 (account.sharing && 
+                  account.sharing[currentUserId] === 'edit');
+  
+  if (!canEdit) {
+    console.warn(`[BookAccountsPopup] User does not have edit permissions for account ${accountId}`);
+    // Восстанавливаем предыдущее состояние переключателя
+    return;
+  }
   try {
     console.log(`[BookAccountsPopup] Toggling account ${accountId} in book ${localSelectedBook.value} to ${isChecked}`);
     
@@ -403,7 +449,13 @@ const handleAccountAdded = (account) => {
 
 // Показать меню аккаунта (редактирование, удаление и т.д.)
 const showAccountMenu = (account) => {
-  // Вместо эмита события, устанавливаем выбранный аккаунт и открываем попап редактирования
+  if (!canEditAccount(account)) {
+    console.warn(`[BookAccountsPopup] User does not have edit permissions for account ${account.id}`);
+    // Можно добавить уведомление для пользователя, что у него нет прав на редактирование
+    return;
+  }
+  
+  // Устанавливаем выбранный аккаунт и открываем попап редактирования
   selectedAccount.value = account;
   showEditAccountPopup.value = true;
 };

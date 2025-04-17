@@ -1,5 +1,5 @@
 // src/stores/account/defaultAccounts.ts
-import type { Account } from './types';
+import type { Account, AccountSharing } from './types';
 /**
  * Данные счетов по умолчанию
  * Используются при первой инициализации приложения,
@@ -19,6 +19,7 @@ export const defaultAccounts: Account[] = [
     type: 'cash',
     icon: 'IconShoppingCart',
     isActive: true,
+    sharing: { 'user_2': 'view' }, // Пользователь user_2 имеет доступ только для просмотра
     createdAt: new Date(),
     updatedAt: new Date()
   },
@@ -34,6 +35,7 @@ export const defaultAccounts: Account[] = [
     symbol: 'Rp',
     type: 'bank',
     isActive: true,
+    sharing: { 'user_2': 'edit' }, // Пользователь user_2 имеет полный доступ 
     createdAt: new Date(),
     updatedAt: new Date()
   },
@@ -49,6 +51,7 @@ export const defaultAccounts: Account[] = [
     symbol: 'Rp',
     type: 'bank',
     isActive: true,
+    sharing: { 'user_1': 'view' }, // Пользователь user_1 имеет доступ только для просмотра
     createdAt: new Date(),
     updatedAt: new Date()
   },
@@ -64,6 +67,7 @@ export const defaultAccounts: Account[] = [
     symbol: 'Rp',
     type: 'card',
     isActive: true,
+    sharing: { 'user_2': 'edit' }, // Пользователь user_2 имеет полный доступ
     createdAt: new Date(),
     updatedAt: new Date()
   },
@@ -80,6 +84,7 @@ export const defaultAccounts: Account[] = [
     type: 'card',
     icon: 'IconShoppingCart',
     isActive: true,
+    sharing: { 'user_1': 'edit' }, // Пользователь user_1 имеет полный доступ
     createdAt: new Date(),
     updatedAt: new Date()
   },
@@ -95,6 +100,7 @@ export const defaultAccounts: Account[] = [
     symbol: '₽',
     type: 'card',
     isActive: true,
+    sharing: {}, // Никто кроме владельца не имеет доступа
     createdAt: new Date(),
     updatedAt: new Date()
   },
@@ -110,6 +116,7 @@ export const defaultAccounts: Account[] = [
     symbol: '$',
     type: 'cash',
     isActive: true,
+    sharing: { 'user_2': 'view' }, // Пользователь user_2 имеет доступ только для просмотра
     createdAt: new Date(),
     updatedAt: new Date()
   }

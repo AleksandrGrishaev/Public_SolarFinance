@@ -114,6 +114,92 @@ export const useAccountStore = defineStore('account', {
     }
   },
   
+// These methods should be added to the actions in accountStore.ts
+
+/**
+ * Get accounts shared with a specific user
+ */
+getAccountsSharedWithUser(userId: string): Account[] {
+  return this.accounts.filter(account => {
+    // Include accounts where the user is the owner
+    if (account.ownerId === userId) return true;
+    
+    // Include accounts shared with the user with 'view' or 'edit' permission
+    return account.sharing && 
+           account.sharing[userId] && 
+           ['view', 'edit'].includes(account.sharing[userId]);
+  });
+},
+
+/**
+ * Check if a user has access to an account
+ */
+hasAccountAccess(accountId: string, userId: string): boolean {
+  const account = this.getAccountById(accountId);
+  if (!account) return false;
+  
+  // Owner always has access
+  if (account.ownerId === userId) return true;
+  
+  // Check sharing permissions
+  return account.sharing && 
+         account.sharing[userId] && 
+         ['view', 'edit'].includes(account.sharing[userId]);
+},
+
+/**
+ * Check if a user can edit an account
+ */
+canEditAccount(accountId: string, userId: string): boolean {
+  const account = this.getAccountById(accountId);
+  if (!account) return false;
+  
+  // Owner always has edit permission
+  if (account.ownerId === userId) return true;
+  
+  // Check for edit permission
+  return account.sharing && 
+         account.sharing[userId] === 'edit';
+},
+
+/**
+ * Update sharing permissions for an account
+ */
+async updateAccountSharing(
+  accountId: string, 
+  sharingPermissions: Record<string, 'no' | 'view' | 'edit'>
+): Promise<boolean> {
+  try {
+    const account = this.getAccountById(accountId);
+    if (!account) {
+      console.error(`[AccountStore] Account ${accountId} not found`);
+      return false;
+    }
+    
+    // Update local state
+    this.loading = true;
+    
+    // Prepare the sharing object
+    const sharing = { ...sharingPermissions };
+    
+    // Filter out 'no' permissions (no need to store them)
+    Object.keys(sharing).forEach(userId => {
+      if (sharing[userId] === 'no') {
+        delete sharing[userId];
+      }
+    });
+    
+    // Update account
+    return await this.updateAccount(accountId, { sharing });
+  } catch (error) {
+    console.error(`[AccountStore] Error updating sharing for account ${accountId}:`, error);
+    return false;
+  } finally {
+    this.loading = false;
+  }
+},
+
+
   actions: {
     /**
      * Инициализация хранилища счетов

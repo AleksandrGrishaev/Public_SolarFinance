@@ -26,6 +26,35 @@ export class UserService {
   }
 
   /**
+   * Получение активных пользователей
+   */
+  async getActiveUsers(): Promise<User[]> {
+    try {
+      const users = await this.getUsers();
+      return users.filter(user => user.isActive);
+    } catch (error) {
+      console.error('[UserService] Error getting active users:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Получение пользователей, кроме указанного
+   */
+  async getOtherUsers(excludeUserId: string): Promise<User[]> {
+    try {
+      const users = await this.getUsers();
+      return users.filter(user => 
+        user.id !== excludeUserId && 
+        user.isActive
+      );
+    } catch (error) {
+      console.error(`[UserService] Error getting other users:`, error);
+      return [];
+    }
+  }
+
+  /**
    * Получение пользователя по ID
    */
   async getUserById(id: string): Promise<User | null> {
@@ -34,6 +63,19 @@ export class UserService {
     } catch (error) {
       console.error(`[UserService] Error getting user with id ${id}:`, error);
       return null;
+    }
+  }
+
+  /**
+   * Получение имени пользователя по ID
+   */
+  async getUserNameById(id: string, defaultName: string = 'Unknown User'): Promise<string> {
+    try {
+      const user = await this.getUserById(id);
+      return user ? user.name : defaultName;
+    } catch (error) {
+      console.error(`[UserService] Error getting user name for id ${id}:`, error);
+      return defaultName;
     }
   }
 

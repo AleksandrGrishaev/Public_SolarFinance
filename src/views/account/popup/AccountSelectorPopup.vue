@@ -114,12 +114,15 @@ import * as TablerIcons from '@tabler/icons-vue';
 import { useCurrencyStore } from '../../../stores/currency';
 import { useFormatBalance } from '../../../composables/transaction/useFormatBalance';
 import { useBookStore } from '../../../stores/book';
+import { useUserStore } from '../../../stores/user';
+
 
 // Initialize the balance formatting composable
 const { getCurrencySymbol, formatAccountBalance } = useFormatBalance();
 
 // Инициализация хранилища книг
 const bookStore = useBookStore();
+const userStore = useUserStore();
 
 // Функция для получения иконки Tabler по имени
 const getTablerIcon = (iconName) => {
@@ -213,8 +216,27 @@ const selectableAccounts = computed(() => {
     console.log('No accounts available');
     return [];
   }
-  console.log('Available accounts:', props.accounts);
-  return props.accounts;
+  
+  // Получаем текущего пользователя
+  const currentUserId = userStore.currentUser?.id;
+  if (!currentUserId) {
+    console.log('No current user');
+    return [];
+  }
+  
+  // Фильтруем счета по доступу
+  const accessibleAccounts = props.accounts.filter(account => {
+    // Владелец всегда имеет доступ
+    if (account.ownerId === currentUserId) return true;
+    
+    // Пользователь имеет доступ через sharing (view или edit)
+    return account.sharing && 
+           account.sharing[currentUserId] && 
+           ['edit'].includes(account.sharing[currentUserId]);
+  });
+  
+  console.log('Available accounts after filtering:', accessibleAccounts.length);
+  return accessibleAccounts;
 });
 
 // Calculate number of filler items for the last row

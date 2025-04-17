@@ -1,10 +1,10 @@
 # Details
 
-Date : 2025-04-17 20:02:31
+Date : 2025-04-17 21:15:36
 
 Directory /Users/peaker/dev/solar-finance/src
 
-Total : 111 files,  16784 codes, 1223 comments, 2588 blanks, all 20595 lines
+Total : 114 files,  17513 codes, 1291 comments, 2714 blanks, all 21518 lines
 
 [Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
@@ -47,6 +47,7 @@ Total : 111 files,  16784 codes, 1223 comments, 2588 blanks, all 20595 lines
 | [src/components/ui/inputs/ColorPicker.vue](/src/components/ui/inputs/ColorPicker.vue) | Vue | 63 | 1 | 12 | 76 |
 | [src/components/ui/inputs/IconPicker.vue](/src/components/ui/inputs/IconPicker.vue) | Vue | 61 | 1 | 8 | 70 |
 | [src/components/ui/inputs/ParentCategorySelector.vue](/src/components/ui/inputs/ParentCategorySelector.vue) | Vue | 121 | 1 | 17 | 139 |
+| [src/components/ui/inputs/SharePicker.vue](/src/components/ui/inputs/SharePicker.vue) | Vue | 163 | 1 | 27 | 191 |
 | [src/components/ui/inputs/TextInput.vue](/src/components/ui/inputs/TextInput.vue) | Vue | 54 | 1 | 7 | 62 |
 | [src/components/ui/inputs/ToggleButtonGroup.vue](/src/components/ui/inputs/ToggleButtonGroup.vue) | Vue | 64 | 1 | 7 | 72 |
 | [src/components/ui/inputs/ToggleSwitch.vue](/src/components/ui/inputs/ToggleSwitch.vue) | Vue | 47 | 1 | 7 | 55 |
@@ -67,10 +68,10 @@ Total : 111 files,  16784 codes, 1223 comments, 2588 blanks, all 20595 lines
 | [src/services/system/AppInitService.ts](/src/services/system/AppInitService.ts) | TypeScript | 56 | 25 | 12 | 93 |
 | [src/services/system/MessageService.ts](/src/services/system/MessageService.ts) | TypeScript | 54 | 33 | 11 | 98 |
 | [src/stores/account/accountService.ts](/src/stores/account/accountService.ts) | TypeScript | 90 | 27 | 13 | 130 |
-| [src/stores/account/accountStore.ts](/src/stores/account/accountStore.ts) | TypeScript | 364 | 103 | 86 | 553 |
-| [src/stores/account/defaultAccounts.ts](/src/stores/account/defaultAccounts.ts) | TypeScript | 110 | 6 | 0 | 116 |
+| [src/stores/account/accountStore.ts](/src/stores/account/accountStore.ts) | TypeScript | 412 | 126 | 101 | 639 |
+| [src/stores/account/defaultAccounts.ts](/src/stores/account/defaultAccounts.ts) | TypeScript | 117 | 6 | 0 | 123 |
 | [src/stores/account/index.ts](/src/stores/account/index.ts) | TypeScript | 4 | 2 | 1 | 7 |
-| [src/stores/account/types.ts](/src/stores/account/types.ts) | TypeScript | 17 | 1 | 1 | 19 |
+| [src/stores/account/types.ts](/src/stores/account/types.ts) | TypeScript | 20 | 3 | 4 | 27 |
 | [src/stores/book/bookService.ts](/src/stores/book/bookService.ts) | TypeScript | 77 | 24 | 12 | 113 |
 | [src/stores/book/bookStore.ts](/src/stores/book/bookStore.ts) | TypeScript | 129 | 32 | 26 | 187 |
 | [src/stores/book/defaultBooks.ts](/src/stores/book/defaultBooks.ts) | TypeScript | 40 | 5 | 1 | 46 |
@@ -100,8 +101,8 @@ Total : 111 files,  16784 codes, 1223 comments, 2588 blanks, all 20595 lines
 | [src/stores/user/defaultUsers.ts](/src/stores/user/defaultUsers.ts) | TypeScript | 35 | 6 | 1 | 42 |
 | [src/stores/user/index.ts](/src/stores/user/index.ts) | TypeScript | 4 | 2 | 1 | 7 |
 | [src/stores/user/types.ts](/src/stores/user/types.ts) | TypeScript | 16 | 2 | 2 | 20 |
-| [src/stores/user/userService.ts](/src/stores/user/userService.ts) | TypeScript | 110 | 43 | 20 | 173 |
-| [src/stores/user/userStore.ts](/src/stores/user/userStore.ts) | TypeScript | 132 | 45 | 39 | 216 |
+| [src/stores/user/userService.ts](/src/stores/user/userService.ts) | TypeScript | 140 | 52 | 23 | 215 |
+| [src/stores/user/userStore.ts](/src/stores/user/userStore.ts) | TypeScript | 162 | 55 | 38 | 255 |
 | [src/types/base.ts](/src/types/base.ts) | TypeScript | 5 | 0 | 0 | 5 |
 | [src/views/AccountsView.vue](/src/views/AccountsView.vue) | Vue | 184 | 4 | 24 | 212 |
 | [src/views/DashboardView.vue](/src/views/DashboardView.vue) | Vue | 221 | 4 | 19 | 244 |
@@ -109,11 +110,13 @@ Total : 111 files,  16784 codes, 1223 comments, 2588 blanks, all 20595 lines
 | [src/views/MoreView.vue](/src/views/MoreView.vue) | Vue | 252 | 8 | 33 | 293 |
 | [src/views/NotFoundView.vue](/src/views/NotFoundView.vue) | Vue | 32 | 1 | 4 | 37 |
 | [src/views/PinLoginView.vue](/src/views/PinLoginView.vue) | Vue | 223 | 5 | 37 | 265 |
-| [src/views/account/popup/AccountAddPopup.vue](/src/views/account/popup/AccountAddPopup.vue) | Vue | 331 | 3 | 49 | 383 |
-| [src/views/account/popup/AccountEditPopup.vue](/src/views/account/popup/AccountEditPopup.vue) | Vue | 402 | 11 | 57 | 470 |
+| [src/views/account/popup/AccountAddPopup.vue](/src/views/account/popup/AccountAddPopup.vue) | Vue | 405 | 10 | 58 | 473 |
+| [src/views/account/popup/AccountEditPopup.vue](/src/views/account/popup/AccountEditPopup.vue) | Vue | 410 | 11 | 58 | 479 |
 | [src/views/account/popup/AccountSelectorPopup.vue](/src/views/account/popup/AccountSelectorPopup.vue) | Vue | 468 | 13 | 77 | 558 |
-| [src/views/account/popup/BookAccountsPopup.vue](/src/views/account/popup/BookAccountsPopup.vue) | Vue | 384 | 4 | 75 | 463 |
-| [src/views/account/popup/composables/useAccountManagement.ts](/src/views/account/popup/composables/useAccountManagement.ts) | TypeScript | 86 | 25 | 18 | 129 |
+| [src/views/account/popup/BookAccountsPopup.vue](/src/views/account/popup/BookAccountsPopup.vue) | Vue | 428 | 6 | 84 | 518 |
+| [src/views/account/popup/components/AccountSharingPanel.vue](/src/views/account/popup/components/AccountSharingPanel.vue) | Vue | 302 | 1 | 57 | 360 |
+| [src/views/account/popup/composables/useAccountManagement.ts](/src/views/account/popup/composables/useAccountManagement.ts) | TypeScript | 56 | 15 | 11 | 82 |
+| [src/views/account/popup/composables/useAccountSharing.ts](/src/views/account/popup/composables/useAccountSharing.ts) | TypeScript | 50 | 23 | 10 | 83 |
 | [src/views/transaction/TransactionView.vue](/src/views/transaction/TransactionView.vue) | Vue | 535 | 7 | 80 | 622 |
 | [src/views/transaction/composables/index.ts](/src/views/transaction/composables/index.ts) | TypeScript | 6 | 2 | 1 | 9 |
 | [src/views/transaction/composables/useAccount.ts](/src/views/transaction/composables/useAccount.ts) | TypeScript | 132 | 37 | 27 | 196 |

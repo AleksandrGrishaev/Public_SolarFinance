@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import { useAccountStore } from '../../../../stores/account';
 import { useBookStore } from '../../../../stores/book';
 import type { Account } from '../../../../stores/account/types';
+import { useUserStore } from '../../../../stores/user';
 
 /**
  * Хук для управления счетами
@@ -11,7 +12,34 @@ export function useAccountManagement() {
   // Инициализация хранилищ
   const accountStore = useAccountStore();
   const bookStore = useBookStore();
+  const userStore = useUserStore();
+
   
+// Проверка доступа к счету
+const hasAccountAccess = (accountId: string, userId?: string) => {
+  const actualUserId = userId || userStore.currentUser?.id;
+  if (!actualUserId) return false;
+  
+  return accountStore.hasAccountAccess(accountId, actualUserId);
+};
+
+// Проверка права на редактирование
+const canEditAccount = (accountId: string, userId?: string) => {
+  const actualUserId = userId || userStore.currentUser?.id;
+  if (!actualUserId) return false;
+  
+  return accountStore.canEditAccount(accountId, actualUserId);
+};
+
+// Получение счетов, доступных текущему пользователю
+const getAccessibleAccounts = () => {
+  const currentUserId = userStore.currentUser?.id;
+  if (!currentUserId) return [];
+  
+  return accountStore.getAccountsSharedWithUser(currentUserId);
+};
+
+
   // Список счетов для выбранной книги
   const getAccountsByBookId = (bookId: string) => {
     return accountStore.getAccountsByBookId(bookId);
@@ -77,6 +105,10 @@ export function useAccountManagement() {
     
     // Методы для управления связями книг и счетов
     addAccountToBook,
-    removeAccountFromBook
+    removeAccountFromBook,
+
+    hasAccountAccess,
+    canEditAccount,
+    getAccessibleAccounts
   };
 }

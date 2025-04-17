@@ -5,14 +5,15 @@ import type { User, UserSettings } from './types';
 
 import { useCurrencyStore } from '../currency';
 
-
 export const useUserStore = defineStore('user', {
   state: () => ({
     currentUser: null as User | null,
     isAuthenticated: false,
     authToken: null as string | null,
     isInitialized: false,
-    loading: false
+    loading: false,
+    // Add users array to state to cache results
+    users: [] as User[]
   }),
   
   getters: {
@@ -61,6 +62,9 @@ export const useUserStore = defineStore('user', {
             this.isAuthenticated = true;
           }
         }
+        
+        // Load all users into state
+        this.users = await this.userService.getUsers();
         
         this.isInitialized = true;
         return this.isAuthenticated;
@@ -157,60 +161,95 @@ export const useUserStore = defineStore('user', {
       console.log('[UserStore] User logged out, session data cleared');
     },
     
-/**
- * Обновление базовой валюты пользователя
- */
-async updateUserBaseCurrency(currencyCode: string): Promise<boolean> {
-  if (!this.currentUser) return false;
-  
-  // Проверяем, существует ли такая валюта
-  const currencyStore = useCurrencyStore();
-  const currency = currencyStore.getCurrency(currencyCode);
-  
-  if (!currency) {
-    console.warn(`[UserStore] Currency not found: ${currencyCode}`);
-    return false;
-  }
-  
-  // Обновляем настройки пользователя
-  this.updateUserSettings({
-    baseCurrency: currencyCode
-  });
-  
-  // Сохраняем изменения в базе данных
-  return await this.userService.updateUser(this.currentUser.id, {
-    settings: this.currentUser.settings
-  });
-},
+    /**
+     * Обновление базовой валюты пользователя
+     */
+    async updateUserBaseCurrency(currencyCode: string): Promise<boolean> {
+      if (!this.currentUser) return false;
+      
+      // Проверяем, существует ли такая валюта
+      const currencyStore = useCurrencyStore();
+      const currency = currencyStore.getCurrency(currencyCode);
+      
+      if (!currency) {
+        console.warn(`[UserStore] Currency not found: ${currencyCode}`);
+        return false;
+      }
+      
+      // Обновляем настройки пользователя
+      this.updateUserSettings({
+        baseCurrency: currencyCode
+      });
+      
+      // Сохраняем изменения в базе данных
+      return await this.userService.updateUser(this.currentUser.id, {
+        settings: this.currentUser.settings
+      });
+    },
+    
     /**
      * Получение всех пользователей
+     * Fixed to ensure it always returns an array
      */
-    async getAllUsers(): Promise<User[]> {
-      return await this.userService.getUsers();
+    getAllUsers(): User[] {
+      if (this.users.length === 0) {
+        // If users aren't loaded yet, try to load them
+        this.userService.getUsers().then(users => {
+          this.users = users;
+        }).catch(error => {
+          console.error('[UserStore] Error loading users:', error);
+        });
+      }
+      return this.users;
     },
     
     /**
      * Добавление нового пользователя
      */
     async addUser(newUser: Omit<User, 'id'>): Promise<User> {
-      return await this.userService.addUser(newUser);
+      const user = await this.userService.addUser(newUser);
+      // Update the local users array
+      this.users.push(user);
+      return user;
     },
-    
     
     /**
      * Обновление пользователя
      */
     async updateUser(id: string, userData: Partial<User>): Promise<boolean> {
-      return await this.userService.updateUser(id, userData);
+      const success = await this.userService.updateUser(id, userData);
+      if (success) {
+        // Update the local users array
+        const index = this.users.findIndex(user => user.id === id);
+        if (index !== -1) {
+          this.users[index] = { ...this.users[index], ...userData };
+        }
+      }
+      return success;
     },
     
     /**
      * Удаление пользователя
      */
     async deleteUser(id: string): Promise<boolean> {
-      return await this.userService.deleteUser(id);
+      const success = await this.userService.deleteUser(id);
+      if (success) {
+        // Update the local users array
+        this.users = this.users.filter(user => user.id !== id);
+      }
+      return success;
+    },
+    
+    /**
+     * Refresh users from storage
+     */
+    async refreshUsers(): Promise<void> {
+      try {
+        const users = await this.userService.getUsers();
+        this.users = users;
+      } catch (error) {
+        console.error('[UserStore] Error refreshing users:', error);
+      }
     }
   }
-
-  
 });

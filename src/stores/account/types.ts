@@ -15,5 +15,13 @@ export interface Account {
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
+  sharing?: AccountSharing; // Added sharing permissions
 }
+
 export type AccountType = 'cash' | 'bank' |  'card' |'credit_card' | 'savings' | 'investment';
+
+// Sharing permission type
+export type SharingPermission = 'no' | 'view' | 'edit';
+
+// Sharing permissions by user ID
+export type AccountSharing = Record<string, SharingPermission>;
