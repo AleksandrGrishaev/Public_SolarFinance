@@ -11,64 +11,39 @@
       <div class="debug-info" v-if="debugMode">
         <div>Total categories: {{ props.categories.length }}</div>
         <div>Selectable: {{ selectableCategories.length }}</div>
-        <div>With Parents: {{ categoriesWithParent.length }}</div>
-        <div>Standalone: {{ standaloneCategories.length }}</div>
-        <div>Unique Parents: {{ uniqueParentIds.length }}</div>
+        <div>Items per row: {{ layoutState.itemsPerRow }}</div>
+        <div>Item size: {{ layoutState.itemSize }}px</div>
+        <div>Grid width: {{ layoutState.gridWidth }}px</div>
+        <div>Max name length: {{ maxNameLength }}</div>
       </div>
       
-      <!-- Группы категорий с родителями -->
-      <template v-for="(parentId, index) in uniqueParentIds" :key="index">
-        <div class="category-group" v-if="getParentCategory(parentId) && getCategoriesByParentId(parentId).length > 0">
-          <div class="parent-label">{{ getParentCategory(parentId).name }}</div>
-          
-          <div class="category-line">
-            <div 
-              v-for="category in getCategoriesByParentId(parentId)"
-              :key="category.id"
-              class="category-item"
-              @click="selectCategory(category)"
-            >
-              <CategoryIcon 
-                :icon-name="category.icon" 
-                :background-color="category.color" 
-                size="small"
-              />
-              <div class="category-name">{{ truncateName(category.name) }}</div>
-            </div>
-          </div>
+      <!-- Динамически адаптируемая сетка категорий -->
+      <div class="category-grid" ref="gridRef">
+        <div 
+          v-for="category in selectableCategories"
+          :key="category.id"
+          class="category-item"
+          :style="categoryItemStyle"
+          @click="selectCategory(category)"
+        >
+          <CategoryIcon 
+            :icon-name="category.icon" 
+            :background-color="category.color" 
+            :size="iconSize"
+          />
+          <div class="category-name">{{ truncateName(category.name) }}</div>
         </div>
-      </template>
-
-      <!-- Категории без родителя (не включая те, что уже отображаются как родители) -->
-      <div v-if="standaloneCategories.length > 0" class="category-group">
-        <div class="parent-label" v-if="categoriesWithParent.length > 0">Other</div>
         
-        <div class="category-line">
-          <div 
-            v-for="category in standaloneCategories"
-            :key="category.id"
-            class="category-item"
-            @click="selectCategory(category)"
-          >
-            <CategoryIcon 
-              :icon-name="category.icon" 
-              :background-color="category.color" 
-              size="small"
-            />
-            <div class="category-name">{{ truncateName(category.name) }}</div>
+        <!-- Кнопка добавления категории (всегда отображается) -->
+        <div 
+          class="category-item" 
+          :style="categoryItemStyle"
+          @click="handleAddCategory"
+        >
+          <div class="add-icon-container" :style="addIconStyle">
+            <IconPlus class="add-icon" :style="plusIconStyle" />
           </div>
-        </div>
-      </div>
-      
-      <!-- Кнопка добавления категории (всегда отображается) -->
-      <div class="category-group">
-        <div class="category-line">
-          <div class="category-item" @click="handleAddCategory">
-            <div class="add-icon-container">
-              <IconPlus class="add-icon" />
-            </div>
-            <div class="category-name">Add</div>
-          </div>
+          <div class="category-name">Add</div>
         </div>
       </div>
       
@@ -82,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, onMounted, onUpdated, nextTick, watch } from 'vue';
 import BasePopup from '../ui/BasePopup.vue';
 import CategoryIcon from './CategoryIcon.vue';
 import { IconEdit, IconPlus } from '@tabler/icons-vue';
@@ -93,6 +68,27 @@ const categoryStore = useCategoryStore();
 
 // Режим отладки (установите в true, чтобы видеть отладочную информацию)
 const debugMode = ref(false);
+
+// Ссылка на DOM элемент grid-контейнера
+const gridRef = ref(null);
+
+// Состояние адаптивного дизайна
+const layoutState = ref({
+  itemsPerRow: 4,
+  itemSize: 56,
+  gridWidth: 0,
+  calculatedItemWidth: 0
+});
+
+// Максимальная длина имени категории (будет вычисляться динамически)
+const maxNameLength = computed(() => {
+  // Для маленьких экранов используем меньшую длину
+  if (layoutState.value.itemsPerRow === 4) {
+    return 8; // 8 символов для 4 элементов в ряду
+  } else {
+    return 10; // 10 символов для 5 элементов в ряду
+  }
+});
 
 const props = defineProps({
   modelValue: {
@@ -143,59 +139,131 @@ const selectableCategories = computed(() => {
   return filteredCategories.value;
 });
 
-// Категории с родителем (подкатегории)
-const categoriesWithParent = computed(() => {
-  return selectableCategories.value.filter(cat => cat.parentId);
-});
-
-// Уникальные ID родителей для группировки
-const uniqueParentIds = computed(() => {
-  const parentIds = new Set();
-  categoriesWithParent.value.forEach(cat => {
-    if (cat.parentId) {
-      parentIds.add(cat.parentId);
-    }
-  });
-  return Array.from(parentIds);
-});
-
-// Категории без родителя (не включая те, что уже отображаются как родители)
-const standaloneCategories = computed(() => {
-  // Получаем все ID родительских категорий, у которых есть отображаемые дочерние элементы
-  const parentIdsWithDisplayedChildren = new Set();
-  categoriesWithParent.value.forEach(cat => {
-    if (cat.parentId) {
-      parentIdsWithDisplayedChildren.add(cat.parentId);
-    }
-  });
+// Стили для категорий, динамически вычисленные на основе размера контейнера
+const categoryItemStyle = computed(() => {
+  const { itemsPerRow } = layoutState.value;
+  const gap = 4; // Уменьшенное расстояние между элементами (4px)
+  const width = `calc(${100 / itemsPerRow}% - ${(gap * (itemsPerRow - 1)) / itemsPerRow}px)`;
   
-  // Возвращаем категории без родителя, исключая те, которые уже отображаются как родители
-  return selectableCategories.value.filter(cat => 
-    !cat.parentId && !parentIdsWithDisplayedChildren.has(cat.id)
-  );
+  return {
+    width
+  };
 });
 
-// Получение родительской категории по ID
-function getParentCategory(parentId) {
-  // Сначала ищем в списке категорий, пришедших через props
-  const parent = props.categories.find(cat => cat.id === parentId);
-  if (parent) return parent;
-  
-  // Если не нашли (возможно, родительская категория неактивна), 
-  // ищем в полном списке категорий из store
-  return categoryStore.getCategoryById(parentId);
-}
+// Стили для иконки добавления
+const addIconStyle = computed(() => {
+  const { itemSize } = layoutState.value;
+  return {
+    width: `${itemSize}px`,
+    height: `${itemSize}px`,
+    borderRadius: `${itemSize / 2}px`
+  };
+});
 
-// Получение категорий по ID родителя
-function getCategoriesByParentId(parentId) {
-  return categoriesWithParent.value.filter(cat => cat.parentId === parentId);
-}
+// Стили для значка "+"
+const plusIconStyle = computed(() => {
+  const { itemSize } = layoutState.value;
+  const iconSize = Math.max(itemSize / 2, 20); // Минимум 20px для видимости
+  return {
+    width: `${iconSize}px`,
+    height: `${iconSize}px`
+  };
+});
+
+// Размер иконки для CategoryIcon компонента
+const iconSize = computed(() => {
+  const { itemSize } = layoutState.value;
+  if (itemSize <= 45) return 'small';
+  if (itemSize <= 56) return 'medium';
+  return 'large';
+});
+
+// Функция для расчета оптимального размещения
+const calculateLayout = () => {
+  if (!gridRef.value) return;
+  
+  // Измеряем текущую ширину grid-контейнера
+  const gridWidth = gridRef.value.clientWidth;
+  const gap = 4; // Отступ между элементами (уменьшен до 4px)
+  const minItemSize = 45; // Минимальный размер иконки
+  const optimalItemSize = 56; // Оптимальный размер иконки
+  
+  // Определяем оптимальное количество элементов в ряду
+  let itemsPerRow = 4; // По умолчанию 4 элемента
+  
+  const screenWidth = window.innerWidth;
+  if (screenWidth >= 390) {
+    // Проверяем, поместятся ли 5 элементов
+    const availableWidthFor5 = gridWidth - (gap * 4);
+    const itemWidthFor5 = availableWidthFor5 / 5;
+    
+    if (itemWidthFor5 >= minItemSize) {
+      itemsPerRow = 5;
+    }
+  }
+  
+  // Вычисляем размер элемента на основе доступного пространства
+  const totalGapWidth = gap * (itemsPerRow - 1);
+  const availableWidth = gridWidth - totalGapWidth;
+  const calculatedItemWidth = availableWidth / itemsPerRow;
+  
+  // Определяем итоговый размер иконки 
+  let itemSize = Math.min(calculatedItemWidth, optimalItemSize);
+  itemSize = Math.max(itemSize, minItemSize); // Не меньше минимального
+  
+  if (debugMode.value) {
+    console.log('Grid width:', gridWidth);
+    console.log('Items per row:', itemsPerRow);
+    console.log('Calculated item width:', calculatedItemWidth);
+    console.log('Item size:', itemSize);
+  }
+  
+  // Обновляем состояние
+  layoutState.value = {
+    itemsPerRow,
+    itemSize,
+    gridWidth,
+    calculatedItemWidth
+  };
+};
+
+// Обработчик изменения размера окна
+const handleResize = () => {
+  calculateLayout();
+};
+
+// Инициализация и обновление при изменении видимости
+onMounted(() => {
+  if (isVisible.value) {
+    nextTick(() => {
+      calculateLayout();
+    });
+  }
+  window.addEventListener('resize', handleResize);
+});
+
+onUpdated(() => {
+  if (isVisible.value) {
+    nextTick(() => {
+      calculateLayout();
+    });
+  }
+});
+
+// Следим за изменением видимости
+watch(isVisible, (newVal) => {
+  if (newVal) {
+    nextTick(() => {
+      calculateLayout();
+    });
+  }
+});
 
 // Усечение длинных названий
 const truncateName = (name) => {
   if (!name) return '';
-  if (name.length > 8) {
-    return name.substring(0, 8) + '...';
+  if (name.length > maxNameLength.value) {
+    return name.substring(0, maxNameLength.value) + '...';
   }
   return name;
 };
@@ -204,8 +272,7 @@ const truncateName = (name) => {
 const selectCategory = (category) => {
   // Проверяем, что выбранная категория не имеет дочерних элементов в текущей книге
   if (!categoryStore.hasChildCategoriesInBook(category.id, props.bookId)) {
-    // Вызываем событие выбора категории и если родительский компонент подтвердил успешную обработку
-    // закрываем попап автоматически
+    // Вызываем событие выбора категории
     emit('select', category);
     // Автоматически закрываем попап после выбора категории
     isVisible.value = false;
@@ -230,10 +297,9 @@ const handleEditClick = () => {
 .category-container {
   display: flex;
   flex-direction: column;
-  gap: 16px;
   width: 100%;
   box-sizing: border-box;
-  padding: 8px 0 16px;
+  padding: 8px 0 16px; /* Убираем горизонтальные отступы, т.к. они уже есть у popup */
 }
 
 .debug-info {
@@ -241,31 +307,17 @@ const handleEditClick = () => {
   background-color: rgba(255, 255, 255, 0.1);
   color: yellow;
   font-size: 12px;
-  margin-bottom: 8px;
+  margin-bottom: 16px;
 }
 
-.category-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  width: 100%;
-  margin-bottom: 8px;
-}
-
-.parent-label {
-  padding: 0 16px;
-  font-size: 14px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.category-line {
+.category-grid {
   display: flex;
   flex-wrap: wrap;
-  padding: 0 16px;
+  justify-content: flex-start;
+  gap: 4px; /* Уменьшенный gap до 4px */
   width: 100%;
+  max-width: 100%;
   box-sizing: border-box;
-  gap: 16px;
 }
 
 .category-item {
@@ -274,7 +326,7 @@ const handleEditClick = () => {
   align-items: center;
   gap: 6px;
   cursor: pointer;
-  width: 56px;
+  margin-bottom: 8px;
 }
 
 .category-name {
@@ -285,21 +337,17 @@ const handleEditClick = () => {
   width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .add-icon-container {
-  width: 40px;
-  height: 40px;
-  border-radius: 20px;
-  border: 1px solid #949496;
   display: flex;
   justify-content: center;
   align-items: center;
+  border: 1px solid #949496;
 }
 
 .add-icon {
-  width: 20px;
-  height: 20px;
   color: #949496;
 }
 
@@ -309,5 +357,6 @@ const handleEditClick = () => {
   padding: 16px;
   font-size: 14px;
   line-height: 20px;
+  margin-top: 16px;
 }
 </style>
