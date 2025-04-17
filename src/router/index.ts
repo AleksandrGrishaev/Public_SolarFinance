@@ -57,7 +57,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: '',
         name: 'transaction',
-        component: () => import('@/views/TransactionView.vue'),
+        component: () => import('@/views/transaction/TransactionView.vue'),
         meta: {
           requiresAuth: true,
           title: 'Add Transaction'

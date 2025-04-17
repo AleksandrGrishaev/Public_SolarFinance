@@ -88,23 +88,23 @@
 
 <script setup lang="ts">
 import { onMounted, watch, ref, computed } from 'vue';
-import BookSelector from '../components/transactions/BookSelector.vue';
-import TransactionTypeSelector from '../components/transactions/TransactionTypeSelector.vue';
-import AccountSelector from '../components/transactions/AccountSelector.vue';
-import PercentageSlider from '../components/transactions/PercentageSlider.vue';
-import NumberKeypad from '../components/transactions/NumberKeypad.vue';
-import CategorySelector from '../components/categories/CategorySelector.vue';
-import CategoryListPopup from '../components/categories/CategoryListPopup.vue';
-import AmountSection from '../components/transactions/AmountSection.vue';
+import BookSelector from '../../components/transactions/BookSelector.vue';
+import TransactionTypeSelector from '../../components/transactions/TransactionTypeSelector.vue';
+import AccountSelector from '../../components/transactions/AccountSelector.vue';
+import PercentageSlider from '../../components/transactions/PercentageSlider.vue';
+import NumberKeypad from '../../components/transactions/NumberKeypad.vue';
+import CategorySelector from '../../components/categories/CategorySelector.vue';
+import CategoryListPopup from '../../components/categories/CategoryListPopup.vue';
+import AmountSection from '../../components/transactions/AmountSection.vue';
 
 // Импортируем хуки и сервисы
-import { useTransaction } from '../composables/transaction';
-import { useAccount } from '../composables/transaction/useAccount';
-import { useCurrency } from '../composables/transaction/useCurrency';
-import { useAccountStore } from '../stores/account';
-import { useTransactionStore } from '../stores/transaction';
-import { useUserStore } from '../stores/user';
-import { messageService } from '../services/system/MessageService';
+import { useTransaction } from './composables/useTransaction.ts';
+import { useAccount } from './composables/useAccount';
+import { useCurrency } from './composables';
+import { useAccountStore } from '../../stores/account';
+import { useTransactionStore } from '../../stores/transaction';
+import { useUserStore } from '../../stores/user';
+import { messageService } from '../../services/system/MessageService';
 
 // Определяем события для emit
 const emit = defineEmits(['update:showMenu']);

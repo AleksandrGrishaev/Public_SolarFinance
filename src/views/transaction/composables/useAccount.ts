@@ -1,8 +1,8 @@
 // src/composables/transaction/useAccount.ts
 import { ref, computed, watch } from 'vue';
-import { useAccountStore } from '../../stores/account';
-import { useBookStore } from '../../stores/book';
-import { useCurrencyStore } from '../../stores/currency';
+import { useAccountStore } from '../../../stores/account';
+import { useBookStore } from '../../../stores/book';
+import { useCurrencyStore } from '../../../stores/currency';
 
 /**
  * Хук для управления аккаунтами в контексте транзакций

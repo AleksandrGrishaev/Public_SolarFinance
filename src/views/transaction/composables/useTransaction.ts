@@ -4,9 +4,9 @@ import { useAccount } from './useAccount';
 import { useCategory } from './useCategory';
 import { useDistribution } from './useDistribution';
 import { useKeypad } from './useKeypad';
-import { useAccountStore } from '../../stores/account';
-import { useBookStore } from '../../stores/book';
-import { useCurrencyStore } from '../../stores/currency';
+import { useAccountStore } from '../../../stores/account';
+import { useBookStore } from '../../../stores/book';
+import { useCurrencyStore } from '../../../stores/currency';
 
 /**
  * Основной хук для работы с транзакциями, объединяющий все дочерние хуки

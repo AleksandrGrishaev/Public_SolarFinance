@@ -1,6 +1,6 @@
 // src/composables/transaction/useCategory.ts
 import { ref, computed } from 'vue';
-import { useCategoryStore } from '../../stores/category';
+import { useCategoryStore } from '../../../stores/category';
 
 /**
  * Хук для управления категориями в контексте транзакций

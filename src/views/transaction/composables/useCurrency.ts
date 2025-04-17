@@ -1,7 +1,7 @@
 // src/composables/transaction/useCurrency.ts
 import { computed, type ComputedRef, type Ref } from 'vue';
-import { useCurrencyStore } from '../../stores/currency';
-import { useAccountStore } from '../../stores/account';
+import { useCurrencyStore } from '../../../stores/currency';
+import { useAccountStore } from '../../../stores/account';
 
 /**
  * Хук для управления валютами и конвертацией в транзакциях
