@@ -2,11 +2,23 @@
 <template>
   <BasePopup 
     v-model="isVisible" 
-    title="Select account" 
     :rightIcon="IconEdit"
     @rightIconClick="handleEditClick"
     @update:modelValue="handleVisibilityChange"
   >
+    <!-- Кастомный заголовок с вертикальным расположением элементов -->
+    <template #title>
+      <div class="custom-title">
+        <!-- Верхняя строка - "Select account" -->
+        <div class="title-text">Select account</div>
+        <!-- Нижняя строка - иконка книги и название -->
+        <div class="book-container">
+          <IconBook class="book-icon" size="16" stroke-width="1.5" color="white" />
+          <span class="book-name">{{ currentBookName }}</span>
+        </div>
+      </div>
+    </template>
+    
     <div class="account-container">
       <div class="debug-info" v-if="debugMode">
         <div>Total accounts: {{ props.accounts.length }}</div>
@@ -97,7 +109,7 @@
 import { computed, ref, onMounted, onUpdated, nextTick, watch, toRefs } from 'vue';
 import BasePopup from '../../../components/ui/BasePopup.vue';
 import BookAccountsPopup from './BookAccountsPopup.vue';
-import { IconEdit, IconPlus } from '@tabler/icons-vue';
+import { IconEdit, IconPlus, IconBook } from '@tabler/icons-vue';
 import * as TablerIcons from '@tabler/icons-vue';
 import { useCurrencyStore } from '../../../stores/currency';
 import { useFormatBalance } from '../../../composables/transaction/useFormatBalance';
@@ -122,7 +134,7 @@ const getTablerIcon = (iconName) => {
 };
 
 // Debug mode
-const debugMode = ref(true); // Включаем debug режим для отладки
+const debugMode = ref(false); // Отключаем debug режим в production версии
 
 // Reference to the grid container DOM element
 const gridRef = ref(null);
@@ -168,6 +180,14 @@ const { bookId } = toRefs(props); // Используем toRefs для реак
 
 // ID книги, который будет использоваться при открытии BookAccountsPopup
 const currentTransactionBookId = ref('');
+
+// Получаем название текущей книги
+const currentBookName = computed(() => {
+  if (!selectedBookId.value) return 'No book selected';
+  
+  const book = bookStore.getBookById(selectedBookId.value);
+  return book ? book.name : 'Unknown book';
+});
 
 const emit = defineEmits(['update:modelValue', 'select', 'add', 'edit']);
 
@@ -399,6 +419,41 @@ const handleEditAccount = (account) => {
 </script>
 
 <style scoped>
+/* Стили для кастомного заголовка */
+.custom-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding-left: 53px;
+  padding-right: 53px;
+}
+
+.title-text {
+  color: white;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 20px;
+}
+
+.book-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.book-icon {
+  /* Стили для иконки книги */
+}
+
+.book-name {
+  color: white;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+}
+
 .account-container {
   display: flex;
   flex-direction: column;
