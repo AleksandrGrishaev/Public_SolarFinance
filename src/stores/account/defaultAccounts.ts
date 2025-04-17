@@ -17,6 +17,7 @@ export const defaultAccounts: Account[] = [
     color: '#4CAF50',
     symbol: '₽',
     type: 'cash',
+    icon: 'IconShoppingCart',
     isActive: true,
     createdAt: new Date(),
     updatedAt: new Date()
@@ -77,6 +78,7 @@ export const defaultAccounts: Account[] = [
     color: '#E91E63',
     symbol: '₽',
     type: 'card',
+    icon: 'IconShoppingCart',
     isActive: true,
     createdAt: new Date(),
     updatedAt: new Date()
