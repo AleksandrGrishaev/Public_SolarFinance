@@ -432,9 +432,9 @@ const handleEditAccount = (account) => {
 
 .title-text {
   color: white;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 20px;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 24px;
 }
 
 .book-container {
@@ -449,9 +449,9 @@ const handleEditAccount = (account) => {
 
 .book-name {
   color: white;
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 400;
-  line-height: 16px;
+  line-height: 20px;
 }
 
 .account-container {
