@@ -24,24 +24,29 @@
 
       <!-- Список аккаунтов с информацией о принадлежности к выбранной книге -->
       <div class="account-list">
-        <ListItemWithToggle
-          v-for="account in sortedAccounts"
-          :key="account.id"
-          :title="account.name"
-          :active="accountsInBook.has(account.id)"
-          :icon-background-color="account.color || '#808080'"
-          @select="selectAccount(account)"
-          @toggle="(isActive) => toggleAccountInBook(account.id, isActive)"
-          @menu="showAccountMenu(account)"
-        >
-          <template #icon-content>
-            <AccountIcon :account="account" :size="20" />
-          </template>
+        <div v-if="isLoading" class="loading-indicator">
+          Loading accounts...
+        </div>
+        <template v-else>
+          <ListItemWithToggle
+            v-for="account in sortedAccounts"
+            :key="account.id"
+            :title="account.name"
+            :active="accountsInBook.has(account.id)"
+            :icon-background-color="account.color || '#808080'"
+            @select="selectAccount(account)"
+            @toggle="(isActive) => toggleAccountInBook(account.id, isActive)"
+            @menu="showAccountMenu(account)"
+          >
+            <template #icon-content>
+              <AccountIcon :account="account" :size="20" />
+            </template>
 
-          <template #subtitle>
-            <div class="account-balance">{{ formatAccountBalance(account) }}</div>
-          </template>
-        </ListItemWithToggle>
+            <template #subtitle>
+              <div class="account-balance">{{ formatAccountBalance(account) }}</div>
+            </template>
+          </ListItemWithToggle>
+        </template>
       </div>
 
       <!-- Кнопка добавления нового аккаунта с использованием CreateActionButton -->
@@ -56,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch, onBeforeMount } from 'vue';
+import { ref, computed, onMounted, watch, onBeforeMount, nextTick } from 'vue';
 import { useAccountStore } from '../../../stores/account';
 import { useBookStore } from '../../../stores/book';
 import BasePopup from '../../../components/ui/BasePopup.vue';
@@ -69,6 +74,9 @@ import { useFormatBalance } from '../../../composables/transaction/useFormatBala
 
 // Включаем режим отладки для дополнительной информации
 const debugMode = ref(true);
+
+// Состояние загрузки для отображения индикатора
+const isLoading = ref(false);
 
 // Инициализируем форматирование баланса
 const { getCurrencySymbol, formatAccountBalance } = useFormatBalance();
@@ -103,33 +111,42 @@ const localSelectedBook = ref('');
 // Используем Set для эффективного хранения и проверки аккаунтов в текущей книге
 const accountsInBook = ref(new Set<string>());
 
-// Проверка, был ли уже выполнен первичный перерасчет аккаунтов
-const initialAccountsLoaded = ref(false);
-
 // Обновляет список аккаунтов в текущей книге
 const updateAccountsInBook = () => {
   if (!localSelectedBook.value) {
-    accountsInBook.value.clear();
+    accountsInBook.value = new Set<string>();
     return;
   }
   
+  isLoading.value = true;
   console.log('[BookAccountsPopup] Updating accounts for book:', localSelectedBook.value);
   
-  // Создаем новый Set для аккаунтов в текущей книге
-  const accountsSet = new Set<string>();
-  
-  // Проходим по всем аккаунтам и проверяем принадлежность к книге
-  accountStore.accounts.forEach(account => {
-    if (account.bookIds && account.bookIds.includes(localSelectedBook.value)) {
-      accountsSet.add(account.id);
-    }
-  });
-  
-  // Обновляем реактивный Set
-  accountsInBook.value = accountsSet;
-  
-  console.log(`[BookAccountsPopup] Found ${accountsSet.size} accounts in book ${localSelectedBook.value}`);
-  initialAccountsLoaded.value = true;
+  try {
+    // Создаем новый Set для аккаунтов в текущей книге
+    const accountsSet = new Set<string>();
+    
+    // Проходим по всем аккаунтам и проверяем принадлежность к книге
+    accountStore.accounts.forEach(account => {
+      if (account.bookIds && account.bookIds.includes(localSelectedBook.value)) {
+        accountsSet.add(account.id);
+      }
+    });
+    
+    // Обновляем реактивный Set - ВАЖНО: присваиваем новый Set вместо изменения существующего
+    accountsInBook.value = accountsSet;
+    
+    console.log(`[BookAccountsPopup] Found ${accountsSet.size} accounts in book ${localSelectedBook.value}`);
+    console.log(`[BookAccountsPopup] Accounts in book:`, [...accountsSet]);
+  } catch (error) {
+    console.error('[BookAccountsPopup] Error updating accounts:', error);
+  } finally {
+    // Принудительно обновляем информацию в UI, чтобы удостовериться, что переключатели корректны
+    nextTick(() => {
+      // Этот блок выполнится после обновления DOM
+      console.log('[BookAccountsPopup] UI updated after accounts refresh');
+      isLoading.value = false;
+    });
+  }
 };
 
 // Отслеживаем изменение props.initialBookId и обновляем локальную переменную
@@ -140,8 +157,11 @@ watch(() => props.initialBookId, (newBookId) => {
     localSelectedBook.value = newBookId;
     console.log('[BookAccountsPopup] localSelectedBook updated to:', localSelectedBook.value);
     
-    // Обновляем список аккаунтов в книге
-    updateAccountsInBook();
+    // Обновляем список аккаунтов в книге с небольшой задержкой, чтобы гарантировать, 
+    // что все данные обновились
+    setTimeout(() => {
+      updateAccountsInBook();
+    }, 10);
   }
 }, { immediate: true });
 
@@ -154,14 +174,24 @@ watch(isVisible, (newValue) => {
     }
     
     // Всегда обновляем список аккаунтов в книге при открытии
-    updateAccountsInBook();
+    setTimeout(() => {
+      updateAccountsInBook();
+    }, 10);
   }
 });
 
 // При изменении выбранной книги обновляем список аккаунтов
-watch(() => localSelectedBook.value, (newBookId) => {
-  if (newBookId && initialAccountsLoaded.value) {
-    updateAccountsInBook();
+watch(() => localSelectedBook.value, (newBookId, oldBookId) => {
+  console.log(`[BookAccountsPopup] Book selection changed from ${oldBookId} to ${newBookId}`);
+  
+  if (newBookId) {
+    // Очищаем предыдущий набор аккаунтов для избежания путаницы при переключении
+    accountsInBook.value = new Set<string>();
+    
+    // Обновляем список аккаунтов с небольшой задержкой
+    setTimeout(() => {
+      updateAccountsInBook();
+    }, 10);
   }
 });
 
@@ -174,8 +204,15 @@ watch(() => accountStore.accounts, () => {
 
 // Отсортированные аккаунты: сначала те что в книге, потом активные, затем неактивные
 const sortedAccounts = computed(() => {
-  // Проверяем, что у нас есть выбранная книга и загружены аккаунты
-  if (!localSelectedBook.value || !initialAccountsLoaded.value) {
+  // Получаем текущий выбранный ID книги
+  const currentBookId = localSelectedBook.value;
+  const currentAccountsInBook = accountsInBook.value;
+  
+  // Вывод для отладки
+  console.log(`[BookAccountsPopup] Computing sortedAccounts: currentBookId=${currentBookId}, accounts in book=${currentAccountsInBook.size}`);
+  
+  // Если нет выбранной книги, просто сортируем по активности
+  if (!currentBookId) {
     return [...accountStore.accounts].sort((a, b) => {
       // Сортируем по активности: активные вверху, неактивные внизу
       if (a.isActive && !b.isActive) return -1;
@@ -186,9 +223,19 @@ const sortedAccounts = computed(() => {
     });
   }
   
+  // Дополнительно проверяем, что аккаунт реально принадлежит книге
+  const accountsByBook = accountStore.getAccountsByBookId(currentBookId).map(acc => acc.id);
+  console.log(`[BookAccountsPopup] Accounts for book ${currentBookId} (from store):`, accountsByBook);
+  
+  // Если есть выбранная книга, используем полную сортировку
   return [...accountStore.accounts].sort((a, b) => {
-    const aInBook = accountsInBook.value.has(a.id);
-    const bInBook = accountsInBook.value.has(b.id);
+    // Надежно проверяем, принадлежит ли аккаунт выбранной книге
+    // Проверяем с помощью двух источников данных для надежности
+    const aInBook = currentAccountsInBook.has(a.id) || 
+                   (a.bookIds && a.bookIds.includes(currentBookId));
+                   
+    const bInBook = currentAccountsInBook.has(b.id) || 
+                   (b.bookIds && b.bookIds.includes(currentBookId));
     
     // Сначала отображаем счета из текущей книги
     if (aInBook && !bInBook) return -1;
@@ -204,9 +251,37 @@ const sortedAccounts = computed(() => {
 });
 
 // Обработчик изменения выбранной книги
-const handleBookChange = (newBookId) => {
+const handleBookChange = async (newBookId) => {
   console.log('[BookAccountsPopup] Book changed to:', newBookId);
+  
+  // Важно сначала обновить данные аккаунтов, а затем изменить localSelectedBook
+  // Устанавливаем временно значение, которое покажет, что идет переключение книги
+  accountsInBook.value = new Set<string>();
+  
+  // Обновляем аккаунты для новой книги перед изменением выбранной книги
+  if (newBookId) {
+    // Получаем аккаунты для новой книги напрямую из хранилища
+    const accountsForNewBook = accountStore.getAccountsByBookId(newBookId);
+    const newAccountsSet = new Set<string>();
+    
+    // Заполняем Set ID аккаунтов для новой книги
+    accountsForNewBook.forEach(account => {
+      newAccountsSet.add(account.id);
+    });
+    
+    console.log(`[BookAccountsPopup] Pre-loaded accounts for book ${newBookId}:`, [...newAccountsSet]);
+    
+    // Устанавливаем новый Set перед обновлением выбранной книги
+    accountsInBook.value = newAccountsSet;
+  }
+  
+  // После подготовки данных, обновляем выбранную книгу
   localSelectedBook.value = newBookId;
+  
+  // Дополнительно запускаем обновление для уверенности, что все синхронизировано
+  nextTick(() => {
+    updateAccountsInBook();
+  });
 };
 
 // Переключение аккаунта в книге
@@ -217,11 +292,18 @@ const toggleAccountInBook = async (accountId, isChecked) => {
     console.log(`[BookAccountsPopup] Toggling account ${accountId} in book ${localSelectedBook.value} to ${isChecked}`);
     
     // Немедленно обновляем UI для лучшего отклика
+    // Создаем новый Set для обеспечения реактивности
+    const newAccountsInBook = new Set(accountsInBook.value);
+    
     if (isChecked) {
-      accountsInBook.value.add(accountId);
+      newAccountsInBook.add(accountId);
     } else {
-      accountsInBook.value.delete(accountId);
+      newAccountsInBook.delete(accountId);
     }
+    
+    // Присваиваем новый Set вместо изменения существующего
+    accountsInBook.value = newAccountsInBook;
+    console.log(`[BookAccountsPopup] UI updated: account ${accountId} in book: ${isChecked}`);
     
     // Асинхронно обновляем данные
     if (isChecked) {
@@ -233,13 +315,34 @@ const toggleAccountInBook = async (accountId, isChecked) => {
       await accountStore.removeAccountFromBook(accountId, localSelectedBook.value);
       console.log(`[BookAccountsPopup] Account ${accountId} removed from book ${localSelectedBook.value}`);
     }
+    
+    // После завершения операции, проверяем, что UI соответствует актуальному состоянию
+    await nextTick();
+    const actualState = (accountStore.getAccountById(accountId)?.bookIds || []).includes(localSelectedBook.value);
+    if (actualState !== isChecked) {
+      console.warn(`[BookAccountsPopup] State mismatch: UI shows ${isChecked} but actual state is ${actualState}`);
+      
+      // Принудительно синхронизируем состояние UI с реальным состоянием
+      const syncedSet = new Set(accountsInBook.value);
+      if (actualState) {
+        syncedSet.add(accountId);
+      } else {
+        syncedSet.delete(accountId);
+      }
+      accountsInBook.value = syncedSet;
+    }
   } catch (error) {
     // В случае ошибки возвращаем предыдущее состояние UI
+    // Снова создаем новый Set для обеспечения реактивности
+    const newAccountsInBook = new Set(accountsInBook.value);
+    
     if (isChecked) {
-      accountsInBook.value.delete(accountId);
+      newAccountsInBook.delete(accountId);
     } else {
-      accountsInBook.value.add(accountId);
+      newAccountsInBook.add(accountId);
     }
+    
+    accountsInBook.value = newAccountsInBook;
     console.error('[BookAccountsPopup] Error toggling account in book:', error);
   }
 };
@@ -276,22 +379,36 @@ onBeforeMount(() => {
 });
 
 onMounted(async () => {
+  console.log('[BookAccountsPopup] Component mounting...');
+  
   // Инициализируем хранилища, если они ещё не инициализированы
   if (!bookStore.isInitialized) {
     await bookStore.init();
+    console.log('[BookAccountsPopup] Book store initialized');
   }
   
   if (!accountStore.isInitialized) {
     await accountStore.init();
+    console.log('[BookAccountsPopup] Account store initialized');
   }
   
   // Проверяем снова после инициализации и обновляем аккаунты
   if (!localSelectedBook.value && bookStore.books.length > 0) {
     localSelectedBook.value = bookStore.books[0].id;
+    console.log('[BookAccountsPopup] Selected first available book:', localSelectedBook.value);
   }
   
-  // Загружаем аккаунты для выбранной книги
-  updateAccountsInBook();
+  // Даем небольшую задержку для инициализации компонента
+  setTimeout(() => {
+    // Загружаем аккаунты для выбранной книги
+    updateAccountsInBook();
+    
+    // Проверяем, что все отображается корректно
+    nextTick(() => {
+      console.log('[BookAccountsPopup] Component fully mounted and updated');
+      console.log('[BookAccountsPopup] Current accountsInBook:', [...accountsInBook.value]);
+    });
+  }, 50);
   
   console.log('[BookAccountsPopup] Mounted with selected book:', localSelectedBook.value);
 });
@@ -333,5 +450,14 @@ onMounted(async () => {
   color: #AEAEAE;
   font-size: 12px;
   line-height: 16px;
+}
+
+.loading-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  color: #AEAEAE;
+  font-size: 14px;
 }
 </style>
