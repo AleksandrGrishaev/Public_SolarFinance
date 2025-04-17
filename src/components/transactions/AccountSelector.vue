@@ -19,8 +19,8 @@
     <!-- For transfers (with two accounts) -->
     <div v-else class="transfer-accounts">
       <div class="account-box" @click="showAccountSelector('source')">
-        <div class="account-icon" :style="{ backgroundColor: selectedAccount.color }">
-          {{ selectedAccount.symbol || getSymbolFromCurrency(selectedAccount.currency) }}
+        <div class="account-icon" :style="{ backgroundColor: selectedAccount.color || '#5B8FF9' }">
+          {{ selectedAccount.symbol || getCurrencySymbol(selectedAccount.currency) }}
         </div>
         <div class="account-name">
           {{ truncateName(selectedAccount.name) }}
@@ -32,8 +32,8 @@
       </div>
       
       <div class="account-box" @click="showAccountSelector('destination')">
-        <div class="account-icon" :style="{ backgroundColor: destinationAccount.color }">
-          {{ destinationAccount.symbol || getSymbolFromCurrency(destinationAccount.currency) }}
+        <div class="account-icon" :style="{ backgroundColor: destinationAccount.color || '#61DDAA' }">
+          {{ destinationAccount.symbol || getCurrencySymbol(destinationAccount.currency) }}
         </div>
         <div class="account-name">
           {{ truncateName(destinationAccount.name) }}
@@ -82,8 +82,15 @@ const emit = defineEmits(['update:modelValue', 'update:destinationAccountId', 'a
 const accountSelectorVisible = ref(false);
 const selectionMode = ref('source'); // 'source' or 'destination'
 
+const currencyStore = useCurrencyStore();
+
 const selectedAccount = computed(() => {
-  return props.accounts.find(account => account.id === props.modelValue) || props.accounts[0];
+  return props.accounts.find(account => account.id === props.modelValue) || props.accounts[0] || { 
+    id: '', 
+    name: 'No account', 
+    currency: 'USD', 
+    color: '#5B8FF9'
+  };
 });
 
 const destinationAccount = computed(() => {
@@ -100,8 +107,13 @@ const destinationAccount = computed(() => {
     if (otherAccount) return otherAccount;
   }
   
-  // Fallback to the first account
-  return props.accounts[0];
+  // Fallback to the first account or default
+  return props.accounts[0] || { 
+    id: '', 
+    name: 'Destination', 
+    currency: 'USD', 
+    color: '#61DDAA'
+  };
 });
 
 // Displayable accounts in the selector popup
@@ -115,15 +127,31 @@ const displayableAccounts = computed(() => {
   return props.accounts.filter(account => account.id !== props.modelValue);
 });
 
-// Currency store for symbol lookups
-const currencyStore = useCurrencyStore();
-
 // Get currency symbol if not available in account
 const getCurrencySymbol = (currencyCode) => {
-  if (!currencyCode) return '
+  if (!currencyCode) return '$';
+  
+  const currency = currencyStore.getCurrency(currencyCode);
+  if (currency && currency.symbol) return currency.symbol;
+  
+  // Fallback symbols for common currencies
+  const symbolMap = {
+    'USD': '$',
+    'EUR': '€',
+    'GBP': '£',
+    'JPY': '¥',
+    'RUB': '₽',
+    'IDR': 'Rp',
+    'INR': '₹',
+    'CNY': '¥'
+  };
+  
+  return symbolMap[currencyCode] || currencyCode.substring(0, 1);
+};
 
 // Function to limit account name length
 const truncateName = (name: string) => {
+  if (!name) return 'Account';
   const maxLength = 15;
   if (name.length <= maxLength) return name;
   return name.substring(0, maxLength - 3) + '...';
@@ -150,6 +178,8 @@ const selectAccount = (account) => {
   } else {
     emit('update:destinationAccountId', account.id);
   }
+  
+  accountSelectorVisible.value = false;
 };
 
 // Handle add account request
@@ -184,10 +214,10 @@ const handleEditAccounts = () => {
   align-items: center;
   justify-content: flex-start;
   height: 100%;
-  min-width: 120px;
-  max-width: 200px; /* Limit width for centering */
+  min-width: 50px;
+  max-width: 200px;
+  width: auto; /* Change from 100% to auto to size based on content */
   cursor: pointer;
-  width: 100%;
 }
 
 /* For transfers (two accounts) */
@@ -245,149 +275,8 @@ const handleEditAccounts = () => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  flex: 1;
+  flex: 0 1 auto; /* Don't grow but can shrink, base size on content */
   min-width: 0; /* Prevent flex item from overflowing */
-}
-
-.choose-button {
-  padding: 7px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-</style>
-;
-  
-  const currency = currencyStore.getCurrency(currencyCode);
-  if (currency && currency.symbol) return currency.symbol;
-  
-  // Fallback symbols for common currencies
-  const symbolMap = {
-    'USD': '
-
-// Function to limit account name length
-const truncateName = (name: string) => {
-  const maxLength = 15;
-  if (name.length <= maxLength) return name;
-  return name.substring(0, maxLength - 3) + '...';
-};
-
-// Show the account selector popup
-const showAccountSelector = (mode = 'source') => {
-  selectionMode.value = mode;
-  accountSelectorVisible.value = true;
-};
-
-// Handle account selection from popup
-const selectAccount = (account) => {
-  if (selectionMode.value === 'source') {
-    emit('update:modelValue', account.id);
-    
-    // If selected source account matches destination, change destination to another account
-    if (props.isTransfer && account.id === props.destinationAccountId) {
-      const otherAccount = props.accounts.find(acc => acc.id !== account.id);
-      if (otherAccount) {
-        emit('update:destinationAccountId', otherAccount.id);
-      }
-    }
-  } else {
-    emit('update:destinationAccountId', account.id);
-  }
-};
-
-// Handle add account request
-const handleAddAccount = () => {
-  emit('add');
-  accountSelectorVisible.value = false;
-};
-
-// Handle edit accounts request
-const handleEditAccounts = () => {
-  emit('edit');
-  accountSelectorVisible.value = false;
-};
-</script>
-
-<style scoped>
-.account-element {
-  width: 100%;
-  height: 42px; /* Fixed height for stability */
-  display: flex;
-  justify-content: center; /* Center content */
-  align-items: center;
-  position: relative;
-}
-
-/* For regular transactions (single account) */
-.single-account {
-  padding: 6px 14px;
-  background: #46484A;
-  border-radius: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 100%;
-  max-width: 200px; /* Limit width for centering */
-  cursor: pointer;
-  width: 100%;
-}
-
-/* For transfers (two accounts) */
-.transfer-accounts {
-  display: flex;
-  justify-content: center; /* Center content */
-  align-items: center;
-  gap: 8px;
-  height: 100%;
-  width: 100%;
-}
-
-.account-box {
-  padding: 6px 14px;
-  background: #46484A;
-  border-radius: 28px;
-  display: flex;
-  align-items: center;
-  height: 100%;
-  cursor: pointer;
-  max-width: 150px; /* Limit each account width */
-  overflow: hidden;
-  flex: 1;
-}
-
-.transfer-arrow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #949496;
-  font-size: 16px;
-}
-
-.account-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: bold;
-  flex-shrink: 0;
-}
-
-.account-name {
-  padding: 0 8px;
-  color: white;
-  font-size: 16px;
-  font-family: Inter, sans-serif;
-  font-weight: 500;
-  line-height: 24px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex: 1;
 }
 
 .choose-button {

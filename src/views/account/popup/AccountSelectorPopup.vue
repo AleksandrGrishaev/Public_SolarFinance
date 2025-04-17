@@ -33,7 +33,7 @@
               class="account-icon"
               :style="[iconStyle, { backgroundColor: account.color || '#808080' }]"
             >
-              {{ account.symbol || getSymbolFromCurrency(account.currency) }}
+              {{ account.symbol || getCurrencySymbol(account.currency) }}
             </div>
             <div class="account-name">{{ truncateName(account.name) }}</div>
             <div class="account-balance">{{ formatBalance(account) }}</div>
@@ -132,6 +132,9 @@
     }
   };
   
+  // Currency store
+  const currencyStore = useCurrencyStore();
+  
   // Filtered accounts
   const selectableAccounts = computed(() => {
     if (!props.accounts || props.accounts.length === 0) return [];
@@ -170,6 +173,44 @@
       height: `${itemSize}px`
     };
   });
+  
+  // Get currency symbol if not available in account
+  const getCurrencySymbol = (currencyCode) => {
+    if (!currencyCode) return '$';
+    
+    const currency = currencyStore.getCurrency(currencyCode);
+    if (currency && currency.symbol) return currency.symbol;
+    
+    // Fallback symbols for common currencies
+    const symbolMap = {
+      'USD': '$',
+      'EUR': '€',
+      'GBP': '£',
+      'JPY': '¥',
+      'RUB': '₽',
+      'IDR': 'Rp',
+      'INR': '₹',
+      'CNY': '¥'
+    };
+    
+    return symbolMap[currencyCode] || currencyCode.substring(0, 1);
+  };
+  
+  // Format account balance with currency symbol
+  const formatBalance = (account) => {
+    if (!account || account.balance === undefined || account.balance === null) return '';
+    
+    const currency = currencyStore.getCurrency(account.currency);
+    const symbol = currency?.symbol || getCurrencySymbol(account.currency);
+    
+    // Format large numbers with K suffix
+    let formattedBalance = account.balance;
+    if (Math.abs(account.balance) >= 1000) {
+      formattedBalance = (account.balance / 1000).toFixed(1) + 'K';
+    }
+    
+    return `${symbol} ${formattedBalance}`;
+  };
   
   // Function to calculate optimal layout
   const calculateLayout = () => {
@@ -244,51 +285,12 @@
   
   // Truncate long names
   const truncateName = (name) => {
-    if (!name) return '';
+    if (!name) return 'Account';
     const maxLen = maxNameLength.value;
     if (name.length > maxLen) {
       return name.substring(0, maxLen) + '...';
     }
     return name;
-  };
-  
-  // Format account balance with currency symbol
-  const currencyStore = useCurrencyStore();
-  const formatBalance = (account) => {
-    if (!account || !account.balance) return '';
-    
-    const currency = currencyStore.getCurrency(account.currency);
-    const symbol = currency?.symbol || getSymbolFromCurrency(account.currency);
-    
-    // Format large numbers with K suffix
-    let formattedBalance = account.balance;
-    if (Math.abs(account.balance) >= 1000) {
-      formattedBalance = (account.balance / 1000).toFixed(1) + 'K';
-    }
-    
-    return `${symbol} ${formattedBalance}`;
-  };
-  
-  // Get currency symbol if not available in account
-  const getSymbolFromCurrency = (currencyCode) => {
-    if (!currencyCode) return '$';
-    
-    const currency = currencyStore.getCurrency(currencyCode);
-    if (currency && currency.symbol) return currency.symbol;
-    
-    // Fallback symbols for common currencies
-    const symbolMap = {
-      'USD': '$',
-      'EUR': '€',
-      'GBP': '£',
-      'JPY': '¥',
-      'RUB': '₽',
-      'IDR': 'Rp',
-      'INR': '₹',
-      'CNY': '¥'
-    };
-    
-    return symbolMap[currencyCode] || currencyCode;
   };
   
   // Initialize and update on visibility change
@@ -312,6 +314,11 @@
     }
   });
   
+  // Clean up event listeners
+  onMounted(() => {
+    window.addEventListener('resize', handleResize);
+  });
+  
   // Select account
   const selectAccount = (account) => {
     emit('select', account);
@@ -321,11 +328,13 @@
   // Add new account
   const handleAddAccount = () => {
     emit('add');
+    isVisible.value = false;
   };
   
   // Edit accounts
   const handleEditClick = () => {
     emit('edit');
+    isVisible.value = false;
   };
   </script>
   
@@ -377,7 +386,7 @@
     border-radius: 50%;
     color: white;
     font-weight: bold;
-    font-size: 14px;
+    font-size: 18px;
     transform-origin: center;
   }
   
