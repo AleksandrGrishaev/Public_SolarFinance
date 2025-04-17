@@ -1,10 +1,10 @@
 # Details
 
-Date : 2025-04-17 18:46:42
+Date : 2025-04-17 20:02:31
 
 Directory /Users/peaker/dev/solar-finance/src
 
-Total : 108 files,  15861 codes, 1184 comments, 2442 blanks, all 19487 lines
+Total : 111 files,  16784 codes, 1223 comments, 2588 blanks, all 20595 lines
 
 [Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
@@ -109,8 +109,11 @@ Total : 108 files,  15861 codes, 1184 comments, 2442 blanks, all 19487 lines
 | [src/views/MoreView.vue](/src/views/MoreView.vue) | Vue | 252 | 8 | 33 | 293 |
 | [src/views/NotFoundView.vue](/src/views/NotFoundView.vue) | Vue | 32 | 1 | 4 | 37 |
 | [src/views/PinLoginView.vue](/src/views/PinLoginView.vue) | Vue | 223 | 5 | 37 | 265 |
+| [src/views/account/popup/AccountAddPopup.vue](/src/views/account/popup/AccountAddPopup.vue) | Vue | 331 | 3 | 49 | 383 |
+| [src/views/account/popup/AccountEditPopup.vue](/src/views/account/popup/AccountEditPopup.vue) | Vue | 402 | 11 | 57 | 470 |
 | [src/views/account/popup/AccountSelectorPopup.vue](/src/views/account/popup/AccountSelectorPopup.vue) | Vue | 468 | 13 | 77 | 558 |
-| [src/views/account/popup/BookAccountsPopup.vue](/src/views/account/popup/BookAccountsPopup.vue) | Vue | 280 | 4 | 53 | 337 |
+| [src/views/account/popup/BookAccountsPopup.vue](/src/views/account/popup/BookAccountsPopup.vue) | Vue | 384 | 4 | 75 | 463 |
+| [src/views/account/popup/composables/useAccountManagement.ts](/src/views/account/popup/composables/useAccountManagement.ts) | TypeScript | 86 | 25 | 18 | 129 |
 | [src/views/transaction/TransactionView.vue](/src/views/transaction/TransactionView.vue) | Vue | 535 | 7 | 80 | 622 |
 | [src/views/transaction/composables/index.ts](/src/views/transaction/composables/index.ts) | TypeScript | 6 | 2 | 1 | 9 |
 | [src/views/transaction/composables/useAccount.ts](/src/views/transaction/composables/useAccount.ts) | TypeScript | 132 | 37 | 27 | 196 |

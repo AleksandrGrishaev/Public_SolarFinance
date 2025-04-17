@@ -1,24 +1,24 @@
 # Summary
 
-Date : 2025-04-17 18:46:42
+Date : 2025-04-17 20:02:31
 
 Directory /Users/peaker/dev/solar-finance/src
 
-Total : 108 files,  15861 codes, 1184 comments, 2442 blanks, all 19487 lines
+Total : 111 files,  16784 codes, 1223 comments, 2588 blanks, all 20595 lines
 
 Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
 ## Languages
 | language | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| Vue | 49 | 8,813 | 181 | 1,212 | 10,206 |
-| TypeScript | 54 | 4,394 | 1,003 | 810 | 6,207 |
+| Vue | 51 | 9,650 | 195 | 1,340 | 11,185 |
+| TypeScript | 55 | 4,480 | 1,028 | 828 | 6,336 |
 | Markdown | 5 | 2,654 | 0 | 420 | 3,074 |
 
 ## Directories
 | path | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| . | 108 | 15,861 | 1,184 | 2,442 | 19,487 |
+| . | 111 | 16,784 | 1,223 | 2,588 | 20,595 |
 | . (Files) | 2 | 110 | 9 | 15 | 134 |
 | about | 5 | 2,654 | 0 | 420 | 3,074 |
 | about (Files) | 2 | 711 | 0 | 149 | 860 |
@@ -62,10 +62,12 @@ Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-
 | stores/transaction | 5 | 501 | 81 | 62 | 644 |
 | stores/user | 5 | 297 | 98 | 63 | 458 |
 | types | 1 | 5 | 0 | 0 | 5 |
-| views | 16 | 3,428 | 225 | 510 | 4,163 |
+| views | 19 | 4,351 | 264 | 656 | 5,271 |
 | views (Files) | 6 | 1,555 | 26 | 176 | 1,757 |
-| views/account | 2 | 748 | 17 | 130 | 895 |
-| views/account/popup | 2 | 748 | 17 | 130 | 895 |
+| views/account | 5 | 1,671 | 56 | 276 | 2,003 |
+| views/account/popup | 5 | 1,671 | 56 | 276 | 2,003 |
+| views/account/popup (Files) | 4 | 1,585 | 31 | 258 | 1,874 |
+| views/account/popup/composables | 1 | 86 | 25 | 18 | 129 |
 | views/transaction | 8 | 1,125 | 182 | 204 | 1,511 |
 | views/transaction (Files) | 1 | 535 | 7 | 80 | 622 |
 | views/transaction/composables | 7 | 590 | 175 | 124 | 889 |

@@ -58,6 +58,21 @@
       />
     </div>
   </BasePopup>
+  
+  <!-- Попап добавления счета -->
+  <AccountAddPopup
+    v-model="showAddAccountPopup"
+    :initialBookId="localSelectedBook"
+    @save="handleAccountAdded"
+  />
+  
+  <!-- Попап редактирования счета -->
+  <AccountEditPopup
+    v-model="showEditAccountPopup"
+    :account="selectedAccount"
+    @save="handleAccountUpdated"
+    @delete="handleAccountDeleted"
+  />
 </template>
 
 <script setup lang="ts">
@@ -71,12 +86,25 @@ import CreateActionButton from '../../../components/ui/buttons/CreateActionButto
 import AccountIcon from '../../../components/ui/icons/AccountIcon.vue';
 import { IconPlus } from '@tabler/icons-vue';
 import { useFormatBalance } from '../../../composables/transaction/useFormatBalance';
+import AccountAddPopup from './AccountAddPopup.vue';
+import AccountEditPopup from './AccountEditPopup.vue';
+import { useAccountManagement } from './composables/useAccountManagement';
+
+// Используем composable для управления счетами
+const { init: initAccounts } = useAccountManagement();
 
 // Включаем режим отладки для дополнительной информации
 const debugMode = ref(true);
 
 // Состояние загрузки для отображения индикатора
 const isLoading = ref(false);
+
+// Состояние видимости попапов
+const showAddAccountPopup = ref(false);
+const showEditAccountPopup = ref(false);
+
+// Выбранный счет для редактирования
+const selectedAccount = ref(null);
 
 // Инициализируем форматирование баланса
 const { getCurrencySymbol, formatAccountBalance } = useFormatBalance();
@@ -350,6 +378,7 @@ const toggleAccountInBook = async (accountId, isChecked) => {
 // Выбор аккаунта
 const selectAccount = (account) => {
   console.log('[BookAccountsPopup] Selected account:', account.name);
+  showAccountMenu(account);
 };
 
 // Обработка изменения видимости
@@ -361,13 +390,36 @@ const handleVisibilityChange = (value) => {
 
 // Добавление нового аккаунта
 const handleAddAccount = () => {
-  emit('add-account', localSelectedBook.value);
-  isVisible.value = false;
+  // Вместо эмита события, открываем попап добавления аккаунта
+  showAddAccountPopup.value = true;
+};
+
+// Обработчик успешного добавления аккаунта
+const handleAccountAdded = (account) => {
+  console.log('[BookAccountsPopup] Account added:', account);
+  // Обновляем список аккаунтов
+  updateAccountsInBook();
 };
 
 // Показать меню аккаунта (редактирование, удаление и т.д.)
 const showAccountMenu = (account) => {
-  emit('edit-account', account);
+  // Вместо эмита события, устанавливаем выбранный аккаунт и открываем попап редактирования
+  selectedAccount.value = account;
+  showEditAccountPopup.value = true;
+};
+
+// Обработчик успешного обновления аккаунта
+const handleAccountUpdated = (account) => {
+  console.log('[BookAccountsPopup] Account updated:', account);
+  // Обновляем список аккаунтов
+  updateAccountsInBook();
+};
+
+// Обработчик успешного удаления аккаунта
+const handleAccountDeleted = (accountId) => {
+  console.log('[BookAccountsPopup] Account deleted:', accountId);
+  // Обновляем список аккаунтов
+  updateAccountsInBook();
 };
 
 onBeforeMount(() => {
@@ -391,6 +443,9 @@ onMounted(async () => {
     await accountStore.init();
     console.log('[BookAccountsPopup] Account store initialized');
   }
+  
+  // Инициализация хранилищ через composable
+  await initAccounts();
   
   // Проверяем снова после инициализации и обновляем аккаунты
   if (!localSelectedBook.value && bookStore.books.length > 0) {
