@@ -14,37 +14,57 @@
         <div>Items per row: {{ layoutState.itemsPerRow }}</div>
         <div>Item size: {{ layoutState.itemSize }}px</div>
         <div>Grid width: {{ layoutState.gridWidth }}px</div>
-        <div>Max name length: {{ maxNameLength }}</div>
+        <div>Gap: {{ GAP_SIZE }}px</div>
+        <div>Cell width: {{ layoutState.calculatedItemWidth }}px</div>
       </div>
       
       <!-- Динамически адаптируемая сетка категорий -->
       <div class="category-grid" ref="gridRef">
+        <!-- Ячейки с категориями -->
         <div 
           v-for="category in selectableCategories"
           :key="category.id"
-          class="category-item"
-          :style="categoryItemStyle"
+          class="grid-cell"
+          :style="gridCellStyle"
           @click="selectCategory(category)"
         >
+          <!-- CategoryIcon внутри ячейки -->
           <CategoryIcon 
+            class="category-icon"
+            :style="iconStyle"
             :icon-name="category.icon" 
             :background-color="category.color" 
-            :size="iconSize"
+            size="medium"
           />
           <div class="category-name">{{ truncateName(category.name) }}</div>
         </div>
         
-        <!-- Кнопка добавления категории (всегда отображается) -->
+        <!-- Ячейка добавления категории -->
         <div 
-          class="category-item" 
-          :style="categoryItemStyle"
+          class="grid-cell"
+          :style="gridCellStyle"
           @click="handleAddCategory"
         >
-          <div class="add-icon-container" :style="addIconStyle">
-            <IconPlus class="add-icon" :style="plusIconStyle" />
+          <div 
+            class="add-button"
+            :style="iconStyle"
+          >
+            <IconPlus 
+              :size="Math.round(layoutState.itemSize * 0.5)" 
+              :stroke-width="1.5"
+              class="plus-icon"
+            />
           </div>
           <div class="category-name">Add</div>
         </div>
+        
+        <!-- Невидимые элементы для выравнивания последней строки -->
+        <div 
+          v-for="i in fillerItemsCount"
+          :key="`filler-${i}`"
+          class="grid-cell filler"
+          :style="gridCellStyle"
+        ></div>
       </div>
       
       <!-- Пустое состояние - показываем, только если нет категорий -->
@@ -61,34 +81,30 @@ import { computed, ref, onMounted, onUpdated, nextTick, watch } from 'vue';
 import BasePopup from '../ui/BasePopup.vue';
 import CategoryIcon from './CategoryIcon.vue';
 import { IconEdit, IconPlus } from '@tabler/icons-vue';
-import { useCategoryStore, type Category } from '../../stores/category';
+import { useCategoryStore } from '../../stores/category';
 import { messageService } from '../../services/system/MessageService';
 
 const categoryStore = useCategoryStore();
 
-// Режим отладки (установите в true, чтобы видеть отладочную информацию)
+// Режим отладки
 const debugMode = ref(false);
 
 // Ссылка на DOM элемент grid-контейнера
 const gridRef = ref(null);
 
+// Константа для отступов - минимальный отступ 4px
+const GAP_SIZE = 4;
+
 // Состояние адаптивного дизайна
 const layoutState = ref({
-  itemsPerRow: 4,
-  itemSize: 56,
-  gridWidth: 0,
-  calculatedItemWidth: 0
+  itemsPerRow: 4,        // Количество элементов в строке
+  itemSize: 56,          // Размер иконки в пикселях
+  gridWidth: 0,          // Ширина сетки
+  calculatedItemWidth: 0 // Расчетная ширина элемента
 });
 
-// Максимальная длина имени категории (будет вычисляться динамически)
-const maxNameLength = computed(() => {
-  // Для маленьких экранов используем меньшую длину
-  if (layoutState.value.itemsPerRow === 4) {
-    return 8; // 8 символов для 4 элементов в ряду
-  } else {
-    return 10; // 10 символов для 5 элементов в ряду
-  }
-});
+// Ширина окна браузера
+const windowWidth = ref(window.innerWidth);
 
 const props = defineProps({
   modelValue: {
@@ -119,83 +135,68 @@ const isVisible = computed({
 
 // Обработчик изменения видимости
 const handleVisibilityChange = (value: boolean) => {
-  if (!value) {
-    // Если закрываем попап без выбора категории, показываем сообщение
-    if (props.transactionType !== 'transfer') {
-      messageService.warning('Операция не сохранена. Для создания транзакции необходимо выбрать категорию.');
-    }
+  if (!value && props.transactionType !== 'transfer') {
+    messageService.warning('Операция не сохранена. Для создания транзакции необходимо выбрать категорию.');
   }
 };
 
-// Отфильтрованные категории - принимаем их уже отфильтрованными
-const filteredCategories = computed(() => {
+// Отфильтрованные категории
+const selectableCategories = computed(() => {
   if (!props.categories || props.categories.length === 0) return [];
-  console.log('Filtered categories for selector:', props.categories);
   return props.categories;
 });
 
-// Категории, которые можно выбрать - все, что пришли в props
-const selectableCategories = computed(() => {
-  return filteredCategories.value;
+// Рассчитываем количество элементов для заполнения последней строки
+const fillerItemsCount = computed(() => {
+  const totalItems = selectableCategories.value.length + 1; // Категории + кнопка добавления
+  const remainder = totalItems % layoutState.value.itemsPerRow;
+  
+  // Если элементы делятся нацело на количество в строке, то дополнительные не нужны
+  if (remainder === 0) return 0;
+  
+  // Иначе добавляем столько, чтобы заполнить последнюю строку
+  return layoutState.value.itemsPerRow - remainder;
 });
 
-// Стили для категорий, динамически вычисленные на основе размера контейнера
-const categoryItemStyle = computed(() => {
-  const { itemsPerRow } = layoutState.value;
-  const gap = 4; // Уменьшенное расстояние между элементами (4px)
-  const width = `calc(${100 / itemsPerRow}% - ${(gap * (itemsPerRow - 1)) / itemsPerRow}px)`;
+// Стиль для ячейки сетки
+const gridCellStyle = computed(() => {
+  // Уменьшаем ширину ячейки на 1px для гарантии размещения
+  const cellWidth = layoutState.value.calculatedItemWidth - 1;
   
-  return {
-    width
+  return { 
+    width: `${cellWidth}px`,
+    marginRight: `${GAP_SIZE}px`,
+    marginBottom: `${GAP_SIZE}px`
   };
 });
 
-// Стили для иконки добавления
-const addIconStyle = computed(() => {
+// Стиль для иконки
+const iconStyle = computed(() => {
   const { itemSize } = layoutState.value;
   return {
     width: `${itemSize}px`,
-    height: `${itemSize}px`,
-    borderRadius: `${itemSize / 2}px`
+    height: `${itemSize}px`
   };
-});
-
-// Стили для значка "+"
-const plusIconStyle = computed(() => {
-  const { itemSize } = layoutState.value;
-  const iconSize = Math.max(itemSize / 2, 20); // Минимум 20px для видимости
-  return {
-    width: `${iconSize}px`,
-    height: `${iconSize}px`
-  };
-});
-
-// Размер иконки для CategoryIcon компонента
-const iconSize = computed(() => {
-  const { itemSize } = layoutState.value;
-  if (itemSize <= 45) return 'small';
-  if (itemSize <= 56) return 'medium';
-  return 'large';
 });
 
 // Функция для расчета оптимального размещения
 const calculateLayout = () => {
   if (!gridRef.value) return;
   
-  // Измеряем текущую ширину grid-контейнера
-  const gridWidth = gridRef.value.clientWidth;
-  const gap = 4; // Отступ между элементами (уменьшен до 4px)
+  // Измеряем текущую ширину grid-контейнера - округляем до целого числа
+  const gridWidth = Math.floor(gridRef.value.clientWidth);
   const minItemSize = 45; // Минимальный размер иконки
-  const optimalItemSize = 56; // Оптимальный размер иконки
+  const optimalItemSize = 56; // Стандартный размер medium иконки
   
   // Определяем оптимальное количество элементов в ряду
   let itemsPerRow = 4; // По умолчанию 4 элемента
   
-  const screenWidth = window.innerWidth;
+  const screenWidth = windowWidth.value;
   if (screenWidth >= 390) {
-    // Проверяем, поместятся ли 5 элементов
-    const availableWidthFor5 = gridWidth - (gap * 4);
-    const itemWidthFor5 = availableWidthFor5 / 5;
+    // Проверяем, поместятся ли 5 элементов с учетом отступов
+    const totalGapWidthFor5 = GAP_SIZE * 5; // Учитываем все отступы
+    const availableWidthFor5 = gridWidth - totalGapWidthFor5;
+    const itemWidthFor5 = Math.floor(availableWidthFor5 / 5);
     
     if (itemWidthFor5 >= minItemSize) {
       itemsPerRow = 5;
@@ -203,19 +204,30 @@ const calculateLayout = () => {
   }
   
   // Вычисляем размер элемента на основе доступного пространства
-  const totalGapWidth = gap * (itemsPerRow - 1);
+  const totalGapWidth = GAP_SIZE * (itemsPerRow - 1);
   const availableWidth = gridWidth - totalGapWidth;
-  const calculatedItemWidth = availableWidth / itemsPerRow;
   
-  // Определяем итоговый размер иконки 
-  let itemSize = Math.min(calculatedItemWidth, optimalItemSize);
-  itemSize = Math.max(itemSize, minItemSize); // Не меньше минимального
+  // Рассчитываем ширину элемента и округляем до целого числа вниз
+  const calculatedItemWidth = Math.floor(availableWidth / itemsPerRow);
+  
+  // Определяем итоговый размер иконки
+  let itemSize = Math.min(calculatedItemWidth, optimalItemSize * 1.2);
+  itemSize = Math.floor(Math.max(itemSize, minItemSize)); // Не меньше минимального
   
   if (debugMode.value) {
-    console.log('Grid width:', gridWidth);
-    console.log('Items per row:', itemsPerRow);
-    console.log('Calculated item width:', calculatedItemWidth);
-    console.log('Item size:', itemSize);
+    console.group('Расчет макета сетки категорий');
+    console.log('Ширина окна:', Math.floor(windowWidth.value), 'px');
+    console.log('Ширина сетки:', gridWidth, 'px');
+    console.log('Элементов в строке:', itemsPerRow);
+    console.log('Gap:', GAP_SIZE, 'px');
+    console.log('Общая ширина gap-ов:', GAP_SIZE * (itemsPerRow - 1), 'px');
+    console.log('Доступная ширина для ячеек:', gridWidth - GAP_SIZE * (itemsPerRow - 1), 'px');
+    console.log('Расчетная ширина ячейки:', calculatedItemWidth, 'px');
+    console.log('Реальная ширина ячейки:', calculatedItemWidth - 1, 'px');
+    console.log('Итоговый размер иконки:', itemSize, 'px');
+    console.log('Всего категорий:', selectableCategories.value.length);
+    console.log('Количество элементов для выравнивания:', fillerItemsCount.value);
+    console.groupEnd();
   }
   
   // Обновляем состояние
@@ -229,55 +241,52 @@ const calculateLayout = () => {
 
 // Обработчик изменения размера окна
 const handleResize = () => {
+  windowWidth.value = window.innerWidth;
   calculateLayout();
+};
+
+// Максимальная длина имени категории
+const maxNameLength = computed(() => {
+  return layoutState.value.itemsPerRow === 4 ? 8 : 10;
+});
+
+// Усечение длинных названий
+const truncateName = (name) => {
+  if (!name) return '';
+  const maxLen = maxNameLength.value;
+  if (name.length > maxLen) {
+    return name.substring(0, maxLen) + '...';
+  }
+  return name;
 };
 
 // Инициализация и обновление при изменении видимости
 onMounted(() => {
   if (isVisible.value) {
-    nextTick(() => {
-      calculateLayout();
-    });
+    nextTick(calculateLayout);
   }
   window.addEventListener('resize', handleResize);
 });
 
 onUpdated(() => {
   if (isVisible.value) {
-    nextTick(() => {
-      calculateLayout();
-    });
+    nextTick(calculateLayout);
   }
 });
 
 // Следим за изменением видимости
 watch(isVisible, (newVal) => {
   if (newVal) {
-    nextTick(() => {
-      calculateLayout();
-    });
+    nextTick(calculateLayout);
   }
 });
 
-// Усечение длинных названий
-const truncateName = (name) => {
-  if (!name) return '';
-  if (name.length > maxNameLength.value) {
-    return name.substring(0, maxNameLength.value) + '...';
-  }
-  return name;
-};
-
 // Выбор категории
 const selectCategory = (category) => {
-  // Проверяем, что выбранная категория не имеет дочерних элементов в текущей книге
   if (!categoryStore.hasChildCategoriesInBook(category.id, props.bookId)) {
-    // Вызываем событие выбора категории
     emit('select', category);
-    // Автоматически закрываем попап после выбора категории
     isVisible.value = false;
   } else {
-    console.log("Категория с дочерними элементами не может быть выбрана");
     messageService.warning('Нельзя выбрать категорию с подкатегориями');
   }
 };
@@ -298,8 +307,7 @@ const handleEditClick = () => {
   display: flex;
   flex-direction: column;
   width: 100%;
-  box-sizing: border-box;
-  padding: 8px 0 16px; /* Убираем горизонтальные отступы, т.к. они уже есть у popup */
+  padding: 8px 0 16px;
 }
 
 .debug-info {
@@ -313,20 +321,49 @@ const handleEditClick = () => {
 .category-grid {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-start;
-  gap: 4px; /* Уменьшенный gap до 4px */
+  justify-content: flex-start; /* Выравнивание по левому краю */
   width: 100%;
-  max-width: 100%;
   box-sizing: border-box;
 }
 
-.category-item {
+.grid-cell {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
   cursor: pointer;
-  margin-bottom: 8px;
+  box-sizing: border-box;
+}
+
+/* Невидимые элементы для выравнивания */
+.grid-cell.filler {
+  visibility: hidden;
+  height: 0;
+  margin-bottom: 0;
+  pointer-events: none;
+}
+
+.category-icon {
+  transform-origin: center;
+}
+
+.add-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1.5px dashed #949496;
+  border-radius: 50%;
+  background-color: transparent;
+  transition: background-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.plus-icon {
+  color: #949496; /* Такой же серый цвет, как и у обводки */
+}
+
+.grid-cell:hover .add-button {
+  background-color: rgba(148, 148, 150, 0.1);
 }
 
 .category-name {
@@ -338,17 +375,6 @@ const handleEditClick = () => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.add-icon-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: 1px solid #949496;
-}
-
-.add-icon {
-  color: #949496;
 }
 
 .empty-state {
