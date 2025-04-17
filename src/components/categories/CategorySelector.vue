@@ -5,6 +5,7 @@
     title="Select category" 
     :rightIcon="IconEdit"
     @rightIconClick="handleEditClick"
+    @update:modelValue="handleVisibilityChange"
   >
     <div class="category-container">
       <div class="debug-info" v-if="debugMode">
@@ -86,11 +87,12 @@ import BasePopup from '../ui/BasePopup.vue';
 import CategoryIcon from './CategoryIcon.vue';
 import { IconEdit, IconPlus } from '@tabler/icons-vue';
 import { useCategoryStore, type Category } from '../../stores/category';
+import { messageService } from '../../services/system/MessageService';
 
 const categoryStore = useCategoryStore();
 
 // Режим отладки (установите в true, чтобы видеть отладочную информацию)
-const debugMode = ref(true);
+const debugMode = ref(false);
 
 const props = defineProps({
   modelValue: {
@@ -118,6 +120,16 @@ const isVisible = computed({
   get: () => props.modelValue,
   set: (value) => emit('update:modelValue', value)
 });
+
+// Обработчик изменения видимости
+const handleVisibilityChange = (value: boolean) => {
+  if (!value) {
+    // Если закрываем попап без выбора категории, показываем сообщение
+    if (props.transactionType !== 'transfer') {
+      messageService.warning('Операция не сохранена. Для создания транзакции необходимо выбрать категорию.');
+    }
+  }
+};
 
 // Отфильтрованные категории - принимаем их уже отфильтрованными
 const filteredCategories = computed(() => {
@@ -192,11 +204,14 @@ const truncateName = (name) => {
 const selectCategory = (category) => {
   // Проверяем, что выбранная категория не имеет дочерних элементов в текущей книге
   if (!categoryStore.hasChildCategoriesInBook(category.id, props.bookId)) {
+    // Вызываем событие выбора категории и если родительский компонент подтвердил успешную обработку
+    // закрываем попап автоматически
     emit('select', category);
+    // Автоматически закрываем попап после выбора категории
     isVisible.value = false;
   } else {
     console.log("Категория с дочерними элементами не может быть выбрана");
-    // Можно добавить уведомление пользователю, что нельзя выбрать категорию с подкатегориями
+    messageService.warning('Нельзя выбрать категорию с подкатегориями');
   }
 };
 

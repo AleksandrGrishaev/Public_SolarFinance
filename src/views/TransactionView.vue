@@ -57,6 +57,7 @@
           @input="handleKeypadInput" 
           @add="handleAddTransaction" 
           @delete="deleteLastDigit" 
+          :is-loading="isSaving"
         />
       </div>
     </div>
@@ -96,10 +97,14 @@ import CategorySelector from '../components/categories/CategorySelector.vue';
 import CategoryListPopup from '../components/categories/CategoryListPopup.vue';
 import AmountSection from '../components/transactions/AmountSection.vue';
 
-// Импортируем хуки
+// Импортируем хуки и сервисы
 import { useTransaction } from '../composables/transaction';
 import { useAccount } from '../composables/transaction/useAccount';
 import { useCurrency } from '../composables/transaction/useCurrency';
+import { useAccountStore } from '../stores/account';
+import { useTransactionStore } from '../stores/transaction';
+import { useUserStore } from '../stores/user';
+import { messageService } from '../services/system/MessageService';
 
 // Определяем события для emit
 const emit = defineEmits(['update:showMenu']);
@@ -108,6 +113,12 @@ const emit = defineEmits(['update:showMenu']);
 const isSourceAmountActive = ref(true);
 const manualDestinationAmount = ref('0');
 const amountSectionRef = ref(null);
+const isSaving = ref(false);
+
+// Инициализируем хранилища
+const accountStore = useAccountStore();
+const transactionStore = useTransactionStore();
+const userStore = useUserStore();
 
 // Инициализируем основной хук, но не деструктурируем методы, которые будем переопределять
 const transactionState = useTransaction(emit);
@@ -137,11 +148,8 @@ const {
   
   // Methods
   initAllStores,
-  handleAddTransaction,
   
   // Category handlers
-  handleCategorySelect,
-  handleAddCategory,
   handleOpenCategoryList,
   handleCategoryListSelect,
   handleAddCategoryFromList,
@@ -197,8 +205,16 @@ const handleKeypadInput = (value: string) => {
       amountSectionRef.value.updateManualAmount(manualDestinationAmount.value);
     }
   } else {
-    // Используем оригинальный обработчик для суммы источника
-    transactionState.handleKeypadInput(value);
+    // Для суммы источника
+    if (value === '.' && amount.value.includes('.')) {
+      return;
+    }
+    
+    if (amount.value === '0' && value !== '.') {
+      amount.value = value;
+    } else {
+      amount.value += value;
+    }
   }
 };
 
@@ -218,8 +234,258 @@ const deleteLastDigit = () => {
     }
   } else {
     // Для суммы источника
-    transactionState.deleteLastDigit();
+    if (amount.value.length > 1) {
+      amount.value = amount.value.slice(0, -1);
+    } else {
+      amount.value = '0';
+    }
   }
+};
+
+// Обработчик добавления категории
+const handleAddCategory = () => {
+  // Стандартное поведение - передаем управление в дочерний компонент
+  // который откроет попап создания категории
+  showCategorySelector.value = false;
+  showCategoryList.value = true;
+};
+
+// Обработчик выбора категории
+const handleCategorySelect = (category) => {
+  if (category) {
+    selectedCategory.value = category;
+    
+    // Автоматически сохраняем транзакцию после выбора категории
+    saveRegularTransaction();
+    
+    return true; // Показываем компоненту, что успешно обработали выбор
+  } else {
+    console.warn('[TransactionView] Attempted to select null category');
+    return false;
+  }
+};
+
+// Проверка валидности транзакции для перевода
+const validateTransferTransaction = () => {
+  // Проверяем сумму
+  const amountValue = parseFloat(amount.value);
+  if (isNaN(amountValue) || amountValue === 0) {
+    messageService.error('Сумма должна быть больше нуля');
+    return false;
+  }
+  
+  // Проверяем выбранный счет
+  if (!selectedAccount.value) {
+    messageService.error('Выберите счет для транзакции');
+    return false;
+  }
+  
+  // Проверяем выбранную книгу
+  if (!selectedBook.value) {
+    messageService.error('Выберите книгу для транзакции');
+    return false;
+  }
+  
+  // Проверяем счет назначения для перевода
+  if (!destinationAccount.value) {
+    messageService.error('Выберите счет назначения для перевода');
+    return false;
+  }
+  
+  return true;
+};
+
+// Проверка валидности транзакции для дохода/расхода
+const validateRegularTransaction = () => {
+  // Проверяем сумму
+  const amountValue = parseFloat(amount.value);
+  if (isNaN(amountValue) || amountValue === 0) {
+    messageService.error('Сумма должна быть больше нуля');
+    return false;
+  }
+  
+  // Проверяем выбранный счет
+  if (!selectedAccount.value) {
+    messageService.error('Выберите счет для транзакции');
+    return false;
+  }
+  
+  // Проверяем выбранную книгу
+  if (!selectedBook.value) {
+    messageService.error('Выберите книгу для транзакции');
+    return false;
+  }
+  
+  return true;
+};
+
+// Основной обработчик добавления транзакции
+const handleAddTransaction = async () => {
+  if (selectedType.value === 'transfer') {
+    // Для переводов выполняем валидацию и сразу сохраняем
+    if (validateTransferTransaction()) {
+      await saveTransferTransaction();
+    }
+  } else {
+    // Для доходов и расходов проверяем базовые поля
+    if (validateRegularTransaction()) {
+      // Если категория уже выбрана, сохраняем транзакцию
+      if (selectedCategory.value) {
+        await saveRegularTransaction();
+      } else {
+        // Если категория не выбрана, открываем селектор категорий
+        showCategorySelector.value = true;
+      }
+    }
+  }
+};
+
+// Сохранение обычной транзакции (доход/расход)
+const saveRegularTransaction = async () => {
+  try {
+    isSaving.value = true;
+    
+    // Проверяем наличие выбранной категории
+    if (!selectedCategory.value) {
+      messageService.error('Необходимо выбрать категорию');
+      showCategorySelector.value = true;
+      return;
+    }
+    
+    // Конвертируем сумму в число и применяем знак в зависимости от типа
+    const amountValue = parseFloat(amount.value);
+    const finalAmount = selectedType.value === 'expense' 
+      ? -Math.abs(amountValue) 
+      : Math.abs(amountValue);
+    
+    // Получаем данные о выбранном счете
+    const account = accountStore.getAccountById(selectedAccount.value);
+    if (!account) {
+      throw new Error(`Счет с ID ${selectedAccount.value} не найден`);
+    }
+    
+    // Получаем текущего пользователя
+    const currentUser = userStore.currentUser;
+    if (!currentUser) {
+      throw new Error('Не найден авторизованный пользователь');
+    }
+    
+    // Формируем данные транзакции
+    const transactionData = {
+      date: new Date(),
+      amount: finalAmount,
+      currency: account.currency,
+      type: selectedType.value,
+      categoryId: selectedCategory.value.id,
+      sourceEntityId: selectedAccount.value,
+      sourceEntityType: 'account',
+      executedByOwnerId: currentUser.id,
+      responsibleOwnerIds: [currentUser.id],
+      bookId: selectedBook.value
+    };
+    
+    // Добавляем правила распределения, если есть
+    if (shouldShowDistribution.value && Object.keys(distributionPercentage.value).length > 0) {
+      transactionData.distributionRules = Object.entries(distributionPercentage.value)
+        .map(([ownerId, percentage]) => ({
+          ownerId,
+          percentage: Number(percentage)
+        }));
+    }
+    
+    // Сохраняем транзакцию
+    await transactionStore.addTransaction(transactionData);
+    
+    // Показываем уведомление об успехе
+    messageService.success('Транзакция успешно добавлена');
+    
+    // Сбрасываем форму
+    resetForm();
+  } catch (error) {
+    console.error('[TransactionView] Ошибка при сохранении транзакции:', error);
+    messageService.error('Произошла ошибка при сохранении транзакции');
+  } finally {
+    isSaving.value = false;
+  }
+};
+
+// Сохранение транзакции перевода
+const saveTransferTransaction = async () => {
+  try {
+    isSaving.value = true;
+    
+    // Конвертируем сумму в число
+    const amountValue = Math.abs(parseFloat(amount.value));
+    
+    // Получаем данные о выбранных счетах
+    const sourceAccount = accountStore.getAccountById(selectedAccount.value);
+    const destAccount = accountStore.getAccountById(destinationAccount.value);
+    
+    if (!sourceAccount || !destAccount) {
+      throw new Error('Исходный или целевой счет не найден');
+    }
+    
+    // Получаем текущего пользователя
+    const currentUser = userStore.currentUser;
+    if (!currentUser) {
+      throw new Error('Не найден авторизованный пользователь');
+    }
+    
+    // 1. Создаем транзакцию списания со счета-источника
+    const withdrawalData = {
+      date: new Date(),
+      amount: -amountValue,
+      currency: sourceAccount.currency,
+      type: 'transfer',
+      description: `Перевод на счет ${destAccount.name}`,
+      sourceEntityId: sourceAccount.id,
+      sourceEntityType: 'account',
+      destinationEntityId: destAccount.id,
+      destinationEntityType: 'account',
+      executedByOwnerId: currentUser.id,
+      responsibleOwnerIds: [currentUser.id],
+      bookId: selectedBook.value
+    };
+    
+    // 2. Создаем транзакцию пополнения счета-назначения
+    const depositData = {
+      date: new Date(),
+      amount: amountValue,
+      currency: destAccount.currency,
+      type: 'transfer',
+      description: `Перевод со счета ${sourceAccount.name}`,
+      sourceEntityId: sourceAccount.id,
+      sourceEntityType: 'account',
+      destinationEntityId: destAccount.id,
+      destinationEntityType: 'account',
+      executedByOwnerId: currentUser.id,
+      responsibleOwnerIds: [currentUser.id],
+      bookId: selectedBook.value
+    };
+    
+    // Добавляем транзакции через хранилище
+    await transactionStore.addTransaction(withdrawalData);
+    await transactionStore.addTransaction(depositData);
+    
+    // Показываем уведомление об успехе
+    messageService.success('Перевод между счетами успешно выполнен');
+    
+    // Сбрасываем форму
+    resetForm();
+  } catch (error) {
+    console.error('[TransactionView] Ошибка при выполнении перевода:', error);
+    messageService.error('Произошла ошибка при выполнении перевода');
+  } finally {
+    isSaving.value = false;
+  }
+};
+
+// Сброс формы после успешного добавления
+const resetForm = () => {
+  amount.value = '0';
+  selectedCategory.value = null;
+  // Не сбрасываем счета и книгу, чтобы пользователю было удобнее 
+  // добавлять несколько транзакций
 };
 
 // Инициализируем хранилища и сообщаем макету, что нужно показать меню
