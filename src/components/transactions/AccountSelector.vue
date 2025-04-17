@@ -78,6 +78,7 @@
     <account-selector-popup
       v-model="accountSelectorVisible"
       :accounts="displayableAccounts"
+      :bookId="bookId"
       @select="selectAccount"
       @add="handleAddAccount"
       @edit="handleEditAccounts"
@@ -106,6 +107,10 @@ const props = defineProps({
     default: false
   },
   destinationAccountId: {
+    type: String,
+    default: ''
+  },
+  bookId: {  // Добавляем prop для передачи ID книги
     type: String,
     default: ''
   }

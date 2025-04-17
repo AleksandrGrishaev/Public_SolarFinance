@@ -29,28 +29,29 @@
       />
       
       <div class="filter-group">
-        <transaction-type-selector 
-          v-model="selectedType" 
-        />
-        
-        <!-- Используем фильтрованные счета на основе выбранной книги -->
-        <account-selector 
-          :accounts="filteredAccounts" 
-          v-model="selectedAccount"
-          :is-transfer="selectedType === 'transfer'"
-          :destination-account-id="destinationAccount"
-          @update:destination-account-id="handleDestinationAccountChange"
-        />
-        
-        <!-- Слайдер отображается только если есть правила распределения в книге и это не перевод -->
-        <percentage-slider 
-          :owners="distributionOwners" 
-          v-model="distributionPercentage"
-          :total-amount="parseFloat(amount) || 0"
-          :currency="sourceCurrencySymbol"
-          :class="{ 'invisible': !shouldShowDistribution }"
-        />
-      </div>
+  <transaction-type-selector 
+    v-model="selectedType" 
+  />
+  
+  <!-- Используем фильтрованные счета на основе выбранной книги и передаем ID книги -->
+  <account-selector 
+    :accounts="filteredAccounts" 
+    v-model="selectedAccount"
+    :is-transfer="selectedType === 'transfer'"
+    :destination-account-id="destinationAccount"
+    :bookId="selectedBook"
+    @update:destination-account-id="handleDestinationAccountChange"
+  />
+  
+  <!-- Слайдер отображается только если есть правила распределения в книге и это не перевод -->
+  <percentage-slider 
+    :owners="distributionOwners" 
+    v-model="distributionPercentage"
+    :total-amount="parseFloat(amount) || 0"
+    :currency="sourceCurrencySymbol"
+    :class="{ 'invisible': !shouldShowDistribution }"
+  />
+</div>
       
       <div class="keypad-container">
         <number-keypad 

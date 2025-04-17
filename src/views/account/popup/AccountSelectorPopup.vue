@@ -11,11 +11,8 @@
       <div class="debug-info" v-if="debugMode">
         <div>Total accounts: {{ props.accounts.length }}</div>
         <div>Selectable: {{ selectableAccounts.length }}</div>
-        <div>Items per row: {{ layoutState.itemsPerRow }}</div>
-        <div>Item size: {{ layoutState.itemSize }}px</div>
-        <div>Grid width: {{ layoutState.gridWidth }}px</div>
-        <div>Gap: {{ GAP_SIZE }}px</div>
-        <div>Cell width: {{ layoutState.calculatedItemWidth }}px</div>
+        <div>Book ID: {{ props.bookId }}</div>
+        <div>Selected Book ID: {{ selectedBookId }}</div>
       </div>
       
       <!-- Dynamically adaptive account grid -->
@@ -90,14 +87,14 @@
   <!-- Popup для управления аккаунтами в книгах -->
   <BookAccountsPopup
     v-model="showBookAccountsPopup"
-    :initialBookId="selectedBookId"
+    :initialBookId="currentTransactionBookId"
     @add-account="handleAddAccountFromBookPopup"
     @edit-account="handleEditAccount"
   />
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, onUpdated, nextTick, watch } from 'vue';
+import { computed, ref, onMounted, onUpdated, nextTick, watch, toRefs } from 'vue';
 import BasePopup from '../../../components/ui/BasePopup.vue';
 import BookAccountsPopup from './BookAccountsPopup.vue';
 import { IconEdit, IconPlus } from '@tabler/icons-vue';
@@ -125,7 +122,7 @@ const getTablerIcon = (iconName) => {
 };
 
 // Debug mode
-const debugMode = ref(false);
+const debugMode = ref(true); // Включаем debug режим для отладки
 
 // Reference to the grid container DOM element
 const gridRef = ref(null);
@@ -146,7 +143,7 @@ const windowWidth = ref(window.innerWidth);
 
 // Состояние дополнительных popup'ов
 const showBookAccountsPopup = ref(false);
-const selectedBookId = ref(null);
+const selectedBookId = ref('');
 
 const props = defineProps({
   modelValue: {
@@ -161,11 +158,16 @@ const props = defineProps({
     type: String,
     default: 'expense'
   },
-  bookId: { // Добавлен новый prop для идентификации книги
+  bookId: { // ID книги из экрана транзакций
     type: String,
     default: null
   }
 });
+
+const { bookId } = toRefs(props); // Используем toRefs для реактивного доступа к props
+
+// ID книги, который будет использоваться при открытии BookAccountsPopup
+const currentTransactionBookId = ref('');
 
 const emit = defineEmits(['update:modelValue', 'select', 'add', 'edit']);
 
@@ -309,6 +311,25 @@ const truncateName = (name) => {
   return name;
 };
 
+// Обновляет идентификатор книги для корректной инициализации BookAccountsPopup
+const updateBookId = () => {
+  console.log('[AccountSelectorPopup] updateBookId called, props.bookId =', bookId.value);
+  
+  if (bookId.value) {
+    // Если bookId передан из родительского компонента, используем его
+    selectedBookId.value = bookId.value;
+    currentTransactionBookId.value = bookId.value;
+    console.log('[AccountSelectorPopup] Using bookId from props:', selectedBookId.value);
+  } else {
+    // Используем первую доступную книгу из хранилища
+    if (bookStore.books.length > 0) {
+      selectedBookId.value = bookStore.books[0].id;
+      currentTransactionBookId.value = bookStore.books[0].id;
+      console.log('[AccountSelectorPopup] Using first available book:', selectedBookId.value);
+    }
+  }
+};
+
 // Initialize and update on visibility change
 onMounted(() => {
   if (isVisible.value) {
@@ -316,24 +337,28 @@ onMounted(() => {
   }
   window.addEventListener('resize', handleResize);
   
-  // Если передан ID книги, сохраняем его для использования
-  if (props.bookId) {
-    selectedBookId.value = props.bookId;
-  } else if (bookStore.books.length > 0) {
-    // Если книга не указана явно, используем первую доступную
-    selectedBookId.value = bookStore.books[0].id;
+  // Инициализация ID книги
+  updateBookId();
+});
+
+// При изменении bookId в props обновляем локальную переменную
+watch(bookId, (newBookId) => {
+  console.log('[AccountSelectorPopup] props.bookId changed to:', newBookId);
+  updateBookId();
+});
+
+// При изменении видимости попапа обновляем ID книги и рассчитываем layout
+watch(isVisible, (newVal) => {
+  if (newVal) {
+    nextTick(() => {
+      calculateLayout();
+      updateBookId(); // Обновляем ID книги при каждом открытии
+    });
   }
 });
 
 onUpdated(() => {
   if (isVisible.value) {
-    nextTick(calculateLayout);
-  }
-});
-
-// Watch for visibility changes
-watch(isVisible, (newVal) => {
-  if (newVal) {
     nextTick(calculateLayout);
   }
 });
@@ -353,6 +378,10 @@ const handleAddAccount = () => {
 
 // Edit accounts - открываем новый BookAccountsPopup
 const handleEditClick = () => {
+  // Обновляем ID книги перед открытием попапа
+  updateBookId();
+  console.log('[AccountSelectorPopup] Opening BookAccountsPopup with book:', currentTransactionBookId.value);
+  
   // Закрываем текущий попап и открываем попап управления аккаунтами в книгах
   isVisible.value = false;
   showBookAccountsPopup.value = true;
