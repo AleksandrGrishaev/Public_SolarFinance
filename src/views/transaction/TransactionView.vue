@@ -353,7 +353,7 @@ const saveRegularTransaction = async () => {
       return;
     }
     
-    // Конвертируем сумму в число и применяем знак в зависимости от типа
+    // Конвертируем сумму в число
     const amountValue = parseFloat(amount.value);
     const finalAmount = selectedType.value === 'expense' 
       ? -Math.abs(amountValue) 
@@ -365,10 +365,25 @@ const saveRegularTransaction = async () => {
       throw new Error(`Счет с ID ${selectedAccount.value} не найден`);
     }
     
+    // Получаем данные о выбранной книге
+    const book = bookStore.getBookById(selectedBook.value);
+    if (!book) {
+      throw new Error(`Книга с ID ${selectedBook.value} не найдена`);
+    }
+    
     // Получаем текущего пользователя
     const currentUser = userStore.currentUser;
     if (!currentUser) {
       throw new Error('Не найден авторизованный пользователь');
+    }
+    
+    // Определяем курс конвертации и сумму в валюте книги
+    let bookRate = 1;
+    let bookAmount = finalAmount;
+    
+    if (account.currency !== book.currency) {
+      bookRate = currencyStore.getExchangeRate(account.currency, book.currency);
+      bookAmount = finalAmount * bookRate;
     }
     
     // Формируем данные транзакции
@@ -376,6 +391,9 @@ const saveRegularTransaction = async () => {
       date: new Date(),
       amount: finalAmount,
       currency: account.currency,
+      bookCurrency: book.currency,
+      bookRate: bookRate,
+      bookAmount: bookAmount,
       type: selectedType.value,
       categoryId: selectedCategory.value.id,
       sourceEntityId: selectedAccount.value,
@@ -385,25 +403,24 @@ const saveRegularTransaction = async () => {
       bookId: selectedBook.value
     };
     
-    // Добавляем правила распределения, если есть
+    // Добавляем правила распределения
     if (shouldShowDistribution.value && distributionOwners.value.length > 0) {
-  // Используем значение из слайдера и создаем два правила
-  transactionData.distributionRules = [
-    {
-      ownerId: distributionOwners.value[0].id,
-      percentage: distributionPercentage.value
-    },
-    {
-      ownerId: distributionOwners.value[1].id,
-      percentage: 100 - distributionPercentage.value
+      transactionData.distributionRules = [
+        {
+          ownerId: distributionOwners.value[0].id,
+          percentage: distributionPercentage.value
+        },
+        {
+          ownerId: distributionOwners.value[1].id,
+          percentage: 100 - distributionPercentage.value
+        }
+      ];
     }
-  ];
-}
     
     // Сохраняем транзакцию
     await transactionStore.addTransaction(transactionData);
     
-    // Показываем уведомление об успехе
+    // Показываем уведомление
     messageService.success('Транзакция успешно добавлена');
     
     // Сбрасываем форму

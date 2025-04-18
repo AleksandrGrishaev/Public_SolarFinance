@@ -1,4 +1,4 @@
-// src/stores/transaction/types.ts
+// src/stores/transaction/types.ts - с добавлением полей для валютной конвертации
 import type { DistributionRule } from '../book/types';
 
 export type TransactionType = 'income' | 'expense' | 'transfer';
@@ -12,8 +12,13 @@ export interface Transaction {
   description?: string;
   categoryId?: string;
   
+  // Данные для валютной конвертации
+  bookCurrency?: string;     // Валюта книги на момент создания транзакции
+  bookRate?: number;         // Обменный курс в момент создания
+  bookAmount?: number;       // Сумма в валюте книги
+  
   // Источник транзакции
-  sourceEntityId: string;  // ID счета/актива, откуда идет транзакция
+  sourceEntityId: string;    // ID счета/актива, откуда идет транзакция
   sourceEntityType: string;  // Тип источника
   
   // Назначение (для переводов)
@@ -21,7 +26,7 @@ export interface Transaction {
   destinationEntityType?: string;
   
   // Владелец и распределение
-  executedByOwnerId: string;  // Кто выполнил транзакцию
+  executedByOwnerId: string;      // Кто выполнил транзакцию
   responsibleOwnerIds: string[];  // Кто отвечает за транзакцию
   distributionRules?: DistributionRule[];  // Распределение
   
@@ -32,13 +37,4 @@ export interface Transaction {
   tags?: string[];
   createdAt: Date;
   updatedAt: Date;
-}
-
-export interface TransactionFilterOptions {
-  dateFrom?: Date;
-  dateTo?: Date;
-  types?: TransactionType[];
-  bookIds?: string[];
-  categoryIds?: string[];
-  searchTerm?: string;
 }
