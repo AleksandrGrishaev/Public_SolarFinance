@@ -5,30 +5,30 @@
     title="New account"
     :rightContent="true"
     :closeOnOverlayClick="false"
+    :hasFooter="true"
   >
     <template #rightContent>
-      <div class="text-accent en-button" @click="saveAccount">Save</div>
+      <div class="save-button color-success" @click="saveAccount">Save</div>
     </template>
 
     <div class="form-container">
       <!-- Icon and Color selection row -->
-<!-- Icon and Color selection row -->
-<div class="form-row icon-color-row">
-  <div class="form-group">
-    <div class="form-label">Icon</div>
-    <div @click="showIconPopup = true">
-      <IconPicker 
-        v-model="accountData.iconComponent"
-        :iconBackgroundColor="accountData.color || 'var(--bg-field-light)'"
-      />
-    </div>
-  </div>
-  
-  <div class="form-group">
-    <div class="form-label text-right">Color</div>
-    <ColorPicker v-model="accountData.color" />
-  </div>
-</div>
+      <div class="form-row icon-color-row">
+        <div class="form-group">
+          <div class="form-label">Icon</div>
+          <div @click="showIconPopup = true">
+            <IconPicker 
+              v-model="accountData.iconComponent"
+              :iconBackgroundColor="accountData.color || 'var(--bg-field-light)'"
+            />
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <div class="form-label text-right">Color</div>
+          <ColorPicker v-model="accountData.color" />
+        </div>
+      </div>
       <!-- Name input -->
       <div class="form-row">
         <div class="form-label">Name</div>
@@ -107,11 +107,11 @@
     </div>
 
     <!-- Save button at the bottom -->
-    <div class="form-footer">
-      <button class="form-button" @click="saveAccount">
+    <template #footer>
+      <button class="form-button bg-color-success" @click="saveAccount">
         Save account
       </button>
-    </div>
+    </template>
   </BasePopup>
 
   <!-- Currency selection popup -->
@@ -374,6 +374,12 @@ const resetForm = () => {
 </script>
 
 <style scoped>
+.save-button {
+  font-weight: 500;
+  font-size: 16px;
+  cursor: pointer;
+}
+
 .sharing-field {
   max-width: 100%;
 }
@@ -388,16 +394,8 @@ const resetForm = () => {
   gap: var(--spacing-md);
 }
 
-.form-footer {
-  margin-top: var(--spacing-lg);
-  padding: var(--spacing-md);
-  display: flex;
-  justify-content: center;
-}
-
 .form-button {
   padding: var(--spacing-sm) var(--spacing-lg);
-  background-color: var(--accent-color);
   color: var(--text-contrast);
   border-radius: var(--border-radius-xl);
   font-size: var(--font-button-size);
@@ -406,6 +404,7 @@ const resetForm = () => {
   text-align: center;
   cursor: pointer;
   transition: all var(--transition-speed) var(--transition-fn);
+  min-width: 180px;
 }
 
 .form-button:hover {
