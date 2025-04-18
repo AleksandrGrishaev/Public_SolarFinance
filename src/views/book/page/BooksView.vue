@@ -9,11 +9,15 @@
       
       <!-- Нижняя часть (90%) с фоном --bg-light и закруглением -->
       <div class="books-content bg-light">
-        <!-- Здесь будет контент книги -->
-        <div v-if="currentBook" class="book-preview">
-          <h2>{{ currentBook.name }}</h2>
-          <p>Type: {{ currentBook.type }}</p>
-          <p>Description: {{ currentBook.description || 'No description' }}</p>
+        <!-- Если книга выбрана, показываем информационную панель -->
+        <DashBoardBook 
+          v-if="currentBook"
+          :bookId="currentBook.id"
+        />
+        
+        <!-- Если книга не выбрана, показываем сообщение -->
+        <div v-else class="empty-selection">
+          <p class="text-grey">Select a book to view details</p>
         </div>
       </div>
   
@@ -27,6 +31,7 @@
   import BookSelector from './components/BookSelector.vue';
   import BaseAddIcon from './components/BaseAddIcon.vue';
   import NewBookPopup from '../popup/NewBookPopup.vue';
+  import DashBoardBook from './components/DashBoardBook.vue';
   import { useBookStore } from '@/stores/book';
   
   // Хранилище книг
@@ -76,10 +81,11 @@
     overflow-y: auto;
   }
   
-  .book-preview {
-    padding: var(--spacing-md);
-    background-color: var(--bg-contrast);
-    border-radius: var(--border-radius-md);
-    color: var(--text-usual);
+  .empty-selection {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    text-align: center;
   }
   </style>
