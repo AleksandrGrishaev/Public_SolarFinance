@@ -262,7 +262,7 @@ export default function useBookFinanceSummary(bookId: string, emit: any) {
     }
     
     // Получаем валюту книги
-    const bookCurrency = book.currency || 'IDR';
+    const bookCurrency = book.currency || '';
     console.log(`[useBookFinanceSummary] Book currency: ${bookCurrency}`);
     
     // Инициализируем суммы

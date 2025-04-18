@@ -1,0 +1,13 @@
+"filename", "language", "TypeScript", "Vue", "SCSS", "comment", "blank", "total"
+"/Users/peaker/dev/solar-finance/src/components/ui/icons/BaseIcon.vue", "Vue", 0, 167, 0, 1, 25, 193
+"/Users/peaker/dev/solar-finance/src/stores/book/types.ts", "TypeScript", 1, 0, 0, 0, 0, 1
+"/Users/peaker/dev/solar-finance/src/stores/transaction/defaultTransactions.ts", "TypeScript", 286, 0, 0, 12, 12, 310
+"/Users/peaker/dev/solar-finance/src/stores/transaction/types.ts", "TypeScript", -5, 0, 0, 1, 0, -4
+"/Users/peaker/dev/solar-finance/src/styles/themes/_colors.scss", "SCSS", 0, 0, 1, 0, 0, 1
+"/Users/peaker/dev/solar-finance/src/views/book/page/BooksView.vue", "Vue", 0, 1, 0, 0, 0, 1
+"/Users/peaker/dev/solar-finance/src/views/book/page/components/BaseAddIcon.vue", "Vue", 0, 1, 0, 0, 0, 1
+"/Users/peaker/dev/solar-finance/src/views/book/page/components/BookFinanceSummary.vue", "Vue", 0, 57, 0, 5, 4, 66
+"/Users/peaker/dev/solar-finance/src/views/book/page/components/BookPercentageSlider.vue", "Vue", 0, 237, 0, 6, 34, 277
+"/Users/peaker/dev/solar-finance/src/views/book/page/composables/useBookFinanceSummary.ts", "TypeScript", 376, 0, 0, 62, 78, 516
+"/Users/peaker/dev/solar-finance/src/views/transaction/TransactionView.vue", "Vue", 0, 14, 0, 0, 3, 17
+"Total", "-", 658, 477, 1, 87, 156, 1379
