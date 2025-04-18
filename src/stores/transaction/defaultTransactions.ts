@@ -42,8 +42,8 @@ export const defaultTransactions: Transaction[] = [
     executedByOwnerId: "user_1",
     responsibleOwnerIds: ["user_1", "user_2"],
     distributionRules: [
-      { ownerId: "user_1", percentage: 50 },
-      { ownerId: "user_2", percentage: 50 }
+      { ownerId: "user_1", percentage: 30 },
+      { ownerId: "user_2", percentage: 70 }
     ],
     bookId: "family",
     createdAt: new Date("2025-03-24"),
@@ -86,8 +86,8 @@ export const defaultTransactions: Transaction[] = [
     executedByOwnerId: "user_1",
     responsibleOwnerIds: ["user_1", "user_2"],
     distributionRules: [
-      { ownerId: "user_1", percentage: 50 },
-      { ownerId: "user_2", percentage: 50 }
+      { ownerId: "user_1", percentage: 30 },
+      { ownerId: "user_2", percentage: 70 }
     ],
     bookId: "family",
     createdAt: new Date("2025-03-10"),
@@ -109,8 +109,8 @@ export const defaultTransactions: Transaction[] = [
     executedByOwnerId: "user_1",
     responsibleOwnerIds: ["user_1", "user_2"],
     distributionRules: [
-      { ownerId: "user_1", percentage: 50 },
-      { ownerId: "user_2", percentage: 50 }
+      { ownerId: "user_1", percentage: 80 },
+      { ownerId: "user_2", percentage: 20 }
     ],
     bookId: "family",
     createdAt: new Date("2025-03-12"),
