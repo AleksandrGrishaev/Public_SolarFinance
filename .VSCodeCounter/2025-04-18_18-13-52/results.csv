@@ -16,7 +16,7 @@
 "/Users/peaker/dev/solar-finance/src/components/categories/CategoryViewPopup.vue", "Vue", 0, 426, 0, 0, 12, 77, 515
 "/Users/peaker/dev/solar-finance/src/components/categories/view/CategoryDateFilters.vue", "Vue", 0, 85, 0, 0, 2, 13, 100
 "/Users/peaker/dev/solar-finance/src/components/categories/view/CategoryTransactionsList.vue", "Vue", 0, 150, 0, 0, 3, 18, 171
-"/Users/peaker/dev/solar-finance/src/components/navigation/NavMenu.vue", "Vue", 0, 96, 0, 0, 1, 4, 101
+"/Users/peaker/dev/solar-finance/src/components/navigation/NavMenu.vue", "Vue", 0, 118, 0, 0, 1, 7, 126
 "/Users/peaker/dev/solar-finance/src/components/system/MessageProvider.vue", "Vue", 0, 11, 0, 0, 0, 3, 14
 "/Users/peaker/dev/solar-finance/src/components/transactions/AccountSelector.vue", "Vue", 0, 294, 0, 0, 10, 37, 341
 "/Users/peaker/dev/solar-finance/src/components/transactions/AmountSection.vue", "Vue", 0, 190, 0, 0, 5, 24, 219
@@ -31,6 +31,7 @@
 "/Users/peaker/dev/solar-finance/src/components/ui/buttons/CreateActionButton.vue", "Vue", 0, 53, 0, 0, 1, 6, 60
 "/Users/peaker/dev/solar-finance/src/components/ui/filters/DateFilter.vue", "Vue", 0, 438, 0, 0, 11, 62, 511
 "/Users/peaker/dev/solar-finance/src/components/ui/icons/AccountIcon.vue", "Vue", 0, 107, 0, 0, 3, 14, 124
+"/Users/peaker/dev/solar-finance/src/components/ui/icons/BaseAddIcon.vue", "Vue", 0, 90, 0, 0, 1, 13, 104
 "/Users/peaker/dev/solar-finance/src/components/ui/icons/DropdownArrow.vue", "Vue", 0, 33, 0, 0, 1, 1, 35
 "/Users/peaker/dev/solar-finance/src/components/ui/inputs/ColorPicker.vue", "Vue", 0, 68, 0, 0, 2, 13, 83
 "/Users/peaker/dev/solar-finance/src/components/ui/inputs/IconPicker.vue", "Vue", 0, 66, 0, 0, 1, 9, 76
@@ -57,7 +58,7 @@
 "/Users/peaker/dev/solar-finance/src/layouts/EmptyLayout.vue", "Vue", 0, 15, 0, 0, 0, 2, 17
 "/Users/peaker/dev/solar-finance/src/layouts/IosLayout.vue", "Vue", 0, 63, 0, 0, 1, 10, 74
 "/Users/peaker/dev/solar-finance/src/main.ts", "TypeScript", 30, 0, 0, 0, 9, 9, 48
-"/Users/peaker/dev/solar-finance/src/router/index.ts", "TypeScript", 124, 0, 0, 0, 15, 10, 149
+"/Users/peaker/dev/solar-finance/src/router/index.ts", "TypeScript", 139, 0, 0, 0, 16, 10, 165
 "/Users/peaker/dev/solar-finance/src/services/BaseCrudService.ts", "TypeScript", 54, 0, 0, 0, 22, 11, 87
 "/Users/peaker/dev/solar-finance/src/services/api/ApiService.ts", "TypeScript", 6, 0, 0, 0, 1, 4, 11
 "/Users/peaker/dev/solar-finance/src/services/api/LocalStorageApiService.ts", "TypeScript", 76, 0, 0, 0, 30, 32, 138
@@ -106,7 +107,7 @@
 "/Users/peaker/dev/solar-finance/src/styles/themes/_colors.scss", "SCSS", 0, 0, 115, 0, 14, 36, 165
 "/Users/peaker/dev/solar-finance/src/styles/themes/_dark.scss", "SCSS", 0, 0, 6, 0, 5, 3, 14
 "/Users/peaker/dev/solar-finance/src/styles/themes/_typography.scss", "SCSS", 0, 0, 66, 0, 13, 17, 96
-"/Users/peaker/dev/solar-finance/src/styles/themes/_variables.scss", "SCSS", 0, 0, 50, 0, 17, 15, 82
+"/Users/peaker/dev/solar-finance/src/styles/themes/_variables.scss", "SCSS", 0, 0, 51, 0, 17, 15, 83
 "/Users/peaker/dev/solar-finance/src/types/base.ts", "TypeScript", 5, 0, 0, 0, 0, 0, 5
 "/Users/peaker/dev/solar-finance/src/views/AccountsView.vue", "Vue", 0, 184, 0, 0, 4, 24, 212
 "/Users/peaker/dev/solar-finance/src/views/DashboardView.vue", "Vue", 0, 221, 0, 0, 4, 19, 244
@@ -123,6 +124,15 @@
 "/Users/peaker/dev/solar-finance/src/views/account/popup/composables/useAccountManagement.ts", "TypeScript", 76, 0, 0, 0, 18, 20, 114
 "/Users/peaker/dev/solar-finance/src/views/account/popup/composables/useAccountSharing.ts", "TypeScript", 50, 0, 0, 0, 23, 10, 83
 "/Users/peaker/dev/solar-finance/src/views/account/popup/composables/useAccountTypes.ts", "TypeScript", 84, 0, 0, 0, 36, 10, 130
+"/Users/peaker/dev/solar-finance/src/views/book/page/BooksView.vue", "Vue", 0, 73, 0, 0, 6, 12, 91
+"/Users/peaker/dev/solar-finance/src/views/book/page/components/BaseAddIcon.vue", "Vue", 0, 89, 0, 0, 1, 12, 102
+"/Users/peaker/dev/solar-finance/src/views/book/page/components/BookFinanceSummary.vue", "Vue", 0, 170, 0, 0, 7, 31, 208
+"/Users/peaker/dev/solar-finance/src/views/book/page/components/BookSelector.vue", "Vue", 0, 117, 0, 0, 1, 22, 140
+"/Users/peaker/dev/solar-finance/src/views/book/page/components/BookTransactionGroup.vue", "Vue", 0, 50, 0, 0, 1, 8, 59
+"/Users/peaker/dev/solar-finance/src/views/book/page/components/BookTransactionItem.vue", "Vue", 0, 97, 0, 0, 1, 14, 112
+"/Users/peaker/dev/solar-finance/src/views/book/page/components/BookTransactionsList.vue", "Vue", 0, 144, 0, 0, 1, 28, 173
+"/Users/peaker/dev/solar-finance/src/views/book/page/components/DashBoardBook.vue", "Vue", 0, 64, 0, 0, 3, 8, 75
+"/Users/peaker/dev/solar-finance/src/views/book/popup/NewBookPopup.vue", "Vue", 0, 30, 0, 0, 1, 5, 36
 "/Users/peaker/dev/solar-finance/src/views/currency/popup/CurrencyPopup.vue", "Vue", 0, 162, 0, 0, 3, 25, 190
 "/Users/peaker/dev/solar-finance/src/views/icon/popup/IconSelectorPopup.vue", "Vue", 0, 361, 0, 0, 6, 52, 419
 "/Users/peaker/dev/solar-finance/src/views/transaction/TransactionView.vue", "Vue", 0, 535, 0, 0, 7, 80, 622
@@ -133,4 +143,4 @@
 "/Users/peaker/dev/solar-finance/src/views/transaction/composables/useDistribution.ts", "TypeScript", 53, 0, 0, 0, 17, 11, 81
 "/Users/peaker/dev/solar-finance/src/views/transaction/composables/useKeypad.ts", "TypeScript", 38, 0, 0, 0, 22, 7, 67
 "/Users/peaker/dev/solar-finance/src/views/transaction/composables/useTransaction.ts", "TypeScript", 139, 0, 0, 0, 27, 27, 193
-"Total", "-", 4925, 11401, 494, 2654, 1473, 3054, 24001
+"Total", "-", 4940, 12347, 495, 2654, 1497, 3210, 25143

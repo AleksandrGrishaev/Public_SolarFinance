@@ -13,8 +13,8 @@
       @click="handleClick"
     >
     <svg 
-  :width="size - 2" 
-  :height="size - 2" 
+  :width="size - 4" 
+  :height="size - 4" 
   viewBox="0 0 50 50" 
   fill="none" 
   xmlns="http://www.w3.org/2000/svg"
@@ -86,6 +86,7 @@
     justify-content: center;
     align-items: center;
     transition: opacity var(--transition-speed, 0.2s) var(--transition-fn, ease);
+    opacity: 0.8;
   }
   
   .interactive {
