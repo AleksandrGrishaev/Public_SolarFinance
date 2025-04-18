@@ -31,11 +31,6 @@ import {
 } from 'naive-ui';
 import { useThemeStore } from './stores/theme';
 import MessageProvider from './components/system/MessageProvider.vue';
-
 // Получение хранилища темы
 const themeStore = useThemeStore();
 </script>
-
-<style>
-@import '@/styles/main.scss';
-</style>

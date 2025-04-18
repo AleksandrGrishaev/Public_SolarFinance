@@ -7,105 +7,108 @@
     :closeOnOverlayClick="false"
   >
     <template #rightContent>
-      <div class="save-button" @click="saveAccount">Save</div>
+      <div class="text-accent en-button" @click="saveAccount">Save</div>
     </template>
 
-    <div class="account-form">
+    <div class="form-container">
       <!-- Icon and Color selection row -->
       <div class="form-row icon-color-row">
         <div class="form-group">
-          <label>Icon</label>
+          <div class="form-label">Icon</div>
           <div @click="showIconPopup = true">
             <IconPicker 
               v-model="accountData.iconComponent"
-              :iconBackgroundColor="accountData.color || '#949496'"
+              :iconBackgroundColor="accountData.color || 'var(--bg-light)'"
             />
           </div>
         </div>
         
         <div class="form-group">
-          <label>Color</label>
+          <div class="form-label">Color</div>
           <ColorPicker v-model="accountData.color" />
         </div>
       </div>
 
       <!-- Name input -->
       <div class="form-row">
-        <label>Name</label>
-        <div class="input-wrapper">
-          <input
+        <div class="form-label">Name</div>
+        <div class="form-field">
+          <TextInput
             v-model="accountData.name"
             placeholder="Account name"
-            class="custom-input"
           />
         </div>
       </div>
 
       <!-- Type selection с использованием AccountTypeSelector -->
       <div class="form-row">
-        <label>Type</label>
-        <div class="input-wrapper">
+        <div class="form-label">Type</div>
+        <div class="form-field">
           <AccountTypeSelector v-model="accountData.type" />
         </div>
       </div>
 
       <!-- Currency selection -->
       <div class="form-row">
-        <label>Currency</label>
-        <div class="currency-selector" @click="showCurrencyPopup = true">
-          <div class="currency-select-display">
-            {{ selectedCurrencyInfo }}
+        <div class="form-label">Currency</div>
+        <div class="form-field">
+          <div class="form-select" @click="showCurrencyPopup = true">
+            <span>{{ selectedCurrencyInfo }}</span>
+            <span class="select-arrow"></span>
           </div>
         </div>
       </div>
 
       <!-- Initial balance -->
       <div class="form-row">
-        <label>Balance</label>
-        <div class="input-wrapper">
-          <input
+        <div class="form-label">Balance</div>
+        <div class="form-field">
+          <TextInput
             v-model.number="accountData.initialBalance"
             type="number"
             placeholder="0.00"
-            class="custom-input"
           />
         </div>
       </div>
 
       <!-- Share permissions -->
       <div class="form-row sharing-row" v-if="userStore.isInitialized">
-        <label>Share</label>
-        <div class="sharing-wrapper">
+        <div class="form-label">Share</div>
+        <div class="form-field">
           <SharePicker v-model="accountData.sharing" />
         </div>
       </div>
 
       <!-- Book selection -->
       <div class="form-row">
-        <label>Book</label>
-        <div class="books-wrapper">
-          <div 
-            v-for="book in bookStore.books" 
-            :key="book.id"
-            class="book-chip"
-            :class="{ 'selected': selectedBooks.includes(book.id) }"
-            @click="toggleBook(book.id)"
-          >
-            {{ book.name }}
+        <div class="form-label">Book</div>
+        <div class="form-field">
+          <div class="chip-container">
+            <div 
+              v-for="book in bookStore.books" 
+              :key="book.id"
+              class="chip"
+              :class="{ 'selected': selectedBooks.includes(book.id) }"
+              @click="toggleBook(book.id)"
+            >
+              {{ book.name }}
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Use in balance toggle -->
       <div class="form-row use-in-balance-row">
-        <label>Use in balance</label>
+        <div class="form-label">Use in balance</div>
         <ToggleSwitch v-model="accountData.isActive" />
       </div>
     </div>
 
     <!-- Save button at the bottom -->
-    <div class="save-account-button" @click="saveAccount">
-      Save account
+    <div class="form-footer">
+      <button class="form-button" @click="saveAccount">
+        Save account
+      </button>
     </div>
   </BasePopup>
 
@@ -127,6 +130,7 @@ import { ref, computed, watch, onMounted } from 'vue';
 import BasePopup from '../../../components/ui/BasePopup.vue';
 import ColorPicker from '../../../components/ui/inputs/ColorPicker.vue';
 import SharePicker from '../../../components/ui/inputs/SharePicker.vue';
+import TextInput from '../../../components/ui/inputs/TextInput.vue';
 import AccountTypeSelector from './components/AccountTypeSelector.vue';
 import ToggleSwitch from '../../../components/ui/inputs/ToggleSwitch.vue';
 import CurrencyPopup from '../../currency/popup/CurrencyPopup.vue';
@@ -372,152 +376,11 @@ const resetForm = () => {
 </script>
 
 <style scoped>
-.account-form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  width: 100%;
-  padding: 0 8px;
-  box-sizing: border-box;
-}
-
-.form-row {
-  display: flex;
-  align-items: center;
-  width: 100%;
-}
-
-.icon-color-row {
-  justify-content: flex-start;
-  gap: 20px; /* Reduced spacing between icon and color */
-}
-
-.sharing-row {
-  align-items: flex-start;
-}
-
-.form-group {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-label {
-  color: white;
-  font-size: 16px;
-  font-weight: 400;
-  min-width: 70px;
-  margin-right: 5px;
-}
-
-.input-wrapper {
-  flex: 1;
-  max-width: 100%;
-}
-
-.sharing-wrapper {
-  flex: 1;
-}
-
-.custom-input {
-  height: 36px;
-  width: 100%;
-  background-color: #949496;
-  border: none;
-  border-radius: 14px;
-  padding: 8px 12px;
-  color: #FFFFFF;
-  font-size: 16px;
-  box-sizing: border-box;
-}
-
-.custom-input:focus {
-  outline: none;
-}
-
-.custom-input::placeholder {
-  color: rgba(64, 64, 64, 0.7);
-}
-
-.currency-selector {
-  flex: 1;
-  cursor: pointer;
-}
-
-.currency-select-display {
-  height: 36px;
-  width: 100%;
-  background-color: #949496;
-  border: none;
-  border-radius: 14px;
-  padding: 0 12px;
-  color: #FFFFFF;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  position: relative;
-}
-
-.currency-select-display::after {
-  content: "";
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
+.select-arrow {
   width: 0;
   height: 0;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
-  border-top: 5px solid white;
-}
-
-.books-wrapper {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  flex: 1;
-}
-
-.book-chip {
-  padding: 8px 16px;
-  background-color: #949496;
-  border-radius: 14px;
-  color: #404040;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.book-chip.selected {
-  background-color: black;
-  color: white;
-}
-
-.save-account-button {
-  margin-top: 20px;
-  margin-bottom: 16px;
-  padding: 12px 24px;
-  background-color: #53B794;
-  color: white;
-  border-radius: 34px;
-  font-size: 16px;
-  font-weight: 500;
-  text-align: center;
-  cursor: pointer;
-  width: calc(100% - 32px);
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.save-button {
-  color: #53B794;
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-/* Keep the Use in balance toggle spacing consistent with original */
-.use-in-balance-row {
-  margin-left: 0;
-  justify-content: space-between;
+  border-top: 5px solid var(--text-usual);
 }
 </style>

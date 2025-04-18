@@ -5,6 +5,9 @@ import App from './App.vue'
 import router from './router'
 import { appInitService } from './services/system/AppInitService'
 import { messageService } from './services/system/MessageService'
+import './styles/main.scss';
+
+
 
 // Типы для глобального message provider
 declare global {
