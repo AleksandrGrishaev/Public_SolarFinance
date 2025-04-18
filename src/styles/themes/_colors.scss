@@ -3,125 +3,163 @@
 // Color styles based on design system
 
 :root {
-    // Text colors
-    --text-header: #FFFFFF;     // TextHeader - белый
-    --text-usual: #F5F5F5;      // TextUsual - почти белый
-    --text-subheader: #E0E0E0;  // TextSubHeader - светло-серый
-    --text-grey: #B0B0B0;       // TextGrey - серый
-    --text-inactive: #808080;   // TextInActive - темно-серый
-    --text-contrast: #FFFFFF;   // TextContrast - белый (для контрастного текста)
+  // Text colors
+  --text-header: #FFFFFF;     // TextHeader - белый
+  --text-usual: #F5F5F5;      // TextUsual - почти белый
+  --text-subheader: #E0E0E0;  // TextSubHeader - светло-серый
+  --text-grey: #B0B0B0;       // TextGrey - серый
+  --text-inactive: #808080;   // TextInActive - темно-серый
+  --text-contrast: #FFFFFF;   // TextContrast - белый (для контрастного текста)
+
+  // Main colors
+  --color-primary: #FFD452;   // ColorPrimary - желтый
+  --color-warning: #FF5252;   // ColorWarning - красный
+  --color-success: #53B794;   // ColorSuccess - зеленый
+
+  // Background colors
+  --bg-contrast: #404040;     // BgContrast - темно-серый
+  --bg-light: #949496;        // BgLight - серый
+  --bg-main: #333333;         // BgMain - основной темно-серый фон
   
-    // Main colors
-    --color-primary: #FFD452;   // ColorPrimary - желтый
-    --color-warning: #FF5252;   // ColorWarning - красный
-    --color-success: #53B794;   // ColorSuccess - зеленый
-  
-    // Background colors
-    --bg-contrast: #404040;     // BgContrast - темно-серый
-    --bg-light: #949496;        // BgLight - серый
-    --bg-main: #333333;         // BgMain - основной темно-серый фон
-  
-    // Other colors
-    --status-online: #53B794;   // StatusOnline - зеленый
-    --status-offline: #FF5252;  // StatusOffline - красный
-  
-    // Illustration colors
-    --color-1: #FFD452;         // Color_1 - желтый
-    --color-1-2: #B8A97D;       // Color_1_2 - бежевый
-    --color-2: #FF8A80;         // Color_2 - розовый
-    --color-3: #64B5F6;         // Color_3 - голубой
-    --color-3-2: #4F9FC8;       // Color_3_2 - синий
-  }
-  
-  // Text color classes
-  .text-header {
-    color: var(--text-header);
-  }
-  
-  .text-usual {
-    color: var(--text-usual);
-  }
-  
-  .text-subheader {
-    color: var(--text-subheader);
-  }
-  
-  .text-grey {
-    color: var(--text-grey);
-  }
-  
-  .text-inactive {
-    color: var(--text-inactive);
-  }
-  
-  .text-contrast {
-    color: var(--text-contrast);
-  }
-  
-  // Main color classes
-  .color-primary {
-    color: var(--color-primary);
-  }
-  
-  .color-warning {
-    color: var(--color-warning);
-  }
-  
-  .color-success {
-    color: var(--color-success);
-  }
-  
-  .bg-color-primary {
-    background-color: var(--color-primary);
-  }
-  
-  .bg-color-warning {
-    background-color: var(--color-warning);
-  }
-  
-  .bg-color-success {
-    background-color: var(--color-success);
-  }
-  
-  // Background classes
-  .bg-contrast {
-    background-color: var(--bg-contrast);
-  }
-  
-  .bg-light {
-    background-color: var(--bg-light);
-  }
-  
-  .bg-main {
-    background-color: var(--bg-main);
-  }
-  
-  // Status classes
-  .status-online {
-    background-color: var(--status-online);
-  }
-  
-  .status-offline {
-    background-color: var(--status-offline);
-  }
-  
-  // Illustration color classes
-  .color-1 {
-    background-color: var(--color-1);
-  }
-  
-  .color-1-2 {
-    background-color: var(--color-1-2);
-  }
-  
-  .color-2 {
-    background-color: var(--color-2);
-  }
-  
-  .color-3 {
-    background-color: var(--color-3);
-  }
-  
-  .color-3-2 {
-    background-color: var(--color-3-2);
-  }
+  // Новые фоновые цвета компонентов
+  --bg-screen: #000000;       // Черный фон экрана
+  --bg-popup: #404040;        // Фон для попапов
+  --bg-field-light: #949496;  // Светлый фон для полей
+  --bg-field-dark: #46484A;   // Темный фон для полей
+  --bg-dropdown: #444444;     // Фон для выпадающих меню
+  --bg-item-selected: #000000;   // Фон для выбранных элементов
+  --bg-item-unselected: #949496; // Фон для невыбранных элементов
+
+  // Other colors
+  --status-online: #53B794;   // StatusOnline - зеленый
+  --status-offline: #FF5252;  // StatusOffline - красный
+
+  // Illustration colors
+  --color-1: #FFD452;         // Color_1 - желтый
+  --color-1-2: #B8A97D;       // Color_1_2 - бежевый
+  --color-2: #FF8A80;         // Color_2 - розовый
+  --color-3: #64B5F6;         // Color_3 - голубой
+  --color-3-2: #4F9FC8;       // Color_3_2 - синий
+}
+
+// Text color classes
+.text-header {
+  color: var(--text-header);
+}
+
+.text-usual {
+  color: var(--text-usual);
+}
+
+.text-subheader {
+  color: var(--text-subheader);
+}
+
+.text-grey {
+  color: var(--text-grey);
+}
+
+.text-inactive {
+  color: var(--text-inactive);
+}
+
+.text-contrast {
+  color: var(--text-contrast);
+}
+
+// Main color classes
+.color-primary {
+  color: var(--color-primary);
+}
+
+.color-warning {
+  color: var(--color-warning);
+}
+
+.color-success {
+  color: var(--color-success);
+}
+
+.bg-color-primary {
+  background-color: var(--color-primary);
+}
+
+.bg-color-warning {
+  background-color: var(--color-warning);
+}
+
+.bg-color-success {
+  background-color: var(--color-success);
+}
+
+// Background classes
+.bg-contrast {
+  background-color: var(--bg-contrast);
+}
+
+.bg-light {
+  background-color: var(--bg-light);
+}
+
+.bg-main {
+  background-color: var(--bg-main);
+}
+
+// Новые классы фонов
+.bg-screen {
+  background-color: var(--bg-screen);
+}
+
+.bg-popup {
+  background-color: var(--bg-popup);
+}
+
+.bg-field-light {
+  background-color: var(--bg-field-light);
+}
+
+.bg-field-dark {
+  background-color: var(--bg-field-dark);
+}
+
+.bg-dropdown {
+  background-color: var(--bg-dropdown);
+}
+
+.bg-item-selected {
+  background-color: var(--bg-item-selected);
+}
+
+.bg-item-unselected {
+  background-color: var(--bg-item-unselected);
+}
+
+// Status classes
+.status-online {
+  background-color: var(--status-online);
+}
+
+.status-offline {
+  background-color: var(--status-offline);
+}
+
+// Illustration color classes
+.color-1 {
+  background-color: var(--color-1);
+}
+
+.color-1-2 {
+  background-color: var(--color-1-2);
+}
+
+.color-2 {
+  background-color: var(--color-2);
+}
+
+.color-3 {
+  background-color: var(--color-3);
+}
+
+.color-3-2 {
+  background-color: var(--color-3-2);
+}

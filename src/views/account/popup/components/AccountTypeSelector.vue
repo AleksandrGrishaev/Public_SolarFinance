@@ -6,25 +6,32 @@
         <component :is="selectedIcon" class="type-icon" :size="20" stroke-width="1.5" />
         <span>{{ selectedLabel }}</span>
       </div>
-      <DropdownArrow class="dropdown-arrow" :color="isOpen ? 'var(--text-contrast)' : 'var(--text-grey)'" />
+      <DropdownArrow 
+        class="dropdown-arrow" 
+        :color="isOpen ? 'var(--text-contrast)' : 'var(--text-grey)'" 
+        :class="{ 'open': isOpen }"
+      />
     </div>
     
-    <div v-if="isOpen" class="dropdown-menu">
-      <div 
-        v-for="option in typeOptions" 
-        :key="option.value"
-        class="dropdown-item"
-        @click="selectType(option.value)"
-      >
-        <component :is="option.icon" class="type-icon" :size="20" stroke-width="1.5" />
-        <span>{{ option.label }}</span>
+    <transition name="dropdown">
+      <div class="dropdown-menu" v-if="isOpen" @click.stop>
+        <div 
+          v-for="option in typeOptions" 
+          :key="option.value"
+          class="dropdown-item"
+          :class="{ 'selected': option.value === modelValue }"
+          @click="selectType(option.value)"
+        >
+          <component :is="option.icon" class="type-icon" :size="20" stroke-width="1.5" />
+          <span>{{ option.label }}</span>
+        </div>
       </div>
-    </div>
+    </transition>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, watch } from 'vue';
+import { computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import { IconCreditCard, IconWallet, IconCash, IconPigMoney } from '@tabler/icons-vue';
 import DropdownArrow from '../../../../components/ui/icons/DropdownArrow.vue';
 import { useDropdown } from '../../../../composables/ui/useDropdown';
@@ -47,6 +54,22 @@ const emit = defineEmits(['update:modelValue']);
 
 // Используем созданный composable для работы с выпадающим списком
 const { isOpen, dropdownRef, toggle, close } = useDropdown();
+
+// Добавляем обработчик нажатия клавиши Escape для закрытия дропдауна
+const handleEscKey = (event) => {
+  if (event.key === 'Escape' && isOpen.value) {
+    close();
+  }
+};
+
+// Устанавливаем и удаляем обработчик клавиши Escape
+onMounted(() => {
+  document.addEventListener('keydown', handleEscKey);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener('keydown', handleEscKey);
+});
 
 // Выбранная опция
 const selectedOption = computed(() => {
@@ -79,7 +102,6 @@ watch(() => props.modelValue, (newValue) => {
 </script>
 
 <style scoped>
-/* Стили остаются те же */
 .account-type-selector {
   position: relative;
   width: 100%;
@@ -97,7 +119,7 @@ watch(() => props.modelValue, (newValue) => {
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
-  transition: background-color var(--transition-speed) var(--transition-fn);
+  transition: all var(--transition-speed) var(--transition-fn);
 }
 
 .form-select:hover {
@@ -116,10 +138,9 @@ watch(() => props.modelValue, (newValue) => {
 
 .dropdown-arrow {
   transition: transform var(--transition-speed) var(--transition-fn);
-  transform: rotate(0deg);
 }
 
-.form-select:hover .dropdown-arrow {
+.dropdown-arrow.open {
   transform: rotate(180deg);
 }
 
@@ -129,7 +150,7 @@ watch(() => props.modelValue, (newValue) => {
   left: 0;
   right: 0;
   margin-top: var(--spacing-xs);
-  background-color: var(--bg-contrast);
+  background-color: var(--dropdown-bg);
   border-radius: var(--border-radius-sm);
   padding: var(--spacing-sm) 0;
   z-index: var(--z-index-dropdown);
@@ -147,6 +168,10 @@ watch(() => props.modelValue, (newValue) => {
 }
 
 .dropdown-item:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--dropdown-item-hover);
+}
+
+.dropdown-item.selected {
+  background-color: var(--dropdown-item-selected);
 }
 </style>

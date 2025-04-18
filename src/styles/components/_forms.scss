@@ -3,45 +3,62 @@
 // Стили для форм и полей ввода
 
 // Контейнер формы
-.form-container {
+// Базовый стиль для строк формы с вертикальным центрированием
+.form-row {
+  display: flex;
+  width: 100%;
+  margin-bottom: var(--spacing-md);
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Метка поля - базовые стили без центрирования
+.form-label {
+  color: var(--text-usual);
+  font-size: var(--font-body-size);
+  font-weight: 400;
+  min-width: var(--form-label-min-width);
+  margin-right: 5px;
+}
+
+// Обновленный стиль для sharing-row
+.sharing-row {
+  // Этот подход позволяет центрировать метку формы по центру всей строки
+  align-items: stretch; // Растягиваем все элементы по высоте строки
+  
+  .form-label {
     display: flex;
-    flex-direction: column;
-    gap: var(--form-field-gap);
-    width: 100%;
-    padding: 0 var(--spacing-sm);
-    box-sizing: border-box;
+    align-items: center; // Центрируем текст метки вертикально
+    align-self: stretch; // Растягиваем метку на всю высоту строки
   }
   
-  // Строка формы
-  .form-row {
+  .form-field {
+    flex: 1;
+    max-width: var(--form-field-max-width);
+  }
+}
+
+// Обработка особых случаев с сохранением центрирования
+.icon-color-row {
+  justify-content: flex-start;
+  gap: var(--spacing-md);
+  
+  .form-label {
     display: flex;
     align-items: center;
-    width: 100%;
-    margin-bottom: var(--spacing-md);
-    
-    &:last-child {
-      margin-bottom: 0;
-    }
-    
-    // Модификаторы для строк
-    &.icon-color-row {
-      justify-content: flex-start;
-      gap: var(--spacing-md);
-    }
-    
-    &.sharing-row {
-      align-items: flex-start;
-    }
-    
-    &.use-in-balance-row {
-      justify-content: space-between;
-    }
-
-    &.use-in-balance-row {
-        justify-content: flex-start;  // Изменяем с space-between на flex-start
-        gap: var(--spacing-md);       // Добавляем фиксированный промежуток
-      }
   }
+}
+
+.use-in-balance-row {
+  align-items: center;
+  
+  .form-label {
+    display: flex;
+    align-items: center;
+  }
+}
   
   // Группа элементов формы
   .form-group {
@@ -57,6 +74,8 @@
     font-weight: 400;
     min-width: var(--form-label-min-width);
     margin-right: 5px;
+    display: flex;
+    align-items: center;
   }
   
   // Обертка поля ввода
@@ -106,7 +125,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: var(--spacing-xs);
-    background-color: var(--bg-contrast);
+    background-color: var(--bg-light);
     border-radius: var(--border-radius-lg);
     padding: 6px;
     width: 100%;

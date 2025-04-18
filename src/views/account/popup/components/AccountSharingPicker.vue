@@ -1,6 +1,6 @@
-<!-- src/components/ui/inputs/SharePicker.vue -->
+<!-- src/views/account/popup/components/AccountSharingPicker.vue -->
 <template>
-  <div class="share-picker">
+  <div class="sharing-picker">
     <div v-if="isLoading" class="loading">
       <span>Loading users...</span>
     </div>
@@ -9,24 +9,25 @@
       <span>No other users to share with</span>
     </div>
     
-    <div 
-      v-else
-      v-for="user in otherUsers" 
-      :key="user.id" 
-      class="user-sharing"
-    >
-      <div class="user-name">{{ user.name }}</div>
-      <div class="permission-buttons">
-        <div 
-          v-for="permission in permissions" 
-          :key="permission.value"
-          class="permission-button"
-          :class="{ 
-            'selected': getPermissionForUser(user.id) === permission.value
-          }"
-          @click="setPermission(user.id, permission.value)"
-        >
-          {{ permission.label }}
+    <div v-else>
+      <div 
+        v-for="user in otherUsers" 
+        :key="user.id" 
+        class="user-sharing"
+      >
+        <div class="user-name">{{ user.name }}</div>
+        <div class="permission-buttons">
+          <div 
+            v-for="permission in permissions" 
+            :key="permission.value"
+            class="permission-button"
+            :class="{ 
+              'selected': getPermissionForUser(user.id) === permission.value
+            }"
+            @click="setPermission(user.id, permission.value)"
+          >
+            {{ permission.label }}
+          </div>
         </div>
       </div>
     </div>
@@ -35,22 +36,25 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue';
-import { useUserStore } from '../../../stores/user';
+import { useUserStore } from '../../../../stores/user';
+import type { AccountSharing } from '../../../../stores/account/types';
 
 const props = defineProps({
   modelValue: {
     type: Object,
     default: () => ({})
+  },
+  ownerId: {
+    type: String,
+    default: ''
   }
 });
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue', 'update-sharing']);
 
 // State
 const isLoading = ref(true);
-const selectedPermissions = ref<Record<string, string>>(
-  props.modelValue ? { ...props.modelValue } : {}
-);
+const currentSharing = ref<AccountSharing>({ ...props.modelValue });
 const otherUsers = ref<any[]>([]);
 
 // Available permissions
@@ -79,7 +83,13 @@ const loadOtherUsers = async () => {
   try {
     // Get other users using userService
     const users = await userStore.userService.getOtherUsers(currentUser.value.id);
-    otherUsers.value = users || [];
+    
+    // Filter out owner if ownerId is provided
+    if (props.ownerId) {
+      otherUsers.value = users?.filter(user => user.id !== props.ownerId) || [];
+    } else {
+      otherUsers.value = users || [];
+    }
   } catch (error) {
     console.error('Error loading other users:', error);
     otherUsers.value = [];
@@ -88,37 +98,46 @@ const loadOtherUsers = async () => {
 
 // Get permission for a specific user
 const getPermissionForUser = (userId: string) => {
-  return selectedPermissions.value[userId] || 'no';
+  return currentSharing.value[userId] || 'no';
 };
 
 // Set permission for a specific user
 const setPermission = (userId: string, permission: string) => {
-  const newPermissions = { ...selectedPermissions.value };
+  const newSharing = { ...currentSharing.value };
   
   if (permission === 'no') {
-    delete newPermissions[userId];
+    delete newSharing[userId];
   } else {
-    newPermissions[userId] = permission;
+    newSharing[userId] = permission;
   }
   
-  selectedPermissions.value = newPermissions;
-  emit('update:modelValue', newPermissions);
+  currentSharing.value = newSharing;
+  emit('update:modelValue', newSharing);
+  emit('update-sharing', newSharing);
 };
 
 // Watch for changes in owner ID from parent
 watch(() => props.modelValue, (newValue) => {
   if (newValue && typeof newValue === 'object') {
-    selectedPermissions.value = { ...newValue };
+    currentSharing.value = { ...newValue };
   } else {
-    selectedPermissions.value = {};
+    currentSharing.value = {};
   }
 }, { deep: true });
 
-// Watch for changes in current user ID
-watch(() => currentUser.value?.id, async (newUserId) => {
-  if (newUserId) {
-    await loadOtherUsers();
+// Watch for changes in owner ID
+watch(() => props.ownerId, (newOwnerId) => {
+  if (newOwnerId && currentSharing.value[newOwnerId]) {
+    // Remove owner from sharing permissions
+    const updatedSharing = { ...currentSharing.value };
+    delete updatedSharing[newOwnerId];
+    currentSharing.value = updatedSharing;
+    emit('update:modelValue', updatedSharing);
+    emit('update-sharing', updatedSharing);
   }
+  
+  // Reload users list to filter out the owner
+  loadOtherUsers();
 });
 
 // Initialize
@@ -132,7 +151,7 @@ onMounted(async () => {
     // Load other users
     await loadOtherUsers();
   } catch (error) {
-    console.error('Error initializing SharePicker:', error);
+    console.error('Error initializing AccountSharingPicker:', error);
   } finally {
     isLoading.value = false;
   }
@@ -140,7 +159,7 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.share-picker {
+.sharing-picker {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
@@ -160,16 +179,14 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--spacing-md);
+  gap: var(--spacing-xs);
   padding: var(--spacing-xs) var(--spacing-sm);
-  background-color: var(--bg-dropdown);
-  border-radius: var(--border-radius-sm);
 }
 
 .user-name {
   min-width: 80px;
   color: var(--text-usual);
-  font-size: var(--font-body-size);
+  font-size: var(--font- small-size);
 }
 
 .permission-buttons {

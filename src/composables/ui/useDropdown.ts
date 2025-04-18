@@ -1,5 +1,5 @@
-// src/composables/useDropdown.ts
-import { ref } from 'vue';
+// src/composables/ui/useDropdown.ts
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { useClickOutside } from './useClickOutside';
 
 export function useDropdown() {
@@ -18,9 +18,27 @@ export function useDropdown() {
     isOpen.value = false;
   };
 
-  // Используем composable для отслеживания кликов вне элемента
+  // Обработчик клавиши Escape для закрытия дропдауна
+  const handleEscKey = (event: KeyboardEvent) => {
+    if (event.key === 'Escape' && isOpen.value) {
+      close();
+    }
+  };
+
+  // Используем улучшенный composable для отслеживания кликов вне элемента
   useClickOutside(dropdownRef, () => {
-    close();
+    if (isOpen.value) {
+      close();
+    }
+  });
+
+  // Добавляем и удаляем слушатель клавиши Escape
+  onMounted(() => {
+    document.addEventListener('keydown', handleEscKey);
+  });
+
+  onBeforeUnmount(() => {
+    document.removeEventListener('keydown', handleEscKey);
   });
 
   return {

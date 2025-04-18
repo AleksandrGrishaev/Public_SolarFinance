@@ -7,15 +7,26 @@
 
 :root {
   // Базовые переменные приложения
-  --app-background: var(--bg-main);
-  --border-color: #444444;
+  --app-background: var(--bg-screen);
+  --border-color: #444444;  // Переменная из _dark.scss
   --accent-color: var(--color-success);
   --error-color: var(--color-warning);
   
-  // Компоненты UI
-  --input-bg: var(--bg-light);
+  // Фоны для контейнеров и компонентов
+  --popup-bg: var(--bg-popup);
+  --container-bg: var(--bg-contrast);
+  
+  // Фоны для полей ввода
+  --input-bg: var(--bg-field-light);
+  --input-bg-dark: var(--bg-field-dark);
   --input-color: var(--text-usual);
   --input-radius: 14px;
+  
+  // Фоны для выпадающих списков и меню
+  --dropdown-bg: var(--bg-dropdown);
+  --dropdown-item-selected: var(--bg-item-selected);
+  --dropdown-item-hover: var(--bg-item-selected);
+  --dropdown-item-unselected: var(--bg-item-unselected);
   
   // Компоненты форм
   --toggle-bg-active: var(--color-success);
@@ -36,6 +47,7 @@
   --icon-size-sm: 16px;
   --icon-size-md: 24px;
   --icon-size-lg: 32px;
+  --icon-size: 24px;
   
   // Отступы
   --spacing-xs: 4px;
@@ -47,24 +59,24 @@
   // Анимация
   --transition-speed: 0.2s;
   --transition-fn: ease;
-// Состояния компонентов
---state-hover-opacity: 0.8;
---state-active-opacity: 0.6;
---state-disabled-opacity: 0.5;
-
-// Z-индексы
---z-index-dropdown: 100;
---z-index-modal: 1000;
---z-index-toast: 1500;
-
-// Тени
---shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
---shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
---shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-
-// Размеры компонентов
---input-height: 36px;
---toggle-height: 32px;
---button-height: 40px;
---icon-size: 24px;
+  
+  // Состояния компонентов
+  --state-hover-opacity: 0.8;
+  --state-active-opacity: 0.6;
+  --state-disabled-opacity: 0.5;
+  
+  // Z-индексы
+  --z-index-dropdown: 100;
+  --z-index-modal: 1000;
+  --z-index-toast: 1500;
+  
+  // Тени
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  
+  // Размеры компонентов
+  --input-height: 36px;
+  --toggle-height: 32px;
+  --button-height: 40px;
 }

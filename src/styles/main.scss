@@ -44,6 +44,32 @@ html, body {
   opacity: 0;
 }
 
+/* Анимации для выпадающих списков */
+.dropdown-enter-active,
+.dropdown-leave-active {
+  transition: opacity var(--transition-speed) var(--transition-fn),
+              transform var(--transition-speed) var(--transition-fn);
+}
+
+.dropdown-enter-from,
+.dropdown-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+/* Анимации для диалогов и попапов */
+.popup-enter-active,
+.popup-leave-active {
+  transition: opacity var(--transition-speed) var(--transition-fn),
+              transform var(--transition-speed) var(--transition-fn);
+}
+
+.popup-enter-from,
+.popup-leave-to {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
 // Утилитарные классы
 
 // Отступы

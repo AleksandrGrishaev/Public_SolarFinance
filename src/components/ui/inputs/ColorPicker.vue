@@ -1,17 +1,18 @@
 <!-- src/components/ui/inputs/ColorPicker.vue -->
 <template>
   <div class="color-picker-container">
-    <div class="color-preview" @click="openColorPicker">
-      <n-color-picker 
-        v-model:value="colorValue" 
-        :show="showPicker"
-        :show-alpha="false"
-        :actions="['confirm']"
-        @confirm="handleConfirm"
-        @close="showPicker = false"
-      />
-    </div>
+    <div class="color-preview" @click="openColorPicker"></div>
   </div>
+  <!-- n-color-picker вынесен за пределы основного контейнера -->
+  <n-color-picker 
+    v-model:value="colorValue" 
+    :show="showPicker"
+    :show-alpha="false"
+    :actions="['confirm']"
+    @confirm="handleConfirm"
+    @close="showPicker = false"
+    class="n-color-picker"
+  />
 </template>
 
 <script setup lang="ts">

@@ -12,22 +12,23 @@
 
     <div class="form-container">
       <!-- Icon and Color selection row -->
-      <div class="form-row icon-color-row">
-        <div class="form-group">
-          <div class="form-label">Icon</div>
-          <div @click="showIconPopup = true">
-            <IconPicker 
-              v-model="accountData.iconComponent"
-              :iconBackgroundColor="accountData.color || 'var(--bg-light)'"
-            />
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <div class="form-label">Color</div>
-          <ColorPicker v-model="accountData.color" />
-        </div>
-      </div>
+<!-- Icon and Color selection row -->
+<div class="form-row icon-color-row">
+  <div class="form-group">
+    <div class="form-label">Icon</div>
+    <div @click="showIconPopup = true">
+      <IconPicker 
+        v-model="accountData.iconComponent"
+        :iconBackgroundColor="accountData.color || 'var(--bg-field-light)'"
+      />
+    </div>
+  </div>
+  
+  <div class="form-group">
+    <div class="form-label text-right">Color</div>
+    <ColorPicker v-model="accountData.color" />
+  </div>
+</div>
       <!-- Name input -->
       <div class="form-row">
         <div class="form-label">Name</div>
@@ -36,29 +37,28 @@
             v-model="accountData.name"
             placeholder="Account name"
           />
-  </div>
-</div>
+        </div>
+      </div>
 
       <!-- Type selection с использованием AccountTypeSelector -->
       <div class="form-row">
-  <div class="form-label">Type</div>
-  <div class="form-field">
-    <AccountTypeSelector v-model="accountData.type" />
-  </div>
-</div>
-
+        <div class="form-label">Type</div>
+        <div class="form-field">
+          <AccountTypeSelector v-model="accountData.type" />
+        </div>
+      </div>
 
       <!-- Currency selection -->
       <div class="form-row">
-  <div class="form-label">Currency</div>
-  <div class="form-field">
-    <CurrencySelector 
-      :currencyCode="accountData.currency"
-      :currencySymbol="currencyStore.getCurrency(accountData.currency)?.symbol || '$'"
-      @open-popup="showCurrencyPopup = true"
-    />
-  </div>
-</div>
+        <div class="form-label">Currency</div>
+        <div class="form-field">
+          <CurrencySelector 
+            :currencyCode="accountData.currency"
+            :currencySymbol="currencyStore.getCurrency(accountData.currency)?.symbol || '$'"
+            @open-popup="showCurrencyPopup = true"
+          />
+        </div>
+      </div>
 
       <!-- Initial balance -->
       <div class="form-row">
@@ -75,8 +75,12 @@
       <!-- Share permissions -->
       <div class="form-row sharing-row" v-if="userStore.isInitialized">
         <div class="form-label">Share</div>
-        <div class="form-field">
-          <SharePicker v-model="accountData.sharing" />
+        <div class="form-field sharing-field">
+          <AccountSharingPicker 
+            v-model="accountData.sharing" 
+            :ownerId="accountData.ownerId" 
+            @update-sharing="updateSharing"
+          />
         </div>
       </div>
 
@@ -84,17 +88,14 @@
       <div class="form-row">
         <div class="form-label">Book</div>
         <div class="form-field">
-          <div class="chip-container">
-            <div 
-              v-for="book in bookStore.books" 
-              :key="book.id"
-              class="chip"
-              :class="{ 'selected': selectedBooks.includes(book.id) }"
-              @click="toggleBook(book.id)"
-            >
-              {{ book.name }}
-            </div>
-          </div>
+          <!-- Используем модифицированный BookSelector -->
+          <BookSelector 
+            v-model="selectedBooks" 
+            :multiSelect="true"
+            :showIcon="false"
+            backgroundColor="var(--bg-light)"
+            selectedColor="var(--dropdown-item-selected)"
+          />
         </div>
       </div>
 
@@ -130,7 +131,6 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import BasePopup from '../../../components/ui/BasePopup.vue';
 import ColorPicker from '../../../components/ui/inputs/ColorPicker.vue';
-import SharePicker from '../../../components/ui/inputs/SharePicker.vue';
 import TextInput from '../../../components/ui/inputs/TextInput.vue';
 import AccountTypeSelector from './components/AccountTypeSelector.vue';
 import ToggleSwitch from '../../../components/ui/inputs/ToggleSwitch.vue';
@@ -138,6 +138,8 @@ import CurrencyPopup from '../../currency/popup/CurrencyPopup.vue';
 import IconSelectorPopup from '../../icon/popup/IconSelectorPopup.vue';
 import IconPicker from '../../../components/ui/inputs/IconPicker.vue';
 import CurrencySelector from '../../../components/ui/selectors/CurrencySelector.vue';
+import AccountSharingPicker from './components/AccountSharingPicker.vue';
+import BookSelector from '../../../components/ui/selectors/BookSelector.vue';
 import { useAccountManagement } from './composables/useAccountManagement';
 import { useAccountTypes } from './composables/useAccountTypes';
 import { useBookStore } from '../../../stores/book';
@@ -246,6 +248,11 @@ const selectedCurrencyInfo = computed(() => {
   return accountData.value.currency;
 });
 
+// Update sharing permissions
+const updateSharing = (sharing: AccountSharing) => {
+  accountData.value.sharing = sharing;
+};
+
 // Watch for icon component changes to update icon name
 watch(() => accountData.value.iconComponent, (newValue) => {
   if (newValue) {
@@ -288,17 +295,6 @@ watch(() => accountData.value.type, (newType) => {
     accountData.value.color = getDefaultColorForAccountType(newType);
   }
 });
-
-// Toggle book selection
-const toggleBook = (bookId: string) => {
-  const index = selectedBooks.value.indexOf(bookId);
-  if (index === -1) {
-    selectedBooks.value.push(bookId);
-  } else if (selectedBooks.value.length > 1) {
-    // Ensure at least one book is selected
-    selectedBooks.value.splice(index, 1);
-  }
-};
 
 // Save the account
 const saveAccount = async () => {
@@ -378,11 +374,59 @@ const resetForm = () => {
 </script>
 
 <style scoped>
+.sharing-field {
+  max-width: 100%;
+}
+
+.sharing-row {
+  align-items: flex-start;
+  margin-bottom: var(--spacing-lg);
+}
+
+.icon-color-row {
+  justify-content: flex-start;
+  gap: var(--spacing-md);
+}
+
+.form-footer {
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-md);
+  display: flex;
+  justify-content: center;
+}
+
+.form-button {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background-color: var(--accent-color);
+  color: var(--text-contrast);
+  border-radius: var(--border-radius-xl);
+  font-size: var(--font-button-size);
+  font-weight: var(--font-button-weight);
+  border: none;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-speed) var(--transition-fn);
+}
+
+.form-button:hover {
+  filter: brightness(1.1);
+}
+
 .select-arrow {
   width: 0;
   height: 0;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
   border-top: 5px solid var(--text-usual);
+}
+
+.icon-color-row {
+  justify-content: flex-start;
+  gap: var(--spacing-md);
+}
+
+.text-right {
+  text-align: right;
+  width: 100%;
 }
 </style>
