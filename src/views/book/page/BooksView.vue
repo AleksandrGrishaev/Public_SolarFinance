@@ -66,7 +66,8 @@
   .books-header {
     height: 10%;
     min-height: 100px;
-    padding: var(--spacing-md);
+    padding-top: var(--spacing-lg);
+    padding-bottom: var(--spacing-xs);
     display: flex;
     align-items: center;
     justify-content: center;
