@@ -4,7 +4,7 @@
       v-model="isVisible"
       title="Icons"
       :closeOnOverlayClick="true"
-      :extendedMode="true"
+      :extendedMode="false"
     >
       <div class="icon-selector">
         <!-- Search input -->
@@ -73,7 +73,7 @@
     </BasePopup>
   </template>
   
-  <script setup>
+  <script setup lang="ts">
   import { ref, computed, watch, onMounted } from 'vue';
   import BasePopup from '../../../components/ui/BasePopup.vue';
   import { useGridLayout } from '../../../composables/ui/useGridLayout';
@@ -291,29 +291,36 @@
     flex-direction: column;
     width: 100%;
     height: 100%;
-    max-height: 70vh;
     position: relative;
   }
   
   .search-wrapper {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    margin-bottom: 16px;
-    width: 100%;
-    flex-shrink: 0; /* Предотвращает сжатие поисковой строки */
-    background-color: #404040;
-    padding-bottom: 10px;
-  }
-  
-  .search-icon {
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    align-items: center;
-  }
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  margin-bottom: 16px;
+  width: 100%;
+  flex-shrink: 0; /* Предотвращает сжатие поисковой строки */
+  background-color: #404040;
+  min-height: 56px;
+  /* Используем flex для центрирования содержимого по вертикали */
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  /* Заменяем top: 50% и transform на другой способ вертикального центрирования */
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+  /* Задаем конкретную высоту для иконки */
+  height: 18px;
+  display: flex;
+  align-items: center;
+}
   
   .search-input {
     height: 36px;

@@ -108,7 +108,6 @@ defineEmits(['update:modelValue', 'rightIconClick']);
   position: fixed;
   left: 0;
   bottom: 0;
-  padding-bottom: 3vh; /* Добавлен отступ снизу в 3% */
 }
 
 /* Специальный класс для режима с календарем */
@@ -169,7 +168,7 @@ defineEmits(['update:modelValue', 'rightIconClick']);
   align-items: center;
 }
 .popup-content {
-  padding: 13px 16px 30px 16px;
+  padding: 13px 16px 0px 16px;
   width: 100%;
   box-sizing: border-box;
   display: flex;

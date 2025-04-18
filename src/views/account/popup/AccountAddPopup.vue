@@ -15,19 +15,11 @@
       <div class="form-row icon-color-row">
         <div class="form-group">
           <label>Icon</label>
-          <div class="icon-picker-wrapper" @click="showIconPopup = true">
-            <div 
-              class="selected-icon"
-              :style="{ backgroundColor: accountData.color || '#949496' }"
-            >
-              <component 
-                v-if="accountData.iconComponent" 
-                :is="accountData.iconComponent" 
-                size="24" 
-                color="white" 
-                stroke-width="1.5"
-              />
-            </div>
+          <div @click="showIconPopup = true">
+            <IconPicker 
+              v-model="accountData.iconComponent"
+              :iconBackgroundColor="accountData.color || '#949496'"
+            />
           </div>
         </div>
         
@@ -105,7 +97,7 @@
       </div>
 
       <!-- Use in balance toggle -->
-      <div class="form-row">
+      <div class="form-row use-in-balance-row">
         <label>Use in balance</label>
         <ToggleSwitch v-model="accountData.isActive" />
       </div>
@@ -139,6 +131,7 @@ import AccountTypeSelector from './components/AccountTypeSelector.vue';
 import ToggleSwitch from '../../../components/ui/inputs/ToggleSwitch.vue';
 import CurrencyPopup from '../../currency/popup/CurrencyPopup.vue';
 import IconSelectorPopup from '../../icon/popup/IconSelectorPopup.vue';
+import IconPicker from '../../../components/ui/inputs/IconPicker.vue';
 import { useAccountManagement } from './composables/useAccountManagement';
 import { useAccountTypes } from './composables/useAccountTypes';
 import { useBookStore } from '../../../stores/book';
@@ -172,7 +165,13 @@ const emit = defineEmits(['update:modelValue', 'save']);
 // Popup visibility
 const isVisible = computed({
   get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
+  set: (value) => {
+    emit('update:modelValue', value);
+    // Reset form when popup is closed
+    if (!value) {
+      resetForm();
+    }
+  }
 });
 
 // Currency popup visibility
@@ -303,6 +302,10 @@ const saveAccount = async () => {
     console.error('Account name is required');
     return;
   }
+  
+  // Reset icon and color popups if they're open
+  showIconPopup.value = false;
+  showCurrencyPopup.value = false;
 
   // Prepare account data
   const newAccount = {
@@ -361,6 +364,10 @@ const resetForm = () => {
   } else {
     selectedBooks.value = [];
   }
+  
+  // Reset popup visibilities
+  showIconPopup.value = false;
+  showCurrencyPopup.value = false;
 };
 </script>
 
@@ -370,19 +377,19 @@ const resetForm = () => {
   flex-direction: column;
   gap: 16px;
   width: 100%;
-  padding: 0 16px;
+  padding: 0 8px;
   box-sizing: border-box;
 }
 
 .form-row {
   display: flex;
   align-items: center;
-  gap: 10px;
   width: 100%;
 }
 
 .icon-color-row {
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 20px; /* Reduced spacing between icon and color */
 }
 
 .sharing-row {
@@ -399,7 +406,8 @@ label {
   color: white;
   font-size: 16px;
   font-weight: 400;
-  min-width: 100px;
+  min-width: 70px;
+  margin-right: 5px;
 }
 
 .input-wrapper {
@@ -463,27 +471,6 @@ label {
   border-top: 5px solid white;
 }
 
-.icon-picker-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-.selected-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.2s ease;
-}
-
-.selected-icon:hover {
-  transform: scale(1.05);
-}
-
 .books-wrapper {
   display: flex;
   flex-wrap: wrap;
@@ -508,7 +495,7 @@ label {
 .save-account-button {
   margin-top: 20px;
   margin-bottom: 16px;
-  padding: 9px 19px;
+  padding: 12px 24px;
   background-color: #53B794;
   color: white;
   border-radius: 34px;
@@ -516,8 +503,9 @@ label {
   font-weight: 500;
   text-align: center;
   cursor: pointer;
-  align-self: center;
-  display: inline-block;
+  width: calc(100% - 32px);
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .save-button {
@@ -525,5 +513,11 @@ label {
   font-size: 16px;
   font-weight: 500;
   cursor: pointer;
+}
+
+/* Keep the Use in balance toggle spacing consistent with original */
+.use-in-balance-row {
+  margin-left: 0;
+  justify-content: space-between;
 }
 </style>
