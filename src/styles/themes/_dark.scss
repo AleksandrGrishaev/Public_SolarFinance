@@ -1,0 +1,15 @@
+// _dark.scss
+.dark-theme {
+    // Цвета из вашего App.vue
+    --app-background: #121212;
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --border-color: #333333;
+    --accent-color: #4CAF50;
+    --error-color: #FF5252;
+    
+    // Обновлённые переменные для тёмной темы
+    --bg-primary: #404040;
+    --bg-secondary: #333333;
+    --bg-tertiary: #949496;
+  }

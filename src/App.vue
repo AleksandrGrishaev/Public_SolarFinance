@@ -37,6 +37,9 @@ const themeStore = useThemeStore();
 </script>
 
 <style>
+@import '@/styles/themes/_variables.scss';
+@import '@/styles/themes/_dark.scss';
+
 html, body {
   margin: 0;
   padding: 0;
@@ -54,26 +57,6 @@ html, body {
   display: flex;
   flex-direction: column;
   background-color: var(--app-background);
-}
-
-/* Общие темы */
-:root {
-  --app-background: #f8f8f8;
-  --text-primary: #212121;
-  --text-secondary: #616161;
-  --border-color: #e0e0e0;
-  --accent-color: #4CAF50;
-  --error-color: #FF5252;
-}
-
-/* Тёмная тема */
-.dark-theme {
-  --app-background: #121212;
-  --text-primary: #ffffff;
-  --text-secondary: #b0b0b0;
-  --border-color: #333333;
-  --accent-color: #4CAF50;
-  --error-color: #FF5252;
 }
 
 /* Анимации переходов */

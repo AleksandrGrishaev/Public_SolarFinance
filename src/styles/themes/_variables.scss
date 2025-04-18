@@ -1,0 +1,30 @@
+// _variables.scss
+:root {
+    // Базовые цвета из вашего App.vue
+    --app-background: #f8f8f8;
+    --text-primary: #212121;
+    --text-secondary: #616161;
+    --border-color: #e0e0e0;
+    --accent-color: #4CAF50;
+    --error-color: #FF5252;
+    
+    // Добавляем новые переменные для вашего UI
+    --bg-primary: #404040;
+    --bg-secondary: #333333;
+    --bg-tertiary: #949496;
+    
+    // UI компоненты
+    --input-bg: #949496;
+    --input-color: #FFFFFF;
+    --input-radius: 14px;
+    
+    // Компоненты форм
+    --toggle-bg-active: #53B794;
+    --toggle-bg-inactive: #949496;
+    
+    // Размеры и радиусы
+    --border-radius-sm: 8px;
+    --border-radius-md: 14px;
+    --border-radius-lg: 28px;
+    --border-radius-xl: 34px;
+  }
