@@ -1,0 +1,56 @@
+Date : 2025-04-18 14:25:13
+Directory : /Users/peaker/dev/solar-finance/src
+Total : 14 files,  213 codes, 22 comments, 49 blanks, all 284 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| Vue        |          8 |        128 |          6 |         26 |        160 |
+| SCSS       |          4 |         68 |          9 |         18 |         95 |
+| TypeScript |          2 |         17 |          7 |          5 |         29 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++---------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                        | files      | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                           |         14 |        213 |         22 |         49 |        284 |
+| components                                                                                  |          4 |        188 |          5 |         42 |        235 |
+| components/ui                                                                               |          4 |        188 |          5 |         42 |        235 |
+| components/ui (Files)                                                                       |          1 |         12 |          1 |         16 |         29 |
+| components/ui/inputs                                                                        |          2 |          5 |          1 |          0 |          6 |
+| components/ui/selectors                                                                     |          1 |        171 |          3 |         26 |        200 |
+| composables                                                                                 |          2 |         17 |          7 |          5 |         29 |
+| composables/ui                                                                              |          2 |         17 |          7 |          5 |         29 |
+| styles                                                                                      |          4 |         68 |          9 |         18 |         95 |
+| styles (Files)                                                                              |          1 |         20 |          2 |          4 |         26 |
+| styles/components                                                                           |          1 |         13 |          3 |          3 |         19 |
+| styles/themes                                                                               |          2 |         35 |          4 |         11 |         50 |
+| views                                                                                       |          4 |        -60 |          1 |        -16 |        -75 |
+| views/account                                                                               |          4 |        -60 |          1 |        -16 |        -75 |
+| views/account/popup                                                                         |          4 |        -60 |          1 |        -16 |        -75 |
+| views/account/popup (Files)                                                                 |          1 |         35 |          1 |          7 |         43 |
+| views/account/popup/components                                                              |          3 |        -95 |          0 |        -23 |       -118 |
++---------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++---------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                                    | language   | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| /Users/peaker/dev/solar-finance/src/components/ui/BasePopup.vue                             | Vue        |         12 |          1 |         16 |         29 |
+| /Users/peaker/dev/solar-finance/src/components/ui/inputs/ColorPicker.vue                    | Vue        |          0 |          1 |          0 |          1 |
+| /Users/peaker/dev/solar-finance/src/components/ui/inputs/SharePicker.vue                    | Vue        |          5 |          0 |          0 |          5 |
+| /Users/peaker/dev/solar-finance/src/components/ui/selectors/BookSelector.vue                | Vue        |        171 |          3 |         26 |        200 |
+| /Users/peaker/dev/solar-finance/src/composables/ui/useClickOutside.ts                       | TypeScript |          4 |          5 |          2 |         11 |
+| /Users/peaker/dev/solar-finance/src/composables/ui/useDropdown.ts                           | TypeScript |         13 |          2 |          3 |         18 |
+| /Users/peaker/dev/solar-finance/src/styles/components/_forms.scss                           | SCSS       |         13 |          3 |          3 |         19 |
+| /Users/peaker/dev/solar-finance/src/styles/main.scss                                        | SCSS       |         20 |          2 |          4 |         26 |
+| /Users/peaker/dev/solar-finance/src/styles/themes/_colors.scss                              | SCSS       |         28 |          2 |          8 |         38 |
+| /Users/peaker/dev/solar-finance/src/styles/themes/_variables.scss                           | SCSS       |          7 |          2 |          3 |         12 |
+| /Users/peaker/dev/solar-finance/src/views/account/popup/AccountAddPopup.vue                 | Vue        |         35 |          1 |          7 |         43 |
+| /Users/peaker/dev/solar-finance/src/views/account/popup/components/AccountSharingPanel.vue  | Vue        |       -302 |         -1 |        -57 |       -360 |
+| /Users/peaker/dev/solar-finance/src/views/account/popup/components/AccountSharingPicker.vue | Vue        |        186 |          1 |         30 |        217 |
+| /Users/peaker/dev/solar-finance/src/views/account/popup/components/AccountTypeSelector.vue  | Vue        |         21 |          0 |          4 |         25 |
+| Total                                                                                       |            |        213 |         22 |         49 |        284 |
++---------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+

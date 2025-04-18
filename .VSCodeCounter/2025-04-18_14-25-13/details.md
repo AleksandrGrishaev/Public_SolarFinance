@@ -1,10 +1,10 @@
 # Details
 
-Date : 2025-04-18 12:18:02
+Date : 2025-04-18 14:25:13
 
 Directory /Users/peaker/dev/solar-finance/src
 
-Total : 131 files,  18813 codes, 1442 comments, 2957 blanks, all 23212 lines
+Total : 131 files,  19026 codes, 1464 comments, 3006 blanks, all 23496 lines
 
 [Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
@@ -38,26 +38,26 @@ Total : 131 files,  18813 codes, 1442 comments, 2957 blanks, all 23212 lines
 | [src/components/transactions/TransactionTypeSelector.vue](/src/components/transactions/TransactionTypeSelector.vue) | Vue | 82 | 1 | 11 | 94 |
 | [src/components/transactions/ViewTransaction/TransactionDateGroup.vue](/src/components/transactions/ViewTransaction/TransactionDateGroup.vue) | Vue | 90 | 3 | 14 | 107 |
 | [src/components/transactions/ViewTransaction/TransactionItem.vue](/src/components/transactions/ViewTransaction/TransactionItem.vue) | Vue | 228 | 4 | 31 | 263 |
-| [src/components/ui/BasePopup.vue](/src/components/ui/BasePopup.vue) | Vue | 194 | 6 | 9 | 209 |
+| [src/components/ui/BasePopup.vue](/src/components/ui/BasePopup.vue) | Vue | 206 | 7 | 25 | 238 |
 | [src/components/ui/CreateCategoryButton.vue](/src/components/ui/CreateCategoryButton.vue) | Vue | 54 | 1 | 7 | 62 |
 | [src/components/ui/buttons/CreateActionButton.vue](/src/components/ui/buttons/CreateActionButton.vue) | Vue | 53 | 1 | 6 | 60 |
 | [src/components/ui/filters/DateFilter.vue](/src/components/ui/filters/DateFilter.vue) | Vue | 438 | 11 | 62 | 511 |
 | [src/components/ui/icons/AccountIcon.vue](/src/components/ui/icons/AccountIcon.vue) | Vue | 107 | 3 | 14 | 124 |
 | [src/components/ui/icons/DropdownArrow.vue](/src/components/ui/icons/DropdownArrow.vue) | Vue | 33 | 1 | 1 | 35 |
-| [src/components/ui/inputs/ColorPicker.vue](/src/components/ui/inputs/ColorPicker.vue) | Vue | 68 | 1 | 13 | 82 |
+| [src/components/ui/inputs/ColorPicker.vue](/src/components/ui/inputs/ColorPicker.vue) | Vue | 68 | 2 | 13 | 83 |
 | [src/components/ui/inputs/IconPicker.vue](/src/components/ui/inputs/IconPicker.vue) | Vue | 66 | 1 | 9 | 76 |
 | [src/components/ui/inputs/ParentCategorySelector.vue](/src/components/ui/inputs/ParentCategorySelector.vue) | Vue | 128 | 1 | 18 | 147 |
-| [src/components/ui/inputs/SharePicker.vue](/src/components/ui/inputs/SharePicker.vue) | Vue | 166 | 1 | 28 | 195 |
+| [src/components/ui/inputs/SharePicker.vue](/src/components/ui/inputs/SharePicker.vue) | Vue | 171 | 1 | 28 | 200 |
 | [src/components/ui/inputs/TextInput.vue](/src/components/ui/inputs/TextInput.vue) | Vue | 60 | 1 | 8 | 69 |
 | [src/components/ui/inputs/ToggleButtonGroup.vue](/src/components/ui/inputs/ToggleButtonGroup.vue) | Vue | 68 | 1 | 8 | 77 |
 | [src/components/ui/inputs/ToggleSwitch.vue](/src/components/ui/inputs/ToggleSwitch.vue) | Vue | 80 | 1 | 8 | 89 |
 | [src/components/ui/lists/ListItemWithToggle.vue](/src/components/ui/lists/ListItemWithToggle.vue) | Vue | 149 | 6 | 20 | 175 |
-| [src/components/ui/selectors/BookSelector.vue](/src/components/ui/selectors/BookSelector.vue) | Vue | 40 | 1 | 4 | 45 |
+| [src/components/ui/selectors/BookSelector.vue](/src/components/ui/selectors/BookSelector.vue) | Vue | 211 | 4 | 30 | 245 |
 | [src/components/ui/selectors/CurrencySelector.vue](/src/components/ui/selectors/CurrencySelector.vue) | Vue | 69 | 1 | 11 | 81 |
 | [src/components/ui/selectors/UniversalSelector.vue](/src/components/ui/selectors/UniversalSelector.vue) | Vue | 144 | 3 | 15 | 162 |
 | [src/composables/transaction/useFormatBalance.ts](/src/composables/transaction/useFormatBalance.ts) | TypeScript | 80 | 28 | 20 | 128 |
-| [src/composables/ui/useClickOutside.ts](/src/composables/ui/useClickOutside.ts) | TypeScript | 20 | 1 | 4 | 25 |
-| [src/composables/ui/useDropdown.ts](/src/composables/ui/useDropdown.ts) | TypeScript | 25 | 2 | 6 | 33 |
+| [src/composables/ui/useClickOutside.ts](/src/composables/ui/useClickOutside.ts) | TypeScript | 24 | 6 | 6 | 36 |
+| [src/composables/ui/useDropdown.ts](/src/composables/ui/useDropdown.ts) | TypeScript | 38 | 4 | 9 | 51 |
 | [src/composables/ui/useGridLayout.ts](/src/composables/ui/useGridLayout.ts) | TypeScript | 106 | 23 | 25 | 154 |
 | [src/composables/ui/useGridLayoutTypes.ts](/src/composables/ui/useGridLayoutTypes.ts) | TypeScript | 34 | 1 | 6 | 41 |
 | [src/composables/useDateFilter.ts](/src/composables/useDateFilter.ts) | TypeScript | 330 | 43 | 64 | 437 |
@@ -109,13 +109,13 @@ Total : 131 files,  18813 codes, 1442 comments, 2957 blanks, all 23212 lines
 | [src/stores/user/userService.ts](/src/stores/user/userService.ts) | TypeScript | 140 | 52 | 23 | 215 |
 | [src/stores/user/userStore.ts](/src/stores/user/userStore.ts) | TypeScript | 162 | 55 | 38 | 255 |
 | [src/styles/\_mixins.scss](/src/styles/_mixins.scss) | SCSS | 20 | 1 | 3 | 24 |
-| [src/styles/components/\_forms.scss](/src/styles/components/_forms.scss) | SCSS | 124 | 13 | 22 | 159 |
+| [src/styles/components/\_forms.scss](/src/styles/components/_forms.scss) | SCSS | 137 | 16 | 25 | 178 |
 | [src/styles/components/\_inputs.scss](/src/styles/components/_inputs.scss) | SCSS | 30 | 1 | 3 | 34 |
-| [src/styles/main.scss](/src/styles/main.scss) | SCSS | 50 | 11 | 13 | 74 |
-| [src/styles/themes/\_colors.scss](/src/styles/themes/_colors.scss) | SCSS | 87 | 12 | 28 | 127 |
+| [src/styles/main.scss](/src/styles/main.scss) | SCSS | 70 | 13 | 17 | 100 |
+| [src/styles/themes/\_colors.scss](/src/styles/themes/_colors.scss) | SCSS | 115 | 14 | 36 | 165 |
 | [src/styles/themes/\_dark.scss](/src/styles/themes/_dark.scss) | SCSS | 6 | 5 | 3 | 14 |
 | [src/styles/themes/\_typography.scss](/src/styles/themes/_typography.scss) | SCSS | 66 | 13 | 17 | 96 |
-| [src/styles/themes/\_variables.scss](/src/styles/themes/_variables.scss) | SCSS | 43 | 15 | 12 | 70 |
+| [src/styles/themes/\_variables.scss](/src/styles/themes/_variables.scss) | SCSS | 50 | 17 | 15 | 82 |
 | [src/types/base.ts](/src/types/base.ts) | TypeScript | 5 | 0 | 0 | 5 |
 | [src/views/AccountsView.vue](/src/views/AccountsView.vue) | Vue | 184 | 4 | 24 | 212 |
 | [src/views/DashboardView.vue](/src/views/DashboardView.vue) | Vue | 221 | 4 | 19 | 244 |
@@ -123,12 +123,12 @@ Total : 131 files,  18813 codes, 1442 comments, 2957 blanks, all 23212 lines
 | [src/views/MoreView.vue](/src/views/MoreView.vue) | Vue | 252 | 8 | 33 | 293 |
 | [src/views/NotFoundView.vue](/src/views/NotFoundView.vue) | Vue | 32 | 1 | 4 | 37 |
 | [src/views/PinLoginView.vue](/src/views/PinLoginView.vue) | Vue | 223 | 5 | 37 | 265 |
-| [src/views/account/popup/AccountAddPopup.vue](/src/views/account/popup/AccountAddPopup.vue) | Vue | 331 | 12 | 45 | 388 |
+| [src/views/account/popup/AccountAddPopup.vue](/src/views/account/popup/AccountAddPopup.vue) | Vue | 366 | 13 | 52 | 431 |
 | [src/views/account/popup/AccountEditPopup.vue](/src/views/account/popup/AccountEditPopup.vue) | Vue | 410 | 11 | 58 | 479 |
 | [src/views/account/popup/AccountSelectorPopup.vue](/src/views/account/popup/AccountSelectorPopup.vue) | Vue | 485 | 13 | 82 | 580 |
 | [src/views/account/popup/BookAccountsPopup.vue](/src/views/account/popup/BookAccountsPopup.vue) | Vue | 471 | 6 | 93 | 570 |
-| [src/views/account/popup/components/AccountSharingPanel.vue](/src/views/account/popup/components/AccountSharingPanel.vue) | Vue | 302 | 1 | 57 | 360 |
-| [src/views/account/popup/components/AccountTypeSelector.vue](/src/views/account/popup/components/AccountTypeSelector.vue) | Vue | 130 | 1 | 21 | 152 |
+| [src/views/account/popup/components/AccountSharingPicker.vue](/src/views/account/popup/components/AccountSharingPicker.vue) | Vue | 186 | 1 | 30 | 217 |
+| [src/views/account/popup/components/AccountTypeSelector.vue](/src/views/account/popup/components/AccountTypeSelector.vue) | Vue | 151 | 1 | 25 | 177 |
 | [src/views/account/popup/composables/useAccountManagement.ts](/src/views/account/popup/composables/useAccountManagement.ts) | TypeScript | 76 | 18 | 20 | 114 |
 | [src/views/account/popup/composables/useAccountSharing.ts](/src/views/account/popup/composables/useAccountSharing.ts) | TypeScript | 50 | 23 | 10 | 83 |
 | [src/views/account/popup/composables/useAccountTypes.ts](/src/views/account/popup/composables/useAccountTypes.ts) | TypeScript | 84 | 36 | 10 | 130 |
