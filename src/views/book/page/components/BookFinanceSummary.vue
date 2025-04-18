@@ -54,16 +54,27 @@
       
       <!-- Информация об участниках -->
       <div class="distribution-info">
+        <!-- Левый пользователь -->
         <div 
-          v-for="(side, index) in ownerSides" 
-          :key="side.id"
-          class="owner-info"
-          :style="getParticipantStyle(index)"
+          class="owner-info left-owner"
+          :style="getParticipantStyle(0)"
         >
-          <div class="owner-name">{{ side.name }}</div>
+          <div class="owner-name">{{ ownerSides[0]?.name }}</div>
           <div class="owner-details">
-            <span class="owner-percentage">{{ index === 0 ? ownerDistribution : 100 - ownerDistribution }}%</span>
-            <span class="owner-amount">{{ formatCurrency(getParticipantAmount(index)) }}</span>
+            <span class="owner-percentage">{{ ownerDistribution }}%</span>
+            <span class="owner-amount">{{ formatCurrency(getParticipantAmount(0)) }}</span>
+          </div>
+        </div>
+        
+        <!-- Правый пользователь -->
+        <div 
+          class="owner-info right-owner"
+          :style="getParticipantStyle(1)"
+        >
+          <div class="owner-name">{{ ownerSides[1]?.name }}</div>
+          <div class="owner-details">
+            <span class="owner-amount">{{ formatCurrency(getParticipantAmount(1)) }}</span>
+            <span class="owner-percentage">{{ 100 - ownerDistribution }}%</span>
           </div>
         </div>
       </div>
@@ -218,10 +229,15 @@ onMounted(async () => {
 .owner-info {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  max-width: 45%;
 }
 
-.owner-info:last-child {
+.left-owner {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.right-owner {
   align-items: flex-end;
   text-align: right;
 }
@@ -230,6 +246,10 @@ onMounted(async () => {
   font-size: var(--font-small-size);
   font-weight: 500;
   margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .owner-details {
