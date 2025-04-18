@@ -28,7 +28,6 @@
           <ColorPicker v-model="accountData.color" />
         </div>
       </div>
-
       <!-- Name input -->
       <div class="form-row">
         <div class="form-label">Name</div>
@@ -37,27 +36,29 @@
             v-model="accountData.name"
             placeholder="Account name"
           />
-        </div>
-      </div>
+  </div>
+</div>
 
       <!-- Type selection с использованием AccountTypeSelector -->
       <div class="form-row">
-        <div class="form-label">Type</div>
-        <div class="form-field">
-          <AccountTypeSelector v-model="accountData.type" />
-        </div>
-      </div>
+  <div class="form-label">Type</div>
+  <div class="form-field">
+    <AccountTypeSelector v-model="accountData.type" />
+  </div>
+</div>
+
 
       <!-- Currency selection -->
       <div class="form-row">
-        <div class="form-label">Currency</div>
-        <div class="form-field">
-          <div class="form-select" @click="showCurrencyPopup = true">
-            <span>{{ selectedCurrencyInfo }}</span>
-            <span class="select-arrow"></span>
-          </div>
-        </div>
-      </div>
+  <div class="form-label">Currency</div>
+  <div class="form-field">
+    <CurrencySelector 
+      :currencyCode="accountData.currency"
+      :currencySymbol="currencyStore.getCurrency(accountData.currency)?.symbol || '$'"
+      @open-popup="showCurrencyPopup = true"
+    />
+  </div>
+</div>
 
       <!-- Initial balance -->
       <div class="form-row">
@@ -136,6 +137,7 @@ import ToggleSwitch from '../../../components/ui/inputs/ToggleSwitch.vue';
 import CurrencyPopup from '../../currency/popup/CurrencyPopup.vue';
 import IconSelectorPopup from '../../icon/popup/IconSelectorPopup.vue';
 import IconPicker from '../../../components/ui/inputs/IconPicker.vue';
+import CurrencySelector from '../../../components/ui/selectors/CurrencySelector.vue';
 import { useAccountManagement } from './composables/useAccountManagement';
 import { useAccountTypes } from './composables/useAccountTypes';
 import { useBookStore } from '../../../stores/book';
