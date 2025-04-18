@@ -132,8 +132,8 @@ export const defaultTransactions: Transaction[] = [
     executedByOwnerId: "user_2",
     responsibleOwnerIds: ["user_1", "user_2"],
     distributionRules: [
-      { ownerId: "user_1", percentage: 50 },
-      { ownerId: "user_2", percentage: 50 }
+      { ownerId: "user_1", percentage: 78 },
+      { ownerId: "user_2", percentage: 22 }
     ],
     bookId: "family",
     createdAt: new Date("2025-03-05"),
@@ -245,8 +245,8 @@ export const defaultTransactions: Transaction[] = [
     executedByOwnerId: "user_2",
     responsibleOwnerIds: ["user_1", "user_2"],
     distributionRules: [
-      { ownerId: "user_1", percentage: 50 },
-      { ownerId: "user_2", percentage: 50 }
+      { ownerId: "user_1", percentage: 80 },
+      { ownerId: "user_2", percentage: 20 }
     ],
     bookId: "family",
     createdAt: new Date("2025-03-18"),
@@ -293,8 +293,8 @@ export const defaultTransactions: Transaction[] = [
     executedByOwnerId: "user_1",
     responsibleOwnerIds: ["user_1", "user_2"],
     distributionRules: [
-      { ownerId: "user_1", percentage: 50 },
-      { ownerId: "user_2", percentage: 50 }
+      { ownerId: "user_1", percentage: 60 },
+      { ownerId: "user_2", percentage: 40 }
     ],
     bookId: "family",
     createdAt: new Date("2025-03-16"),
@@ -425,8 +425,8 @@ export const defaultTransactions: Transaction[] = [
     executedByOwnerId: "user_1",
     responsibleOwnerIds: ["user_1", "user_2"],
     distributionRules: [
-      { ownerId: "user_1", percentage: 50 },
-      { ownerId: "user_2", percentage: 50 }
+      { ownerId: "user_1", percentage: 60 },
+      { ownerId: "user_2", percentage: 40 }
     ],
     bookId: "family",
     createdAt: new Date("2025-03-14"),
@@ -471,8 +471,8 @@ export const defaultTransactions: Transaction[] = [
     executedByOwnerId: "user_1",
     responsibleOwnerIds: ["user_1", "user_2"],
     distributionRules: [
-      { ownerId: "user_1", percentage: 50 },
-      { ownerId: "user_2", percentage: 50 }
+      { ownerId: "user_1", percentage: 70 },
+      { ownerId: "user_2", percentage: 30 }
     ],
     bookId: "family",
     createdAt: new Date("2025-03-19"),

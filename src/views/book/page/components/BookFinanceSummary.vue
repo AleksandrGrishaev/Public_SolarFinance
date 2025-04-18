@@ -37,18 +37,24 @@
     </div>
     
     <!-- Слайдер распределения между владельцами -->
-    <div v-if="bookData.distributionRules && bookData.distributionRules.length > 1">
-      <!-- Слайдер -->
+    <div v-if="bookData.distributionRules && bookData.distributionRules.length > 1 && ownerSides.length >= 2">
+      <!-- Заголовок секции -->
+      <div class="distribution-header">
+        <span>Распределение расходов</span>
+      </div>
+      
+      <!-- Слайдер (только для отображения) -->
       <div class="slider-container">
         <input 
           type="range" 
           class="slider" 
-          :value="ownerDistribution"
+          :value="actualOwnerDistribution"
           @input="updateOwnerDistribution"
           min="0" 
           max="100" 
           step="1"
           :style="getSliderStyle()"
+          disabled
         />
       </div>
       
@@ -59,9 +65,9 @@
           class="owner-info left-owner"
           :style="getParticipantStyle(0)"
         >
-          <div class="owner-name">{{ ownerSides[0]?.name }}</div>
+          <div class="owner-name">{{ ownerSides[0]?.name || 'User 1' }}</div>
           <div class="owner-details">
-            <span class="owner-percentage">{{ ownerDistribution }}%</span>
+            <span class="owner-percentage">{{ Math.round(ownerSides[0]?.percentage || 0) }}%</span>
             <span class="owner-amount">{{ formatCurrency(getParticipantAmount(0)) }}</span>
           </div>
         </div>
@@ -71,10 +77,10 @@
           class="owner-info right-owner"
           :style="getParticipantStyle(1)"
         >
-          <div class="owner-name">{{ ownerSides[1]?.name }}</div>
+          <div class="owner-name">{{ ownerSides[1]?.name || 'User 2' }}</div>
           <div class="owner-details">
             <span class="owner-amount">{{ formatCurrency(getParticipantAmount(1)) }}</span>
-            <span class="owner-percentage">{{ 100 - ownerDistribution }}%</span>
+            <span class="owner-percentage">{{ Math.round(ownerSides[1]?.percentage || 0) }}%</span>
           </div>
         </div>
       </div>
@@ -108,7 +114,7 @@ const currentBookId = ref(props.bookId);
 
 // Используем композабл вместо локальной логики
 const {
-  ownerDistribution,
+  actualOwnerDistribution,
   dateFilter,
   bookData,
   ownerSides,
@@ -134,15 +140,23 @@ const handleEditClick = () => {
 watch(() => props.bookId, (newBookId) => {
   console.log(`[BookFinanceSummary] BookId changed to ${newBookId}`);
   currentBookId.value = newBookId;
-  // Принудительно обновляем данные
-  refreshData();
+  
+  // Используем setTimeout для предотвращения обновления перед полной загрузкой данных
+  setTimeout(() => {
+    // Принудительно обновляем данные
+    refreshData();
+  }, 100);
 }, { immediate: true });
 
 // Инициализация компонента
 onMounted(async () => {
   await initStores();
-  // Принудительно обновляем данные после инициализации
-  refreshData();
+  
+  // Используем setTimeout для предотвращения обновления перед полной загрузкой данных
+  setTimeout(() => {
+    // Принудительно обновляем данные после инициализации
+    refreshData();
+  }, 100);
 });
 </script>
 
@@ -194,7 +208,13 @@ onMounted(async () => {
   color: var(--text-grey);
 }
 
-.summary-edit {
+.distribution-header {
+  display: flex;
+  justify-content: center;
+  margin: var(--spacing-md) 0 var(--spacing-sm) 0;
+  font-size: var(--font-small-size);
+  color: var(--text-grey);
+  font-weight: 500;
 }
 
 /* Стили для слайдера */
@@ -211,6 +231,11 @@ onMounted(async () => {
   border-radius: 3px;
   outline: none;
   transition: opacity 0.2s;
+  cursor: default;
+}
+
+.slider:disabled {
+  opacity: 1;
 }
 
 .slider::-webkit-slider-thumb {
@@ -220,7 +245,7 @@ onMounted(async () => {
   height: 18px;
   border-radius: 50%;
   background: white;
-  cursor: pointer;
+  cursor: default;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
@@ -229,7 +254,7 @@ onMounted(async () => {
   height: 18px;
   border-radius: 50%;
   background: white;
-  cursor: pointer;
+  cursor: default;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
