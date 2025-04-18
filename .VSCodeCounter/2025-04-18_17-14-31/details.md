@@ -1,10 +1,10 @@
 # Details
 
-Date : 2025-04-18 14:25:13
+Date : 2025-04-18 17:14:31
 
 Directory /Users/peaker/dev/solar-finance/src
 
-Total : 131 files,  19026 codes, 1464 comments, 3006 blanks, all 23496 lines
+Total : 134 files,  19474 codes, 1473 comments, 3054 blanks, all 24001 lines
 
 [Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
@@ -34,10 +34,10 @@ Total : 131 files,  19026 codes, 1464 comments, 3006 blanks, all 23496 lines
 | [src/components/transactions/AmountSection.vue](/src/components/transactions/AmountSection.vue) | Vue | 190 | 5 | 24 | 219 |
 | [src/components/transactions/BookSelector.vue](/src/components/transactions/BookSelector.vue) | Vue | 135 | 1 | 19 | 155 |
 | [src/components/transactions/NumberKeypad.vue](/src/components/transactions/NumberKeypad.vue) | Vue | 147 | 1 | 17 | 165 |
-| [src/components/transactions/PercentageSlider.vue](/src/components/transactions/PercentageSlider.vue) | Vue | 170 | 1 | 23 | 194 |
+| [src/components/transactions/PercentageSlider.vue](/src/components/transactions/PercentageSlider.vue) | Vue | 57 | 3 | 8 | 68 |
 | [src/components/transactions/TransactionTypeSelector.vue](/src/components/transactions/TransactionTypeSelector.vue) | Vue | 82 | 1 | 11 | 94 |
-| [src/components/transactions/ViewTransaction/TransactionDateGroup.vue](/src/components/transactions/ViewTransaction/TransactionDateGroup.vue) | Vue | 90 | 3 | 14 | 107 |
-| [src/components/transactions/ViewTransaction/TransactionItem.vue](/src/components/transactions/ViewTransaction/TransactionItem.vue) | Vue | 228 | 4 | 31 | 263 |
+| [src/components/transactions/ViewTransaction/TransactionDateGroup.vue](/src/components/transactions/ViewTransaction/TransactionDateGroup.vue) | Vue | 46 | 1 | 7 | 54 |
+| [src/components/transactions/ViewTransaction/TransactionItem.vue](/src/components/transactions/ViewTransaction/TransactionItem.vue) | Vue | 88 | 1 | 6 | 95 |
 | [src/components/ui/BasePopup.vue](/src/components/ui/BasePopup.vue) | Vue | 206 | 7 | 25 | 238 |
 | [src/components/ui/CreateCategoryButton.vue](/src/components/ui/CreateCategoryButton.vue) | Vue | 54 | 1 | 7 | 62 |
 | [src/components/ui/buttons/CreateActionButton.vue](/src/components/ui/buttons/CreateActionButton.vue) | Vue | 53 | 1 | 6 | 60 |
@@ -55,6 +55,9 @@ Total : 131 files,  19026 codes, 1464 comments, 3006 blanks, all 23496 lines
 | [src/components/ui/selectors/BookSelector.vue](/src/components/ui/selectors/BookSelector.vue) | Vue | 211 | 4 | 30 | 245 |
 | [src/components/ui/selectors/CurrencySelector.vue](/src/components/ui/selectors/CurrencySelector.vue) | Vue | 69 | 1 | 11 | 81 |
 | [src/components/ui/selectors/UniversalSelector.vue](/src/components/ui/selectors/UniversalSelector.vue) | Vue | 144 | 3 | 15 | 162 |
+| [src/components/ui/views/BasePercentageSlider.vue](/src/components/ui/views/BasePercentageSlider.vue) | Vue | 245 | 4 | 31 | 280 |
+| [src/components/ui/views/BaseTransactionGroup.vue](/src/components/ui/views/BaseTransactionGroup.vue) | Vue | 171 | 4 | 24 | 199 |
+| [src/components/ui/views/BaseTransactionItem.vue](/src/components/ui/views/BaseTransactionItem.vue) | Vue | 329 | 4 | 40 | 373 |
 | [src/composables/transaction/useFormatBalance.ts](/src/composables/transaction/useFormatBalance.ts) | TypeScript | 80 | 28 | 20 | 128 |
 | [src/composables/ui/useClickOutside.ts](/src/composables/ui/useClickOutside.ts) | TypeScript | 24 | 6 | 6 | 36 |
 | [src/composables/ui/useDropdown.ts](/src/composables/ui/useDropdown.ts) | TypeScript | 38 | 4 | 9 | 51 |

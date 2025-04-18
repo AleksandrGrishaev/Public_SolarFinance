@@ -1,4 +1,4 @@
-<!-- /Users/peaker/dev/solar-finance/src/components/navigation/NavMenu.vue -->
+<!-- /src/components/navigation/NavMenu.vue -->
 <template>
   <div class="menu-float-element">
     <div class="menu">
@@ -22,11 +22,12 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, onMounted, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 
 // Router для навигации
 const router = useRouter();
+const route = useRoute();
 
 const menuItems = [
   { id: 'new', label: '', route: '/transaction' },
@@ -38,11 +39,32 @@ const menuItems = [
 
 const activeItem = ref('new');
 
+// Установка активного элемента в зависимости от текущего маршрута
+const setActiveItemFromRoute = (path) => {
+  const matchedItem = menuItems.find(item => path.startsWith(item.route));
+  if (matchedItem) {
+    activeItem.value = matchedItem.id;
+  }
+};
+
 // Обработчик клика по пункту меню
-const handleItemClick = (item: any) => {
+const handleItemClick = (item) => {
   activeItem.value = item.id;
   router.push(item.route);
 };
+
+// При монтировании компонента определяем активный элемент
+onMounted(() => {
+  setActiveItemFromRoute(route.path);
+});
+
+// Следим за изменениями маршрута
+watch(
+  () => route.path,
+  (newPath) => {
+    setActiveItemFromRoute(newPath);
+  }
+);
 </script>
 <style scoped>
 .menu-float-element {
@@ -96,6 +118,9 @@ const handleItemClick = (item: any) => {
   align-items: center;
   gap: 10px;
 }
-/* Убрал стили .menu-item.active, так как в предоставленном примере не видно 
-   отличия активного текстового элемента */
+/* Добавляем стили для активного пункта меню */
+.menu-item.active {
+  font-weight: 600;
+  color: #000000;
+}
 </style>

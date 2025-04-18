@@ -1,0 +1,8 @@
+"filename", "language", "Vue", "comment", "blank", "total"
+"/Users/peaker/dev/solar-finance/src/components/transactions/PercentageSlider.vue", "Vue", -113, 2, -15, -126
+"/Users/peaker/dev/solar-finance/src/components/transactions/ViewTransaction/TransactionDateGroup.vue", "Vue", -44, -2, -7, -53
+"/Users/peaker/dev/solar-finance/src/components/transactions/ViewTransaction/TransactionItem.vue", "Vue", -140, -3, -25, -168
+"/Users/peaker/dev/solar-finance/src/components/ui/views/BasePercentageSlider.vue", "Vue", 245, 4, 31, 280
+"/Users/peaker/dev/solar-finance/src/components/ui/views/BaseTransactionGroup.vue", "Vue", 171, 4, 24, 199
+"/Users/peaker/dev/solar-finance/src/components/ui/views/BaseTransactionItem.vue", "Vue", 329, 4, 40, 373
+"Total", "-", 448, 9, 48, 505

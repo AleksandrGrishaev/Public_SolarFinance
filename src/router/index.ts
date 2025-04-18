@@ -33,6 +33,22 @@ const routes: Array<RouteRecordRaw> = [
       title: 'Login'
     }
   },
+  // BooksView
+  {
+    path: '/books',
+    component: IosLayout,
+    children: [
+      {
+        path: '',
+        name: 'books',
+        component: () => import('@/views/book/page/BooksView.vue'),
+        meta: {
+          requiresAuth: true,
+          title: 'Books'
+        }
+      }
+    ]
+  },
   // MoreView - используем IosLayout
   {
     path: '/more',

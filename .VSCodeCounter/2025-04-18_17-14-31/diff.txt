@@ -1,0 +1,36 @@
+Date : 2025-04-18 17:14:31
+Directory : /Users/peaker/dev/solar-finance/src
+Total : 6 files,  448 codes, 9 comments, 48 blanks, all 505 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| Vue      |          6 |        448 |          9 |         48 |        505 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                 | files      | code       | comment    | blank      | total      |
++------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                    |          6 |        448 |          9 |         48 |        505 |
+| components                                                                                           |          6 |        448 |          9 |         48 |        505 |
+| components/transactions                                                                              |          3 |       -297 |         -3 |        -47 |       -347 |
+| components/transactions (Files)                                                                      |          1 |       -113 |          2 |        -15 |       -126 |
+| components/transactions/ViewTransaction                                                              |          2 |       -184 |         -5 |        -32 |       -221 |
+| components/ui                                                                                        |          3 |        745 |         12 |         95 |        852 |
+| components/ui/views                                                                                  |          3 |        745 |         12 |         95 |        852 |
++------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++------------------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                                                             | language | code       | comment    | blank      | total      |
++------------------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| /Users/peaker/dev/solar-finance/src/components/transactions/PercentageSlider.vue                     | Vue      |       -113 |          2 |        -15 |       -126 |
+| /Users/peaker/dev/solar-finance/src/components/transactions/ViewTransaction/TransactionDateGroup.vue | Vue      |        -44 |         -2 |         -7 |        -53 |
+| /Users/peaker/dev/solar-finance/src/components/transactions/ViewTransaction/TransactionItem.vue      | Vue      |       -140 |         -3 |        -25 |       -168 |
+| /Users/peaker/dev/solar-finance/src/components/ui/views/BasePercentageSlider.vue                     | Vue      |        245 |          4 |         31 |        280 |
+| /Users/peaker/dev/solar-finance/src/components/ui/views/BaseTransactionGroup.vue                     | Vue      |        171 |          4 |         24 |        199 |
+| /Users/peaker/dev/solar-finance/src/components/ui/views/BaseTransactionItem.vue                      | Vue      |        329 |          4 |         40 |        373 |
+| Total                                                                                                |          |        448 |          9 |         48 |        505 |
++------------------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
