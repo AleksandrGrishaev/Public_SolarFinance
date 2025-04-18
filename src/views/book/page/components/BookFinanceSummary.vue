@@ -88,7 +88,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, watch, ref } from 'vue';
 import { IconPencil } from '@tabler/icons-vue';
 import BaseIcon from '@/components/ui/icons/BaseIcon.vue';
 import DateFilter from '@/components/ui/filters/DateFilter.vue';
@@ -102,6 +102,9 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['update:dateFilter']);
+
+// Создаем реактивную ссылку для отслеживания изменений bookId
+const currentBookId = ref(props.bookId);
 
 // Используем композабл вместо локальной логики
 const {
@@ -117,8 +120,9 @@ const {
   getParticipantAmount,
   updateOwnerDistribution,
   onCalendarVisibilityChange,
-  initStores
-} = useBookFinanceSummary(props.bookId, emit);
+  initStores,
+  refreshData
+} = useBookFinanceSummary(currentBookId.value, emit);
 
 // Обработчик клика по иконке редактирования
 const handleEditClick = () => {
@@ -126,9 +130,19 @@ const handleEditClick = () => {
   // Здесь можно добавить логику редактирования
 };
 
+// Отслеживаем изменение bookId из свойства компонента
+watch(() => props.bookId, (newBookId) => {
+  console.log(`[BookFinanceSummary] BookId changed to ${newBookId}`);
+  currentBookId.value = newBookId;
+  // Принудительно обновляем данные
+  refreshData();
+}, { immediate: true });
+
 // Инициализация компонента
 onMounted(async () => {
   await initStores();
+  // Принудительно обновляем данные после инициализации
+  refreshData();
 });
 </script>
 
