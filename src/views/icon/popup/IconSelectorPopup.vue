@@ -4,6 +4,7 @@
       v-model="isVisible"
       title="Icons"
       :closeOnOverlayClick="true"
+      :extendedMode="true"
     >
       <div class="icon-selector">
         <!-- Search input -->
@@ -24,46 +25,48 @@
           class="icon-selector-content"
           ref="containerRef"
         >
-          <template v-for="(categoryIcons, category) in filteredIconGroups" :key="category">
-            <div class="category-header">{{ category }}</div>
-            
-            <div class="icon-grid">
-              <!-- Icons -->
-              <div
-                v-for="(icon, iconName) in categoryIcons"
-                :key="iconName"
-                class="grid-cell"
-                :style="gridCellStyle"
-                @click="selectIcon(iconName, icon)"
-              >
-                <div 
-                  class="icon-wrapper"
-                  :style="iconStyle"
-                  :class="{ 'selected': iconName === selectedIconName }"
-                >
-                  <component 
-                    :is="icon"
-                    :size="32"
-                    :stroke-width="1.5"
-                    color="white"
-                  />
-                </div>
-              </div>
+          <div class="scrollable-content">
+            <template v-for="(categoryIcons, category) in filteredIconGroups" :key="category">
+              <div class="category-header">{{ category }}</div>
               
-              <!-- Filler items for last row -->
-              <div 
-                v-for="i in fillerItemsCount" 
-                :key="`filler-${i}`"
-                class="grid-cell filler"
-                :style="gridCellStyle"
-              ></div>
+              <div class="icon-grid">
+                <!-- Icons -->
+                <div
+                  v-for="(icon, iconName) in categoryIcons"
+                  :key="iconName"
+                  class="grid-cell"
+                  :style="gridCellStyle"
+                  @click="selectIcon(iconName, icon)"
+                >
+                  <div 
+                    class="icon-wrapper"
+                    :style="iconStyle"
+                    :class="{ 'selected': iconName === selectedIconName }"
+                  >
+                    <component 
+                      :is="icon"
+                      :size="32"
+                      :stroke-width="1.5"
+                      color="white"
+                    />
+                  </div>
+                </div>
+                
+                <!-- Filler items for last row -->
+                <div 
+                  v-for="i in fillerItemsCount" 
+                  :key="`filler-${i}`"
+                  class="grid-cell filler"
+                  :style="gridCellStyle"
+                ></div>
+              </div>
+            </template>
+            
+            <!-- Empty state when no icons match search -->
+            <div v-if="Object.keys(filteredIconGroups).length === 0" class="empty-state">
+              <div>No icons found matching your search</div>
+              <div>Try a different search term</div>
             </div>
-          </template>
-          
-          <!-- Empty state when no icons match search -->
-          <div v-if="Object.keys(filteredIconGroups).length === 0" class="empty-state">
-            <div>No icons found matching your search</div>
-            <div>Try a different search term</div>
           </div>
         </div>
       </div>
@@ -208,14 +211,37 @@
     searchQuery.value = '';
   };
   
-  // Update selected icon name from props when component mounts
+  // Вычисляем оптимальную высоту контента для скролла
+  const calculateContentHeight = () => {
+    // Если попап открыт и у нас есть ссылка на контейнер
+    if (isVisible.value && containerRef.value) {
+      // Пересчитываем сетку после небольшой задержки, чтобы DOM успел обновиться
+      setTimeout(() => {
+        // Получаем высоту окна
+        const windowHeight = window.innerHeight;
+        // Проверяем высоту контента с учетом запаса для скролла
+        const contentElement = containerRef.value;
+        if (contentElement) {
+          // Проверяем, достаточно ли места для скролла
+          console.log('Content scrollHeight:', contentElement.scrollHeight);
+          console.log('Window height:', windowHeight);
+        }
+        
+        // Пересчитываем макет
+        calculateLayout();
+      }, 150);
+    }
+  };
+  
+  // Определяем высоту контента для скролла
   onMounted(() => {
     // Сбрасываем поиск при монтировании
     resetSearch();
     
-    // Пересчитываем сетку после рендеринга
+    // Рассчитываем макет и проверяем высоту
     setTimeout(() => {
       calculateLayout();
+      calculateContentHeight();
     }, 100);
     
     if (props.selectedIcon) {
@@ -230,14 +256,15 @@
     }
   });
   
-  // Reset search when popup closes
+  // Восстанавливаем скролл при закрытии
   watch(isVisible, (newValue) => {
     if (!newValue) {
       resetSearch();
     } else {
-      // Пересчитываем сетку при открытии
+      // Пересчитываем сетку и контент при открытии
       setTimeout(() => {
         calculateLayout();
+        calculateContentHeight();
       }, 100);
     }
   });
@@ -248,6 +275,14 @@
       calculateLayout();
     }, 100);
   });
+  
+  // Наблюдаем за изменениями в отфильтрованных группах иконок
+  watch(filteredIconGroups, () => {
+    // Обновляем макет после изменения результатов фильтрации
+    setTimeout(() => {
+      calculateLayout();
+    }, 100);
+  }, { deep: true });
   </script>
   
   <style scoped>
@@ -257,12 +292,18 @@
     width: 100%;
     height: 100%;
     max-height: 70vh;
+    position: relative;
   }
   
   .search-wrapper {
-    position: relative;
+    position: sticky;
+    top: 0;
+    z-index: 10;
     margin-bottom: 16px;
     width: 100%;
+    flex-shrink: 0; /* Предотвращает сжатие поисковой строки */
+    background-color: #404040;
+    padding-bottom: 10px;
   }
   
   .search-icon {
@@ -296,9 +337,18 @@
   
   .icon-selector-content {
     flex: 1;
-    overflow-y: auto;
+    overflow-y: auto; /* Обеспечиваем скролл */
+    overflow-x: hidden;
     padding: 0 4px;
-    max-height: calc(70vh - 80px);
+    -webkit-overflow-scrolling: touch; /* Для плавной прокрутки на iOS */
+    height: calc(80vh - 120px); /* Фиксированная высота для скролла */
+    position: relative;
+  }
+  
+  .scrollable-content {
+    min-height: 100%;
+    width: 100%;
+    padding-bottom: 30px; /* Добавляем отступ внизу для лучшего UX */
   }
   
   .category-header {
