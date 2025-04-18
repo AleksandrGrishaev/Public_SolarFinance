@@ -36,13 +36,12 @@
         </div>
       </div>
 
-      <!-- Type selection -->
+      <!-- Type selection с использованием AccountTypeSelector -->
       <div class="form-row">
         <label>Type</label>
-        <ToggleButtonGroup 
-          v-model="accountData.type" 
-          :options="typeOptions"
-        />
+        <div class="input-wrapper">
+          <AccountTypeSelector v-model="accountData.type" />
+        </div>
       </div>
 
       <!-- Currency selection -->
@@ -114,16 +113,21 @@ import BasePopup from '../../../components/ui/BasePopup.vue';
 import ColorPicker from '../../../components/ui/inputs/ColorPicker.vue';
 import IconPicker from '../../../components/ui/inputs/IconPicker.vue';
 import SharePicker from '../../../components/ui/inputs/SharePicker.vue';
-import ToggleButtonGroup from '../../../components/ui/inputs/ToggleButtonGroup.vue';
+import AccountTypeSelector from './components/AccountTypeSelector.vue';
 import ToggleSwitch from '../../../components/ui/inputs/ToggleSwitch.vue';
 import { useAccountManagement } from './composables/useAccountManagement';
+import { useAccountTypes } from './composables/useAccountTypes';
 import { useBookStore } from '../../../stores/book';
 import { useCurrencyStore } from '../../../stores/currency';
 import { useUserStore } from '../../../stores/user';
 import type { AccountType, AccountSharing } from '../../../stores/account/types';
 
-// Используем кастомный хук для работы с аккаунтами
+// Используем кастомные хуки
 const { accountStore, init } = useAccountManagement();
+const { 
+  getDefaultIconForAccountType, 
+  getDefaultColorForAccountType
+} = useAccountTypes();
 const bookStore = useBookStore();
 const currencyStore = useCurrencyStore();
 const userStore = useUserStore();
@@ -180,50 +184,14 @@ onMounted(async () => {
   }
 });
 
-// Options for toggle groups
-const typeOptions = computed(() => [
-  { label: 'Cash', value: 'cash' },
-  { label: 'Bank', value: 'bank' },
-  { label: 'Card', value: 'card' }
-]);
-
-// Owner options
-const ownerOptions = computed(() => {
-  // Проверяем, инициализирован ли userStore и доступен ли метод getAllUsers
-  if (!userStore.isInitialized || !userStore.getAllUsers) {
-    return [];
-  }
-  
-  try {
-    // Получаем всех пользователей
-    const users = userStore.getAllUsers();
-    
-    // Проверяем, что users - это массив
-    if (!Array.isArray(users)) {
-      console.warn('[AccountAddPopup] getAllUsers did not return an array');
-      return [];
-    }
-    
-    // Фильтруем активных пользователей и преобразуем в нужный формат
-    return users
-      .filter(user => user && user.isActive !== false)
-      .map(user => ({
-        label: user.name,
-        value: user.id
-      }));
-  } catch (error) {
-    console.error('[AccountAddPopup] Error getting owner options:', error);
-    return [];
-  }
-});
-
-// Account data
+// Account data с использованием значений по умолчанию
+const defaultAccountType: AccountType = 'card';
 const accountData = ref({
   name: '',
   iconComponent: null,
-  icon: '',
-  color: '#949496',
-  type: 'card' as AccountType,
+  icon: getDefaultIconForAccountType(defaultAccountType),
+  color: getDefaultColorForAccountType(defaultAccountType),
+  type: defaultAccountType,
   currency: 'USD',
   initialBalance: 0,
   ownerId: userStore.currentUser?.id || 'user_1',
@@ -241,7 +209,8 @@ watch(() => accountData.value.iconComponent, (newValue) => {
     const iconName = newValue.type?.name?.replace('Icon', '') || '';
     accountData.value.icon = iconName ? `Icon${iconName}` : '';
   } else {
-    accountData.value.icon = '';
+    // Если компонент иконки удален, установим иконку по умолчанию для текущего типа
+    accountData.value.icon = getDefaultIconForAccountType(accountData.value.type);
   }
 });
 
@@ -259,6 +228,20 @@ watch(() => accountData.value.ownerId, (newOwnerId) => {
     const updatedSharing = { ...accountData.value.sharing };
     delete updatedSharing[newOwnerId];
     accountData.value.sharing = updatedSharing;
+  }
+});
+
+// Watch for type changes to update defaults
+watch(() => accountData.value.type, (newType) => {
+  // Если иконка не была установлена пользователем, установим иконку по умолчанию для нового типа
+  if (!accountData.value.iconComponent) {
+    accountData.value.icon = getDefaultIconForAccountType(newType);
+  }
+  
+  // Можно также автоматически предлагать цвет по умолчанию, но только если пользователь
+  // еще не выбрал собственный цвет (опционально)
+  if (accountData.value.color === '#949496') {
+    accountData.value.color = getDefaultColorForAccountType(newType);
   }
 });
 
@@ -317,12 +300,13 @@ const saveAccount = async () => {
 
 // Reset the form
 const resetForm = () => {
+  const defaultType: AccountType = 'card';
   accountData.value = {
     name: '',
     iconComponent: null,
-    icon: '',
-    color: '#949496',
-    type: 'card' as AccountType,
+    icon: getDefaultIconForAccountType(defaultType),
+    color: getDefaultColorForAccountType(defaultType),
+    type: defaultType,
     currency: userStore.userSettings?.baseCurrency || currencyStore.appBaseCurrency,
     initialBalance: 0,
     ownerId: userStore.currentUser?.id || 'user_1',
