@@ -15,7 +15,20 @@
       <div class="form-row icon-color-row">
         <div class="form-group">
           <label>Icon</label>
-          <IconPicker v-model="accountData.iconComponent" />
+          <div class="icon-picker-wrapper" @click="showIconPopup = true">
+            <div 
+              class="selected-icon"
+              :style="{ backgroundColor: accountData.color || '#949496' }"
+            >
+              <component 
+                v-if="accountData.iconComponent" 
+                :is="accountData.iconComponent" 
+                size="24" 
+                color="white" 
+                stroke-width="1.5"
+              />
+            </div>
+          </div>
         </div>
         
         <div class="form-group">
@@ -47,12 +60,10 @@
       <!-- Currency selection -->
       <div class="form-row">
         <label>Currency</label>
-        <div class="currency-selector">
-          <select v-model="accountData.currency" class="currency-select">
-            <option v-for="currency in currencyStore.currencies" :key="currency.code" :value="currency.code">
-              {{ currency.code }} ({{ currency.symbol }})
-            </option>
-          </select>
+        <div class="currency-selector" @click="showCurrencyPopup = true">
+          <div class="currency-select-display">
+            {{ selectedCurrencyInfo }}
+          </div>
         </div>
       </div>
 
@@ -105,16 +116,29 @@
       Save account
     </div>
   </BasePopup>
+
+  <!-- Currency selection popup -->
+  <CurrencyPopup
+    v-model="showCurrencyPopup"
+    v-model:selectedCurrency="accountData.currency"
+  />
+  
+  <!-- Icon selection popup -->
+  <IconSelectorPopup
+    v-model="showIconPopup"
+    v-model:selectedIcon="accountData.iconComponent"
+  />
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue';
 import BasePopup from '../../../components/ui/BasePopup.vue';
 import ColorPicker from '../../../components/ui/inputs/ColorPicker.vue';
-import IconPicker from '../../../components/ui/inputs/IconPicker.vue';
 import SharePicker from '../../../components/ui/inputs/SharePicker.vue';
 import AccountTypeSelector from './components/AccountTypeSelector.vue';
 import ToggleSwitch from '../../../components/ui/inputs/ToggleSwitch.vue';
+import CurrencyPopup from '../../currency/popup/CurrencyPopup.vue';
+import IconSelectorPopup from '../../icon/popup/IconSelectorPopup.vue';
 import { useAccountManagement } from './composables/useAccountManagement';
 import { useAccountTypes } from './composables/useAccountTypes';
 import { useBookStore } from '../../../stores/book';
@@ -150,6 +174,12 @@ const isVisible = computed({
   get: () => props.modelValue,
   set: (value) => emit('update:modelValue', value)
 });
+
+// Currency popup visibility
+const showCurrencyPopup = ref(false);
+
+// Icon popup visibility
+const showIconPopup = ref(false);
 
 // Initialize stores if needed
 onMounted(async () => {
@@ -201,6 +231,15 @@ const accountData = ref({
 
 // Selected books
 const selectedBooks = ref<string[]>([]);
+
+// Computed property for currency display
+const selectedCurrencyInfo = computed(() => {
+  const currency = currencyStore.getCurrency(accountData.value.currency);
+  if (currency) {
+    return `${currency.code} (${currency.symbol})`;
+  }
+  return accountData.value.currency;
+});
 
 // Watch for icon component changes to update icon name
 watch(() => accountData.value.iconComponent, (newValue) => {
@@ -394,9 +433,10 @@ label {
 
 .currency-selector {
   flex: 1;
+  cursor: pointer;
 }
 
-.currency-select {
+.currency-select-display {
   height: 36px;
   width: 100%;
   background-color: #949496;
@@ -405,11 +445,43 @@ label {
   padding: 0 12px;
   color: #FFFFFF;
   font-size: 16px;
-  appearance: none;
-  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px top 50%;
-  background-size: 10px auto;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.currency-select-display::after {
+  content: "";
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid white;
+}
+
+.icon-picker-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.selected-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.selected-icon:hover {
+  transform: scale(1.05);
 }
 
 .books-wrapper {
