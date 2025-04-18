@@ -1,6 +1,0 @@
-"filename", "language", "Vue", "TypeScript", "comment", "blank", "total"
-"/Users/peaker/dev/solar-finance/src/components/ui/lists/ListItemWithToggle.vue", "Vue", 10, 0, 0, 1, 11
-"/Users/peaker/dev/solar-finance/src/views/account/popup/AccountSelectorPopup.vue", "Vue", 17, 0, 0, 5, 22
-"/Users/peaker/dev/solar-finance/src/views/account/popup/BookAccountsPopup.vue", "Vue", 43, 0, 0, 9, 52
-"/Users/peaker/dev/solar-finance/src/views/account/popup/composables/useAccountManagement.ts", "TypeScript", 0, 20, 3, 9, 32
-"Total", "-", 70, 20, 3, 24, 117

@@ -1,0 +1,11 @@
+"filename", "language", "Vue", "TypeScript", "comment", "blank", "total"
+"/Users/peaker/dev/solar-finance/src/components/currency/CurrencySelector.vue", "Vue", -146, 0, 0, -23, -169
+"/Users/peaker/dev/solar-finance/src/composables/ui/useGridLayout.ts", "TypeScript", 0, 106, 23, 25, 154
+"/Users/peaker/dev/solar-finance/src/composables/ui/useGridLayoutTypes.ts", "TypeScript", 0, 34, 1, 6, 41
+"/Users/peaker/dev/solar-finance/src/views/account/popup/AccountAddPopup.vue", "Vue", 48, 0, 2, 6, 56
+"/Users/peaker/dev/solar-finance/src/views/account/popup/components/AccountTypeSelector.vue", "Vue", 160, 0, 0, 23, 183
+"/Users/peaker/dev/solar-finance/src/views/account/popup/composables/useAccountTypes.ts", "TypeScript", 0, 84, 36, 10, 130
+"/Users/peaker/dev/solar-finance/src/views/currency/popup/CurrencyPopup.vue", "Vue", 162, 0, 3, 25, 190
+"/Users/peaker/dev/solar-finance/src/views/icon/composables/useIconGroups.ts", "TypeScript", 0, 53, 7, 10, 70
+"/Users/peaker/dev/solar-finance/src/views/icon/popup/IconSelectorPopup.vue", "Vue", 354, 0, 6, 52, 412
+"Total", "-", 578, 277, 78, 134, 1067
