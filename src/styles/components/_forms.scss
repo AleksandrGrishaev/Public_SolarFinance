@@ -36,6 +36,11 @@
     &.use-in-balance-row {
       justify-content: space-between;
     }
+
+    &.use-in-balance-row {
+        justify-content: flex-start;  // Изменяем с space-between на flex-start
+        gap: var(--spacing-md);       // Добавляем фиксированный промежуток
+      }
   }
   
   // Группа элементов формы
