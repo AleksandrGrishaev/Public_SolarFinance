@@ -1,0 +1,24 @@
+// _mixins.scss
+@mixin flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  @mixin transition-standard {
+    transition: all var(--transition-speed) var(--transition-fn);
+  }
+  
+  @mixin input-base {
+    height: var(--input-height);
+    background-color: var(--input-bg);
+    border: none;
+    border-radius: var(--input-radius);
+    padding: var(--spacing-sm) var(--spacing-md);
+    color: var(--input-color);
+    font-size: var(--font-body-size);
+    
+    &:focus {
+      outline: none;
+    }
+  }

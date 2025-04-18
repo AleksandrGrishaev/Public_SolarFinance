@@ -40,23 +40,30 @@ const updateValue = (event) => {
 }
 
 .text-input {
-  height: 36px;
-  background-color: white;
+  height: var(--input-height);
+  background-color: var(--input-bg);
   border: none;
-  border-radius: 4px;
-  padding: 8px 12px;
-  color: #333;
-  font-size: 16px;
+  border-radius: var(--input-radius);
+  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--input-color);
+  font-size: var(--font-body-size);
   width: 100%;
   box-sizing: border-box;
+  transition: all var(--transition-speed) var(--transition-fn);
 }
 
 .text-input::placeholder {
-  color: #999;
+  color: var(--text-inactive);
+  opacity: 0.7;
 }
 
 .text-input:focus {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(83, 183, 148, 0.3);
+  box-shadow: 0 0 0 2px var(--accent-color);
+}
+
+.text-input:disabled {
+  opacity: var(--state-disabled-opacity);
+  cursor: not-allowed;
 }
 </style>

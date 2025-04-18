@@ -1,34 +1,154 @@
-// _forms.scss
+// src/styles/components/_forms.scss
+
+// Стили для форм и полей ввода
+
+// Контейнер формы
 .form-container {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: var(--form-field-gap);
     width: 100%;
-    padding: 0 8px;
+    padding: 0 var(--spacing-sm);
     box-sizing: border-box;
   }
   
+  // Строка формы
   .form-row {
     display: flex;
     align-items: center;
     width: 100%;
+    margin-bottom: var(--spacing-md);
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    // Модификаторы для строк
+    &.icon-color-row {
+      justify-content: flex-start;
+      gap: var(--spacing-md);
+    }
+    
+    &.sharing-row {
+      align-items: flex-start;
+    }
+    
+    &.use-in-balance-row {
+      justify-content: space-between;
+    }
   }
   
+  // Группа элементов формы
+  .form-group {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+  
+  // Метка поля
   .form-label {
-    color: var(--text-primary);
-    font-size: 16px;
+    color: var(--text-usual);
+    font-size: var(--font-body-size);
     font-weight: 400;
-    min-width: 70px;
+    min-width: var(--form-label-min-width);
     margin-right: 5px;
   }
   
+  // Обертка поля ввода
   .form-field {
     flex: 1;
-    max-width: 70%;
+    max-width: var(--form-field-max-width);
   }
   
-  // Строки с разметкой
-  .form-row.icon-color-row {
-    justify-content: flex-start;
-    gap: 20px;
+  // Текстовое поле ввода
+  .form-input {
+    height: 36px;
+    width: 100%;
+    background-color: var(--input-bg);
+    border: none;
+    border-radius: var(--input-radius);
+    padding: var(--spacing-sm) var(--spacing-md);
+    color: var(--input-color);
+    font-size: var(--font-body-size);
+    box-sizing: border-box;
+    
+    &:focus {
+      outline: none;
+    }
+    
+    &::placeholder {
+      color: rgba(64, 64, 64, 0.7);
+    }
+  }
+  
+  // Селектор (выпадающий список)
+  .form-select {
+    height: 36px;
+    background-color: var(--input-bg);
+    border: none;
+    border-radius: var(--input-radius);
+    padding: 0 var(--spacing-md);
+    color: var(--input-color);
+    font-size: var(--font-body-size);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+  }
+  
+  // Чипы (например, для выбора книг)
+  .chip-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+    background-color: var(--bg-contrast);
+    border-radius: var(--border-radius-lg);
+    padding: 6px;
+    width: 100%;
+  }
+  
+  .chip {
+    padding: 6px 16px;
+    background-color: transparent;
+    border-radius: var(--border-radius-xl);
+    color: var(--text-usual);
+    font-size: var(--font-small-size);
+    cursor: pointer;
+    
+    &.selected {
+      background-color: black;
+      color: var(--text-contrast);
+    }
+  }
+  
+  // Кнопки формы
+  .form-button {
+    padding: var(--spacing-md) var(--spacing-lg);
+    background-color: var(--accent-color);
+    color: var(--text-contrast);
+    border-radius: var(--border-radius-xl);
+    font-size: var(--font-button-size);
+    font-weight: var(--font-button-weight);
+    border: none;
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition-speed) var(--transition-fn);
+    
+    &:hover {
+      filter: brightness(1.1);
+    }
+    
+    &.text-button {
+      background-color: transparent;
+      color: var(--accent-color);
+      padding: var(--spacing-xs) var(--spacing-sm);
+    }
+  }
+  
+  // Footer формы
+  .form-footer {
+    margin-top: var(--spacing-lg);
+    padding: var(--spacing-md);
+    display: flex;
+    justify-content: center;
   }

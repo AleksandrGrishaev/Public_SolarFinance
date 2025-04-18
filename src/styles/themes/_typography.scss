@@ -1,0 +1,96 @@
+// src/styles/themes/_typography.scss
+
+// Typography styles
+// Формат: Название шрифта, размер шрифта/высота строки
+
+// Text styles
+:root {
+    // En_SuperHeader - 40/48
+    --font-super-header-size: 40px;
+    --font-super-header-line-height: 48px;
+    --font-super-header-weight: 700;
+  
+    // En_heading - 24/32
+    --font-heading-size: 24px;  
+    --font-heading-line-height: 32px;
+    --font-heading-weight: 600;
+  
+    // En_Subheading_HIGH - 16/30
+    --font-subheading-high-size: 16px;
+    --font-subheading-high-line-height: 30px;
+    --font-subheading-high-weight: 600;
+  
+    // En_Subheading - 20/24
+    --font-subheading-size: 20px;
+    --font-subheading-line-height: 24px;
+    --font-subheading-weight: 500;
+  
+    // En_body - 16/20
+    --font-body-size: 16px;
+    --font-body-line-height: 20px;
+    --font-body-weight: 400;
+  
+    // En_small - 12/16
+    --font-small-size: 12px;
+    --font-small-line-height: 16px;
+    --font-small-weight: 400;
+  
+    // En_Button - 16/24
+    --font-button-size: 16px;
+    --font-button-line-height: 24px;
+    --font-button-weight: 500;
+  
+    // En_SuperSmall - 10/12
+    --font-super-small-size: 10px;
+    --font-super-small-line-height: 12px;
+    --font-super-small-weight: 400;
+  }
+  
+  // Typography classes
+  .en-super-header {
+    font-size: var(--font-super-header-size);
+    line-height: var(--font-super-header-line-height);
+    font-weight: var(--font-super-header-weight);
+  }
+  
+  .en-heading {
+    font-size: var(--font-heading-size);
+    line-height: var(--font-heading-line-height);
+    font-weight: var(--font-heading-weight);
+  }
+  
+  .en-subheading-high {
+    font-size: var(--font-subheading-high-size);
+    line-height: var(--font-subheading-high-line-height);
+    font-weight: var(--font-subheading-high-weight);
+  }
+  
+  .en-subheading {
+    font-size: var(--font-subheading-size);
+    line-height: var(--font-subheading-line-height);
+    font-weight: var(--font-subheading-weight);
+  }
+  
+  .en-body {
+    font-size: var(--font-body-size);
+    line-height: var(--font-body-line-height);
+    font-weight: var(--font-body-weight);
+  }
+  
+  .en-small {
+    font-size: var(--font-small-size);
+    line-height: var(--font-small-line-height);
+    font-weight: var(--font-small-weight);
+  }
+  
+  .en-button {
+    font-size: var(--font-button-size);
+    line-height: var(--font-button-line-height);
+    font-weight: var(--font-button-weight);
+  }
+  
+  .en-super-small {
+    font-size: var(--font-super-small-size);
+    line-height: var(--font-super-small-line-height);
+    font-weight: var(--font-super-small-weight);
+  }
