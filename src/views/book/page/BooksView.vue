@@ -1,6 +1,8 @@
 <!-- src/views/book/page/BooksView.vue -->
 <template>
   <div class="books-view-container">
+
+    
     <!-- Верхняя часть с BookFilterView -->
     <div class="books-header bg-screen">
       <BookFilterView :multiSelect="false" @click="showNewBookPopup = true" />
@@ -8,6 +10,10 @@
     
     <!-- Нижняя часть с контентом -->
     <div class="books-content bg-light">
+    
+      <!-- Header with book title and edit icon -->
+    <BookHeader />
+
       <!-- Если книга выбрана, показываем панель -->
       <DashBoardBook 
         v-if="currentBook"
@@ -18,7 +24,6 @@
         <p class="text-grey">Select a book to view details</p>
       </div>
     </div>
-
     <!-- Попап для создания новой книги -->
     <NewBookPopup v-model="showNewBookPopup" />
   </div>
@@ -27,6 +32,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
 import BookFilterView from './components/BookFilterView.vue';
+import BookHeader from './components/BookHeader.vue';
 import NewBookPopup from '../popup/NewBookPopup.vue';
 import DashBoardBook from './components/DashBoardBook.vue';
 import { useBookContextProvider } from './composables/useBookContext';
@@ -35,6 +41,7 @@ console.log('[BooksView] Component setup started');
 
 // Используем провайдер контекста и сохраняем весь контекст
 const context = useBookContextProvider();
+
 // Затем получаем нужные значения из контекста
 const { currentBook } = context;
 
