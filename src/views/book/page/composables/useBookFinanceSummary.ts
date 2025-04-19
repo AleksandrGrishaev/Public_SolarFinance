@@ -16,7 +16,11 @@ export default function useBookFinanceSummary(bookIdProp: string, emit: any) {
     refreshData,
     initStores,
     isLoading,
-    onCalendarVisibilityChange
+    onCalendarVisibilityChange,
+    bookDetail,
+    isBookDataReady,
+    hasDistributionRules: bookDataHasRules,
+    bookStore
   } = useBookData(bookIdProp, emit);
   
   // Получаем данные о распределении между владельцами
@@ -25,7 +29,8 @@ export default function useBookFinanceSummary(bookIdProp: string, emit: any) {
     actualOwnerDistribution,
     getParticipantAmount,
     updateOwnerDistribution,
-    hasDistributionRules
+    hasDistributionRules: ownerDistributionHasRules,
+    bookDistributionRules
   } = useOwnerDistribution(bookIdProp, emit);
   
   // Получаем функции форматирования для отображения
@@ -37,6 +42,9 @@ export default function useBookFinanceSummary(bookIdProp: string, emit: any) {
     getParticipantStyle
   } = useFormatting(bookIdProp, emit);
   
+  // Объединенная проверка наличия правил распределения
+  const hasDistributionRules = ownerDistributionHasRules;
+  
   return {
     // Из useBookData
     dateFilter,
@@ -46,6 +54,8 @@ export default function useBookFinanceSummary(bookIdProp: string, emit: any) {
     initStores,
     isLoading,
     onCalendarVisibilityChange,
+    bookDetail,
+    isBookDataReady,
     
     // Из useOwnerDistribution
     ownerSides,
@@ -53,12 +63,16 @@ export default function useBookFinanceSummary(bookIdProp: string, emit: any) {
     getParticipantAmount,
     updateOwnerDistribution,
     hasDistributionRules,
+    bookDistributionRules,
     
     // Из useFormatting
     formatAmount,
     formatCurrency,
     getTotalClass,
     getSliderStyle,
-    getParticipantStyle
+    getParticipantStyle,
+    
+    // Предоставляем доступ к хранилищу книг
+    bookStore
   };
 }

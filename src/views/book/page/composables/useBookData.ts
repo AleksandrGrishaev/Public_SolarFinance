@@ -18,6 +18,8 @@ export default function useBookData(bookIdProp: string, emit: any) {
   
   // Состояние
   const isLoading = ref(true);
+  const isBookDataReady = ref(false);
+  
   const dateFilter = ref({
     period: 'monthly',
     date: new Date(),
@@ -53,6 +55,15 @@ export default function useBookData(bookIdProp: string, emit: any) {
     // Иначе используем валюту выбранной книги
     const book = bookStore.getBookById(bookId.value);
     return book?.currency || currencyStore.userBaseCurrency;
+  });
+  
+  // Детальные данные книги
+  const bookDetail = computed(() => {
+    if (isAllBooks.value) {
+      return null;
+    }
+    
+    return bookStore.getBookById(bookId.value);
   });
   
   // Отфильтрованные транзакции на основе текущих фильтров
@@ -101,9 +112,6 @@ export default function useBookData(bookIdProp: string, emit: any) {
   
   /**
    * Получение суммы транзакции в целевой валюте
-   * Приоритет:
-   * 1. bookAmount если доступен и в нужной валюте
-   * 2. Конвертация из валюты транзакции в целевую
    */
   const getTransactionAmount = (transaction: Transaction, currency: string): number => {
     // Проверка существования транзакции
@@ -133,7 +141,8 @@ export default function useBookData(bookIdProp: string, emit: any) {
   
   // Получаем данные книги или сводную информацию по всем книгам
   const bookData = computed(() => {
-    if (isLoading.value) {
+    // Если данные загружаются или книга еще не готова, возвращаем базовые данные
+    if (isLoading.value || !isBookDataReady.value) {
       return {
         name: bookId.value === 'all' ? 'All Books' : 'Loading...',
         incomeAmount: 0,
@@ -185,8 +194,8 @@ export default function useBookData(bookIdProp: string, emit: any) {
         };
       }
       
-      // Для конкретной книги
-      const book = bookStore.getBookById(bookId.value);
+      // Для конкретной книги - получаем детальные данные
+      const book = bookDetail.value;
       
       if (!book) {
         return {
@@ -220,6 +229,19 @@ export default function useBookData(bookIdProp: string, emit: any) {
     }
   });
   
+  // Проверяем наличие правил распределения
+  const hasDistributionRules = computed(() => {
+    // Проверяем, загружены ли данные
+    if (isLoading.value || !isBookDataReady.value) {
+      return false;
+    }
+    
+    // Проверяем, есть ли в книге правила распределения
+    return bookData.value && 
+           bookData.value.distributionRules && 
+           bookData.value.distributionRules.length >= 2;
+  });
+  
   // Обработчики событий
   const onCalendarVisibilityChange = (isVisible) => {
     // Возможность дополнительной логики при изменении видимости календаря
@@ -234,6 +256,7 @@ export default function useBookData(bookIdProp: string, emit: any) {
   watch(bookId, (newBookId) => {
     console.log(`[useBookData] Book ID changed to: ${newBookId}`);
     isLoading.value = true;
+    isBookDataReady.value = false;
     
     // Сбрасываем фильтр даты на текущий месяц
     dateFilter.value = {
@@ -244,16 +267,6 @@ export default function useBookData(bookIdProp: string, emit: any) {
         new Date()
       ]
     };
-    
-    // Выполняем принудительное обновление транзакций
-    transactionStore.refreshTransactions()
-      .then(() => {
-        isLoading.value = false;
-      })
-      .catch(error => {
-        console.error('[useBookData] Error refreshing transactions:', error);
-        isLoading.value = false;
-      });
   });
   
   // Функция для принудительного обновления данных
@@ -261,7 +274,23 @@ export default function useBookData(bookIdProp: string, emit: any) {
     isLoading.value = true;
     
     try {
-      console.log(`[useBookData] Manually refreshing data for book: ${bookId.value}`);
+      console.log(`[useBookData] Refreshing data for book: ${bookId.value}`);
+      
+      // Обновляем данные книг
+      if (!bookStore.isInitialized) {
+        await bookStore.init();
+      } else {
+        await bookStore.refreshBooks();
+      }
+      
+      // Проверяем, что книга существует
+      const selectedBook = bookStore.getBookById(bookId.value);
+      if (!selectedBook && !isAllBooks.value) {
+        console.warn(`[useBookData] Book with ID ${bookId.value} not found after refresh`);
+      } else {
+        isBookDataReady.value = true;
+      }
+      
       // Обновляем данные транзакций из хранилища
       await transactionStore.refreshTransactions();
       
@@ -286,29 +315,32 @@ export default function useBookData(bookIdProp: string, emit: any) {
     try {
       // Последовательно инициализируем все необходимые хранилища
       if (!userStore.isInitialized) {
-        console.log('[useBookData] Initializing user store');
         await userStore.init();
       }
       
       if (!bookStore.isInitialized) {
-        console.log('[useBookData] Initializing book store');
         await bookStore.init();
       }
       
       if (!transactionStore.isInitialized) {
-        console.log('[useBookData] Initializing transaction store');
         await transactionStore.init();
       }
       
       if (!currencyStore.currencies.length) {
-        console.log('[useBookData] Initializing currency store');
         await currencyStore.init();
       }
       
       // Убедимся, что пользователи загружены
       if (userStore.users.length === 0) {
-        console.log('[useBookData] Loading users');
         await userStore.refreshUsers();
+      }
+      
+      // Проверяем, существует ли книга
+      const selectedBook = bookStore.getBookById(bookId.value);
+      if (selectedBook || isAllBooks.value) {
+        isBookDataReady.value = true;
+      } else {
+        console.warn(`[useBookData] Book with ID ${bookId.value} not found during initialization`);
       }
     } catch (error) {
       console.error('[useBookData] Error initializing stores:', error);
@@ -328,6 +360,9 @@ export default function useBookData(bookIdProp: string, emit: any) {
     refreshData,
     initStores,
     isLoading,
+    bookDetail,
+    isBookDataReady,
+    hasDistributionRules,
     onCalendarVisibilityChange,
     bookStore,
     userStore,

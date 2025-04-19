@@ -1,94 +1,103 @@
 <!-- src/views/book/page/components/BookFinanceSummary.vue -->
 <template>
   <div class="financial-info">
-    <!-- Контейнер для верхней строки с суммами и иконкой -->
-    <div class="header-container">
-      <div class="summary-row">
-        <!-- Итоговая сумма -->
-        <div class="summary-total">
-          <div class="amount" :class="getTotalClass(bookData.totalAmount)">{{ formatAmount(bookData.totalAmount) }}</div>
-          <div class="label">Total</div>
-        </div>
-        
-        <!-- Доход -->
-        <div class="summary-income">
-          <div class="amount amount-positive">{{ formatAmount(bookData.incomeAmount) }}</div>
-          <div class="label">Income</div>
-        </div>
-        
-        <!-- Расход -->
-        <div class="summary-expense">
-          <div class="amount amount-negative">{{ formatAmount(bookData.expenseAmount) }}</div>
-          <div class="label">Expense</div>
-        </div>
-      </div>
-      
-      <!-- Иконка редактирования -->
-      <div class="summary-edit">
-        <BaseIcon 
-          :icon="IconPencil" 
-          size="lg"
-          color="#808080"
-          :customStyle="{backgroundColor: '#F7F9F8'}"
-          clickable
-          @click="handleEditClick"
-        />
-      </div>
+    <!-- Состояние загрузки -->
+    <div v-if="isLoading" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Загрузка данных...</p>
     </div>
     
-    <!-- Слайдер распределения между владельцами -->
-    <div v-if="hasDistributionRules">
-      <!-- Заголовок секции -->
-      <div class="distribution-header">
-        <span>Распределение расходов</span>
-      </div>
-      
-      <!-- Слайдер (только для отображения) -->
-      <div class="slider-container">
-        <input 
-          type="range" 
-          class="slider" 
-          :value="actualOwnerDistribution"
-          @input="updateOwnerDistribution"
-          min="0" 
-          max="100" 
-          step="1"
-          :style="getSliderStyle()"
-          disabled
-        />
-      </div>
-      
-      <!-- Информация об участниках -->
-      <div class="distribution-info">
-        <!-- Левый пользователь -->
-        <div 
-          class="owner-info left-owner"
-          :style="getParticipantStyle(0)"
-        >
-          <div class="owner-name">{{ ownerSides[0]?.name || 'No data' }}</div>
-          <div class="owner-details">
-            <span class="owner-percentage">{{ Math.round(ownerSides[0]?.percentage || 0) }}%</span>
-            <span class="owner-amount">{{ formatCurrency(getParticipantAmount(0)) }}</span>
+    <!-- Данные загружены -->
+    <div v-else>
+      <!-- Контейнер для верхней строки с суммами и иконкой -->
+      <div class="header-container">
+        <div class="summary-row">
+          <!-- Итоговая сумма -->
+          <div class="summary-total">
+            <div class="amount" :class="getTotalClass(bookData.totalAmount)">{{ formatAmount(bookData.totalAmount) }}</div>
+            <div class="label">Total</div>
+          </div>
+          
+          <!-- Доход -->
+          <div class="summary-income">
+            <div class="amount amount-positive">{{ formatAmount(bookData.incomeAmount) }}</div>
+            <div class="label">Income</div>
+          </div>
+          
+          <!-- Расход -->
+          <div class="summary-expense">
+            <div class="amount amount-negative">{{ formatAmount(bookData.expenseAmount) }}</div>
+            <div class="label">Expense</div>
           </div>
         </div>
         
-        <!-- Правый пользователь -->
-        <div 
-          class="owner-info right-owner"
-          :style="getParticipantStyle(1)"
-        >
-          <div class="owner-name">{{ ownerSides[1]?.name || 'No data' }}</div>
-          <div class="owner-details">
-            <span class="owner-amount">{{ formatCurrency(getParticipantAmount(1)) }}</span>
-            <span class="owner-percentage">{{ Math.round(ownerSides[1]?.percentage || 0) }}%</span>
+        <!-- Иконка редактирования -->
+        <div class="summary-edit">
+          <BaseIcon 
+            :icon="IconPencil" 
+            size="lg"
+            color="#808080"
+            :customStyle="{backgroundColor: '#F7F9F8'}"
+            clickable
+            @click="handleEditClick"
+          />
+        </div>
+      </div>
+      
+      <!-- Слайдер распределения между владельцами -->
+      <div v-if="shouldShowDistribution">
+        <!-- Заголовок секции -->
+        <div class="distribution-header">
+          <span>Распределение расходов</span>
+        </div>
+        
+        <!-- Слайдер (только для отображения) -->
+        <div class="slider-container">
+          <input 
+            type="range" 
+            class="slider" 
+            :value="actualOwnerDistribution"
+            @input="updateOwnerDistribution"
+            min="0" 
+            max="100" 
+            step="1"
+            :style="getSliderStyle()"
+            disabled
+          />
+        </div>
+        
+        <!-- Информация об участниках -->
+        <div class="distribution-info">
+          <!-- Левый пользователь -->
+          <div 
+            class="owner-info left-owner"
+            :style="getParticipantStyle(0)"
+          >
+            <div class="owner-name">{{ ownerSides[0]?.name || 'No data' }}</div>
+            <div class="owner-details">
+              <span class="owner-percentage">{{ Math.round(ownerSides[0]?.percentage || 0) }}%</span>
+              <span class="owner-amount">{{ formatCurrency(getParticipantAmount(0)) }}</span>
+            </div>
+          </div>
+          
+          <!-- Правый пользователь -->
+          <div 
+            class="owner-info right-owner"
+            :style="getParticipantStyle(1)"
+          >
+            <div class="owner-name">{{ ownerSides[1]?.name || 'No data' }}</div>
+            <div class="owner-details">
+              <span class="owner-amount">{{ formatCurrency(getParticipantAmount(1)) }}</span>
+              <span class="owner-percentage">{{ Math.round(ownerSides[1]?.percentage || 0) }}%</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    
-    <!-- Фильтр даты -->
-    <div class="date-filter-wrapper">
-      <DateFilter v-model="dateFilter" @calendar-visibility-change="onCalendarVisibilityChange" />
+      
+      <!-- Фильтр даты -->
+      <div class="date-filter-wrapper">
+        <DateFilter v-model="dateFilter" @calendar-visibility-change="onCalendarVisibilityChange" />
+      </div>
     </div>
   </div>
 </template>
@@ -99,6 +108,7 @@ import { IconPencil } from '@tabler/icons-vue';
 import BaseIcon from '@/components/ui/icons/BaseIcon.vue';
 import DateFilter from '@/components/ui/filters/DateFilter.vue';
 import useBookFinanceSummary from '../composables/useBookFinanceSummary';
+import { useBookStore } from '@/stores/book';
 
 const props = defineProps({
   bookId: {
@@ -111,6 +121,9 @@ const emit = defineEmits(['update:dateFilter']);
 
 // Создаем реактивную ссылку для отслеживания изменений bookId
 const currentBookId = ref(props.bookId);
+
+// Прямой доступ к хранилищу книг для проверки правил распределения
+const bookStore = useBookStore();
 
 // Используем композабл вместо локальной логики
 const {
@@ -127,16 +140,28 @@ const {
   updateOwnerDistribution,
   onCalendarVisibilityChange,
   initStores,
-  refreshData
+  refreshData,
+  isLoading,
+  hasDistributionRules,
+  bookDistributionRules
 } = useBookFinanceSummary(currentBookId.value, emit);
 
-// Определяем, нужно ли показывать распределение
-const hasDistributionRules = computed(() => {
-  return bookData.value &&
-         bookData.value.distributionRules &&
-         bookData.value.distributionRules.length >= 2 &&
-         ownerSides.value &&
-         ownerSides.value.length >= 2;
+// Непосредственно получаем книгу из хранилища для проверки правил распределения
+const bookFromStore = computed(() => {
+  return bookStore.getBookById(currentBookId.value);
+});
+
+// Проверяем, есть ли правила распределения в книге напрямую из хранилища
+const hasRules = computed(() => {
+  const book = bookFromStore.value;
+  return book && 
+         book.distributionRules && 
+         book.distributionRules.length >= 2;
+});
+
+// Решаем, показывать ли раздел распределения
+const shouldShowDistribution = computed(() => {
+  return hasRules.value && !isLoading.value;
 });
 
 // Обработчик клика по иконке редактирования
@@ -146,15 +171,12 @@ const handleEditClick = () => {
 };
 
 // Отслеживаем изменение bookId из свойства компонента
-watch(() => props.bookId, (newBookId) => {
+watch(() => props.bookId, async (newBookId) => {
   console.log(`[BookFinanceSummary] BookId changed to ${newBookId}`);
   currentBookId.value = newBookId;
   
-  // Используем setTimeout для предотвращения обновления перед полной загрузкой данных
-  setTimeout(() => {
-    // Принудительно обновляем данные
-    refreshData();
-  }, 100);
+  // Принудительно обновляем данные
+  await refreshData();
 }, { immediate: true });
 
 // Инициализация компонента
@@ -162,12 +184,9 @@ onMounted(async () => {
   console.log('[BookFinanceSummary] Mounted, initializing stores');
   await initStores();
   
-  // Используем setTimeout для предотвращения обновления перед полной загрузкой данных
-  setTimeout(() => {
-    // Принудительно обновляем данные после инициализации
-    console.log('[BookFinanceSummary] Refreshing data after initialization');
-    refreshData();
-  }, 100);
+  // Принудительно обновляем данные после инициализации
+  console.log('[BookFinanceSummary] Refreshing data after initialization');
+  await refreshData();
 });
 </script>
 
@@ -176,6 +195,31 @@ onMounted(async () => {
   padding: var(--spacing-md);
   border-radius: var(--border-radius-xxxl);
   background-color: #F7F9F8; /* --bg-superlight как запрошено */
+}
+
+/* Состояние загрузки */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  color: var(--text-grey);
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: var(--spacing-sm);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* Контейнер для верхней строки и иконки */
