@@ -1,10 +1,10 @@
 # Details
 
-Date : 2025-04-19 14:34:07
+Date : 2025-04-19 16:52:25
 
 Directory /Users/peaker/dev/solar-finance/src
 
-Total : 155 files,  22180 codes, 1719 comments, 3531 blanks, all 27430 lines
+Total : 152 files,  21822 codes, 1648 comments, 3472 blanks, all 26942 lines
 
 [Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
@@ -42,7 +42,7 @@ Total : 155 files,  22180 codes, 1719 comments, 3531 blanks, all 27430 lines
 | [src/components/ui/BasePopup.vue](/src/components/ui/BasePopup.vue) | Vue | 206 | 7 | 25 | 238 |
 | [src/components/ui/CreateCategoryButton.vue](/src/components/ui/CreateCategoryButton.vue) | Vue | 54 | 1 | 7 | 62 |
 | [src/components/ui/buttons/CreateActionButton.vue](/src/components/ui/buttons/CreateActionButton.vue) | Vue | 53 | 1 | 6 | 60 |
-| [src/components/ui/filters/DateFilter.vue](/src/components/ui/filters/DateFilter.vue) | Vue | 438 | 11 | 62 | 511 |
+| [src/components/ui/filters/DateFilter.vue](/src/components/ui/filters/DateFilter.vue) | Vue | 503 | 14 | 73 | 590 |
 | [src/components/ui/icons/AccountIcon.vue](/src/components/ui/icons/AccountIcon.vue) | Vue | 107 | 3 | 14 | 124 |
 | [src/components/ui/icons/BaseAddIcon.vue](/src/components/ui/icons/BaseAddIcon.vue) | Vue | 90 | 1 | 13 | 104 |
 | [src/components/ui/icons/BaseIcon.vue](/src/components/ui/icons/BaseIcon.vue) | Vue | 167 | 1 | 25 | 193 |
@@ -66,7 +66,7 @@ Total : 155 files,  22180 codes, 1719 comments, 3531 blanks, all 27430 lines
 | [src/composables/ui/useDropdown.ts](/src/composables/ui/useDropdown.ts) | TypeScript | 38 | 4 | 9 | 51 |
 | [src/composables/ui/useGridLayout.ts](/src/composables/ui/useGridLayout.ts) | TypeScript | 106 | 23 | 25 | 154 |
 | [src/composables/ui/useGridLayoutTypes.ts](/src/composables/ui/useGridLayoutTypes.ts) | TypeScript | 34 | 1 | 6 | 41 |
-| [src/composables/useDateFilter.ts](/src/composables/useDateFilter.ts) | TypeScript | 330 | 43 | 64 | 437 |
+| [src/composables/useDateFilter.ts](/src/composables/useDateFilter.ts) | TypeScript | 382 | 69 | 83 | 534 |
 | [src/data/categories.ts](/src/data/categories.ts) | TypeScript | 110 | 11 | 26 | 147 |
 | [src/layouts/ConsoleLayout.vue](/src/layouts/ConsoleLayout.vue) | Vue | 70 | 3 | 9 | 82 |
 | [src/layouts/EmptyLayout.vue](/src/layouts/EmptyLayout.vue) | Vue | 15 | 0 | 2 | 17 |
@@ -139,19 +139,16 @@ Total : 155 files,  22180 codes, 1719 comments, 3531 blanks, all 27430 lines
 | [src/views/account/popup/composables/useAccountSharing.ts](/src/views/account/popup/composables/useAccountSharing.ts) | TypeScript | 50 | 23 | 10 | 83 |
 | [src/views/account/popup/composables/useAccountTypes.ts](/src/views/account/popup/composables/useAccountTypes.ts) | TypeScript | 84 | 36 | 10 | 130 |
 | [src/views/book/page/BooksView.vue](/src/views/book/page/BooksView.vue) | Vue | 72 | 6 | 13 | 91 |
-| [src/views/book/page/Old/useBookData.ts](/src/views/book/page/Old/useBookData.ts) | TypeScript | 265 | 53 | 54 | 372 |
-| [src/views/book/page/Old/useFormatting.ts](/src/views/book/page/Old/useFormatting.ts) | TypeScript | 112 | 21 | 23 | 156 |
-| [src/views/book/page/Old/useOwnerDistribution.ts](/src/views/book/page/Old/useOwnerDistribution.ts) | TypeScript | 181 | 45 | 38 | 264 |
 | [src/views/book/page/components/BaseAddIcon.vue](/src/views/book/page/components/BaseAddIcon.vue) | Vue | 90 | 1 | 12 | 103 |
-| [src/views/book/page/components/BookFinanceSummary.vue](/src/views/book/page/components/BookFinanceSummary.vue) | Vue | 293 | 14 | 45 | 352 |
+| [src/views/book/page/components/BookFinanceSummary.vue](/src/views/book/page/components/BookFinanceSummary.vue) | Vue | 298 | 14 | 48 | 360 |
 | [src/views/book/page/components/BookPercentageSlider.vue](/src/views/book/page/components/BookPercentageSlider.vue) | Vue | 237 | 6 | 34 | 277 |
 | [src/views/book/page/components/BookSelector.vue](/src/views/book/page/components/BookSelector.vue) | Vue | 62 | 1 | 10 | 73 |
 | [src/views/book/page/components/BookTransactionGroup.vue](/src/views/book/page/components/BookTransactionGroup.vue) | Vue | 50 | 1 | 8 | 59 |
 | [src/views/book/page/components/BookTransactionItem.vue](/src/views/book/page/components/BookTransactionItem.vue) | Vue | 97 | 1 | 14 | 112 |
 | [src/views/book/page/components/BookTransactionsList.vue](/src/views/book/page/components/BookTransactionsList.vue) | Vue | 67 | 1 | 13 | 81 |
 | [src/views/book/page/components/DashBoardBook.vue](/src/views/book/page/components/DashBoardBook.vue) | Vue | 25 | 0 | 4 | 29 |
-| [src/views/book/page/composables/useBookContext.ts](/src/views/book/page/composables/useBookContext.ts) | TypeScript | 181 | 33 | 41 | 255 |
-| [src/views/book/page/composables/useBookFinanceSummary.ts](/src/views/book/page/composables/useBookFinanceSummary.ts) | TypeScript | 74 | 9 | 13 | 96 |
+| [src/views/book/page/composables/useBookContext.ts](/src/views/book/page/composables/useBookContext.ts) | TypeScript | 203 | 40 | 46 | 289 |
+| [src/views/book/page/composables/useBookFinanceSummary.ts](/src/views/book/page/composables/useBookFinanceSummary.ts) | TypeScript | 130 | 21 | 31 | 182 |
 | [src/views/book/page/composables/useBookSelect.ts](/src/views/book/page/composables/useBookSelect.ts) | TypeScript | 45 | 7 | 13 | 65 |
 | [src/views/book/page/composables/useBookTransactions.ts](/src/views/book/page/composables/useBookTransactions.ts) | TypeScript | 48 | 8 | 13 | 69 |
 | [src/views/book/page/composables/usePercentageSlider.ts](/src/views/book/page/composables/usePercentageSlider.ts) | TypeScript | 102 | 17 | 27 | 146 |

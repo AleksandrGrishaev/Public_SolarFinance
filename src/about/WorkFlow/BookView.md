@@ -75,6 +75,24 @@ Total, income, expense - за это отвечает [создать отдел
 
 
 
+Задача следующая, 
+
+каждая транзакция имеет bookAmount: -35000 мы должны использовать это поле. Также мы должны правильно высчитывать процент распределия, кто сколько потратил.  distributionRules: [
+      { ownerId: "user_1", percentage: 30 },
+      { ownerId: "user_2", percentage: 70 }
+
+То есть когда мы в слайдере должны посчитать, кто и что потратил мы должны bookAmount * percentage: 30 и прибавить к расходам юзера и так для каждой транзакции. 
+
+В Transaction list мы должны отображать bookAmount
+
+А в src/views/book/page/components/BookFinanceSummary.vue считать income and expense, тоже по полю bookAmount
+
+Для ситуаций когда выбраны больше одной книги и их валюты различаются, мы должны для отображения использовать валюту пользователя, из user.store  settings.baseCurrency: 'RUB',  и тогда использовать курс export const defaultExchangeRates: ExchangeRate[] = [
+
+
+Давай изменим функции и добавим логирование. 
+
+
 ### src/components/ui/filters/DateFilter.vue
 
 ### src/views/book/page/components/BookPercentageSlider.vue
