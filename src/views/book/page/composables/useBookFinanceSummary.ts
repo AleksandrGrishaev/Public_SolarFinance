@@ -24,7 +24,8 @@ export default function useBookFinanceSummary(bookIdProp: string, emit: any) {
     ownerSides,
     actualOwnerDistribution,
     getParticipantAmount,
-    updateOwnerDistribution
+    updateOwnerDistribution,
+    hasDistributionRules
   } = useOwnerDistribution(bookIdProp, emit);
   
   // Получаем функции форматирования для отображения
@@ -51,6 +52,7 @@ export default function useBookFinanceSummary(bookIdProp: string, emit: any) {
     actualOwnerDistribution,
     getParticipantAmount,
     updateOwnerDistribution,
+    hasDistributionRules,
     
     // Из useFormatting
     formatAmount,

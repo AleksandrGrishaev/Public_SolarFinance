@@ -12,6 +12,13 @@ export default function useOwnerDistribution(bookIdProp: string, emit: any) {
     isAllBooks,
     userStore
   } = useBookData(bookIdProp, emit);
+
+  // Проверка наличия правил распределения
+  const hasDistributionRules = computed(() => {
+    return bookData.value &&
+           bookData.value.distributionRules &&
+           bookData.value.distributionRules.length >= 2;
+  });
   
   // Расчет распределения расходов между владельцами
   const ownerExpenseDistribution = computed(() => {
@@ -22,7 +29,7 @@ export default function useOwnerDistribution(bookIdProp: string, emit: any) {
     
     try {
       // Если не выбрана конкретная книга или она не имеет правил распределения, возвращаем пустой результат
-      if (isAllBooks.value || !bookData.value.distributionRules || bookData.value.distributionRules.length < 2) {
+      if (isAllBooks.value || !hasDistributionRules.value) {
         console.log('[DEBUG] Early return from ownerExpenseDistribution: no valid distribution rules');
         return null;
       }
@@ -121,12 +128,12 @@ export default function useOwnerDistribution(bookIdProp: string, emit: any) {
     
     try {
       // Проверяем, есть ли правила распределения и достаточно ли их
-      if (!bookData.value.distributionRules || bookData.value.distributionRules.length < 2) {
+      if (!hasDistributionRules.value) {
         console.log('[DEBUG] No distribution rules, returning default values');
         // Возвращаем значения по умолчанию, если правил распределения нет
         return [
-          { name: 'Alex', id: 'me', percentage: 50, amount: 0 },
-          { name: 'Sasha Solar', id: 'other', percentage: 50, amount: 0 }
+          { name: 'No data', id: 'unknown', percentage: 50, amount: 0 },
+          { name: 'No data', id: 'unknown', percentage: 50, amount: 0 }
         ];
       }
   
@@ -185,7 +192,7 @@ export default function useOwnerDistribution(bookIdProp: string, emit: any) {
         console.log('[DEBUG] Less than 2 owners, adding a second one');
         // Добавим второго владельца, если его нет
         ownersData.push({
-          name: 'User 2',
+          name: 'No data',
           id: 'unknown',
           percentage: 100 - (ownersData[0]?.percentage || 50),
           amount: 0
@@ -199,8 +206,8 @@ export default function useOwnerDistribution(bookIdProp: string, emit: any) {
       console.error('[DEBUG] Error stack:', error.stack);
       // Возвращаем значения по умолчанию при ошибке
       return [
-        { name: 'User 1', id: 'user1', percentage: 50, amount: 0 },
-        { name: 'User 2', id: 'user2', percentage: 50, amount: 0 }
+        { name: 'No data', id: 'unknown', percentage: 50, amount: 0 },
+        { name: 'No data', id: 'unknown', percentage: 50, amount: 0 }
       ];
     }
   });
@@ -285,6 +292,7 @@ export default function useOwnerDistribution(bookIdProp: string, emit: any) {
   };
   
   return {
+    hasDistributionRules,
     ownerExpenseDistribution,
     ownerSides,
     actualOwnerDistribution,

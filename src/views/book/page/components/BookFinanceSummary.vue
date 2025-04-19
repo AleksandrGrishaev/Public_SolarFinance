@@ -37,7 +37,7 @@
     </div>
     
     <!-- Слайдер распределения между владельцами -->
-    <div v-if="bookData.distributionRules && bookData.distributionRules.length > 1 && ownerSides.length >= 2">
+    <div v-if="hasDistributionRules">
       <!-- Заголовок секции -->
       <div class="distribution-header">
         <span>Распределение расходов</span>
@@ -65,7 +65,7 @@
           class="owner-info left-owner"
           :style="getParticipantStyle(0)"
         >
-          <div class="owner-name">{{ ownerSides[0]?.name || 'User 1' }}</div>
+          <div class="owner-name">{{ ownerSides[0]?.name || 'No data' }}</div>
           <div class="owner-details">
             <span class="owner-percentage">{{ Math.round(ownerSides[0]?.percentage || 0) }}%</span>
             <span class="owner-amount">{{ formatCurrency(getParticipantAmount(0)) }}</span>
@@ -77,7 +77,7 @@
           class="owner-info right-owner"
           :style="getParticipantStyle(1)"
         >
-          <div class="owner-name">{{ ownerSides[1]?.name || 'User 2' }}</div>
+          <div class="owner-name">{{ ownerSides[1]?.name || 'No data' }}</div>
           <div class="owner-details">
             <span class="owner-amount">{{ formatCurrency(getParticipantAmount(1)) }}</span>
             <span class="owner-percentage">{{ Math.round(ownerSides[1]?.percentage || 0) }}%</span>
@@ -94,7 +94,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, watch, ref } from 'vue';
+import { onMounted, watch, ref, computed } from 'vue';
 import { IconPencil } from '@tabler/icons-vue';
 import BaseIcon from '@/components/ui/icons/BaseIcon.vue';
 import DateFilter from '@/components/ui/filters/DateFilter.vue';
@@ -129,6 +129,15 @@ const {
   initStores,
   refreshData
 } = useBookFinanceSummary(currentBookId.value, emit);
+
+// Определяем, нужно ли показывать распределение
+const hasDistributionRules = computed(() => {
+  return bookData.value &&
+         bookData.value.distributionRules &&
+         bookData.value.distributionRules.length >= 2 &&
+         ownerSides.value &&
+         ownerSides.value.length >= 2;
+});
 
 // Обработчик клика по иконке редактирования
 const handleEditClick = () => {
