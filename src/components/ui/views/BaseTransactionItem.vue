@@ -41,17 +41,22 @@
     <!-- Центральная часть с названием и описанием -->
     <div class="item-content">
       <slot name="content">
-        <div class="item-title" v-if="title">{{ title }}</div>
+        <div class="content-main">
+          <div class="item-title" v-if="title">{{ title }}</div>
+          <div class="item-description" v-if="description">{{ description }}</div>
+          
+        </div>
         <div class="item-subtitle" v-if="subtitle">{{ subtitle }}</div>
-        <div class="item-description" v-if="description">{{ description }}</div>
       </slot>
     </div>
     
     <!-- Правая часть с суммой и дополнительной информацией -->
     <div class="item-amount">
       <slot name="amount">
-        <div class="amount" :class="amountColorClass" v-if="amount !== undefined">
-          {{ formattedAmount }}
+        <div class="amount-main">
+          <div class="amount" :class="amountColorClass" v-if="amount !== undefined">
+            {{ formattedAmount }}
+          </div>
         </div>
         <!-- Всегда показываем item-info без условия v-if -->
         <div class="item-info" :class="{ 'has-info': !!info }">
@@ -389,11 +394,17 @@ const handleClick = (event) => {
 
 .item-content {
   flex: 1;
-  padding: var(--spacing-sm) 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
   min-width: 0; /* Для корректной работы text-overflow */
+  height: 48px; /* Фиксированная высота для контентной области */
+}
+
+.content-main {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .item-title {
@@ -406,30 +417,40 @@ const handleClick = (event) => {
 }
 
 .item-subtitle {
-  color: var(--text-usual);
-  font-size: var(--font-small-size);
-  line-height: var(--font-small-line-height);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.item-description {
+  flex: 1;
   color: var(--text-grey);
   font-size: var(--font-super-small-size);
   line-height: var(--font-super-small-line-height);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  padding-top: 2px;
+}
+.item-description {
+  flex: 1;
+  color: var(--text-grey);
+  font-size: var(--font-super-small-size);
+  line-height: var(--font-super-small-line-height);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-top: 2px;
 }
 
 .item-amount {
   min-width: 110px;
-  padding: var(--spacing-xs) 0;
+  height: 48px; /* Фиксированная высота для блока с суммой */
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 2px;
+}
+
+.amount-main {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
 }
 
 .amount {
@@ -443,19 +464,63 @@ const handleClick = (event) => {
 }
 
 .item-info {
+  flex: 1;
   width: 100%;
   text-align: right;
   color: var(--text-grey);
-  font-size: var(--font-small-size);
-  line-height: var(--font-small-line-height);
+  font-size: var(--font-super-small-size);
+  line-height: var(--font-super-small-line-height);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-top: 2px;
-  min-height: 16px; /* Минимальная высота, чтобы элемент всегда был видим */
+  padding-top: 2px;
 }
 
 .item-info.has-info {
   color: var(--text-usual); /* Более контрастный цвет, когда есть информация */
 }
+
+/* Цветовые классы для сумм */
+.color-success {
+  color: var(--color-success);
+}
+
+.color-warning {
+  color: var(--color-warning);
+}
+/* Специальные стили для элементов транзакций книги */
+:global(.book-transaction-item) .item-title {
+  font-weight: 500;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 4px;
+}
+
+:global(.book-transaction-item) .item-description {
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 4px;
+}
+
+:global(.book-transaction-item) .content-main {
+  width: 100%;
+}
+
+:global(.book-transaction-item) .item-content {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* Удаляем лишнее */
+:global(.book-transaction-item) .item-subtitle {
+  font-size: var(--font-super-small-size);
+  margin-top: 0;
+  padding-top: 0;
+}
+
 </style>
