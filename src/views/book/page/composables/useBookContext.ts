@@ -221,32 +221,57 @@ export function useBookContextProvider() {
   };
   
   // Расчет финансовых данных книги
-  const getBookFinancialData = (): BookFinancialData => {
-    // Логика перенесена из useBookData для финансовых расчетов
-    let incomeAmount = 0;
-    let expenseAmount = 0;
-    
-    const transactions = getFilteredTransactions();
-    const currency = currentBook.value?.currency || currencyStore.userBaseCurrency;
-    
-    transactions.forEach(transaction => {
-      if (transaction.type === 'income') {
-        incomeAmount += transaction.amount;
-      } else if (transaction.type === 'expense') {
-        expenseAmount += transaction.amount;
-      }
-    });
-    
-    return {
-      name: currentBook.value?.name || 'All Books',
-      incomeAmount,
-      expenseAmount,
-      totalAmount: incomeAmount + expenseAmount,
-      distributionRules: currentBook.value?.distributionRules || [],
-      currency
-    };
-  };
+// Модифицированная функция getBookFinancialData в useBookContext.ts
+const getBookFinancialData = (): BookFinancialData => {
+  console.log('[useBookContext] Calculating financial data...');
   
+  let incomeAmount = 0;
+  let expenseAmount = 0;
+  
+  const transactions = getFilteredTransactions();
+  console.log(`[useBookContext] Processing ${transactions.length} transactions for financial data`);
+  
+  // Получаем валюту книги или пользователя, если выбрано несколько книг
+  const currency = currentBook.value?.currency || userStore.currentUser?.settings?.baseCurrency || currencyStore.userBaseCurrency;
+  console.log(`[useBookContext] Using currency: ${currency}`);
+  
+  // Если выбрано несколько книг, возможно с разными валютами
+  const useUserCurrency = isAllBooks.value || selectedBookIds.value.length > 1;
+  
+  transactions.forEach(transaction => {
+    // Используем bookAmount вместо amount для расчетов
+    let transactionAmount = transaction.bookAmount || transaction.amount;
+    
+    // Если выбрано несколько книг с разными валютами, конвертируем в валюту пользователя
+    if (useUserCurrency && transaction.bookCurrency !== currency) {
+      console.log(`[useBookContext] Converting transaction ${transaction.id} from ${transaction.bookCurrency} to ${currency}`);
+      const conversionResult = currencyStore.convertAmount(
+        transactionAmount,
+        transaction.bookCurrency || transaction.currency,
+        currency
+      );
+      transactionAmount = conversionResult.convertedAmount;
+      console.log(`[useBookContext] Converted amount: ${transactionAmount} ${currency}`);
+    }
+    
+    if (transaction.type === 'income') {
+      incomeAmount += transactionAmount;
+    } else if (transaction.type === 'expense') {
+      expenseAmount += transactionAmount;
+    }
+  });
+  
+  console.log(`[useBookContext] Calculated totals - Income: ${incomeAmount}, Expense: ${expenseAmount}, Currency: ${currency}`);
+  
+  return {
+    name: currentBook.value?.name || 'All Books',
+    incomeAmount,
+    expenseAmount,
+    totalAmount: incomeAmount + expenseAmount,
+    distributionRules: currentBook.value?.distributionRules || [],
+    currency
+  };
+};
   // Создаем объект контекста
   const context: BookContext = {
     // Состояние

@@ -9,45 +9,46 @@
     <!-- Загруженные данные -->
     <div v-else>
       <!-- Верхняя строка с суммами и иконкой редактирования -->
-      <div class="header-container">
-        <div class="summary-row">
-          <!-- Общая сумма - с проверкой на undefined -->
-          <div class="summary-total">
-            <div class="amount" :class="getTotalClass(bookData?.totalAmount || 0)">
-              {{ formatAmount(bookData?.totalAmount || 0) }}
-            </div>
-            <div class="label">Total</div>
-          </div>
-          
-          <!-- Доход - с проверкой на undefined -->
-          <div class="summary-income">
-            <div class="amount amount-positive">
-              {{ formatAmount(bookData?.incomeAmount || 0) }}
-            </div>
-            <div class="label">Income</div>
-          </div>
-          
-          <!-- Расход - с проверкой на undefined -->
-          <div class="summary-expense">
-            <div class="amount amount-negative">
-              {{ formatAmount(bookData?.expenseAmount || 0) }}
-            </div>
-            <div class="label">Expense</div>
-          </div>
+<!-- Верхняя строка с суммами и иконкой редактирования -->
+<div class="header-container">
+    <div class="summary-row">
+      <!-- Общая сумма - использует bookAmount -->
+      <div class="summary-total">
+        <div class="amount" :class="getTotalClass(bookData?.totalAmount || 0)">
+          {{ formatAmount(bookData?.totalAmount || 0) }}
         </div>
-        
-        <!-- Иконка редактирования -->
-        <div class="summary-edit">
-          <BaseIcon 
-            :icon="IconPencil" 
-            size="lg"
-            color="#808080"
-            :customStyle="{backgroundColor: '#F7F9F8'}"
-            clickable
-            @click="handleEditClick"
-          />
-        </div>
+        <div class="label">Total</div>
       </div>
+      
+      <!-- Доход - использует bookAmount -->
+      <div class="summary-income">
+        <div class="amount amount-positive">
+          {{ formatAmount(bookData?.incomeAmount || 0) }}
+        </div>
+        <div class="label">Income</div>
+      </div>
+      
+      <!-- Расход - использует bookAmount -->
+      <div class="summary-expense">
+        <div class="amount amount-negative">
+          {{ formatAmount(bookData?.expenseAmount || 0) }}
+        </div>
+        <div class="label">Expense</div>
+      </div>
+    </div>
+    
+    <!-- Иконка редактирования -->
+    <div class="summary-edit">
+      <BaseIcon 
+        :icon="IconPencil" 
+        size="lg"
+        color="#808080"
+        :customStyle="{backgroundColor: '#F7F9F8'}"
+        clickable
+        @click="handleEditClick"
+      />
+    </div>
+  </div>
       
       <!-- Секция распределения между владельцами (слайдер) -->
       <div v-if="shouldShowDistribution">
@@ -179,6 +180,15 @@ onMounted(() => {
   // При монтировании обеспечиваем синхронизацию локального фильтра с глобальным
   localDateFilter.value = JSON.parse(JSON.stringify(dateFilter.value));
 });
+
+watch(() => bookData.value, (newData) => {
+  console.log('[BookFinanceSummary] Book data updated:', {
+    incomeAmount: newData?.incomeAmount,
+    expenseAmount: newData?.expenseAmount,
+    totalAmount: newData?.totalAmount,
+    currency: newData?.currency
+  });
+}, { deep: true });
 </script>
 
 
