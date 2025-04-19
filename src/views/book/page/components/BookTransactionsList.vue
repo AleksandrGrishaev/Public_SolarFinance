@@ -76,6 +76,6 @@ onMounted(() => {
   .transaction-groups {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-md);
+    gap: var(--spacing-xs);
   }
   </style>
