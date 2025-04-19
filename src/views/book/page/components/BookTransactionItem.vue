@@ -1,18 +1,18 @@
 <!-- src/views/book/page/components/BookTransactionItem.vue -->
 <template>
-  <BaseTransactionItem 
-    :title="transaction.description || 'Unnamed transaction'"
-    :subtitle="ownerName"
-    :info="accountInfo"
-    :amount="transaction.bookAmount"
-    :currency="transaction.bookCurrency"
-    :type="transaction.type"
-    :categoryIcon="categoryIcon"
-    :categoryColor="categoryColor"
-    :initials="initials"
-    withBorder
-    @click="$emit('click', transaction)"
-  />
+    <BaseTransactionItem 
+      :title="transaction.description || 'Unnamed transaction'"
+      :subtitle="ownerName"
+      :info="accountInfo"
+      :amount="transaction.bookAmount"
+      :currency="transaction.bookCurrency"
+      :type="transaction.type"
+      :categoryIcon="categoryIcon"
+      :categoryColor="categoryColor"
+      :initials="initials"
+      withBorder
+      @click="$emit('click', transaction)"
+    />
 </template>
 
 <script setup lang="ts">
@@ -86,20 +86,37 @@ const ownerName = computed(() => {
 
 // Информация о счете
 const accountInfo = computed(() => {
-  if (props.transaction.type === 'income') {
-    // Для дохода показываем счет назначения
-    const accountId = props.transaction.destinationEntityId;
-    if (!accountId) return '';
+    if (props.transaction.type === 'income') {
+      // Для дохода показываем счет назначения
+      const accountId = props.transaction.destinationEntityId;
+      if (!accountId) return '';
+      
+      const account = accountStore.getAccountById(accountId);
+      return account ? account.name : '';
+    } else if (props.transaction.type === 'expense') {
+      // Для расхода показываем счет источника
+      const accountId = props.transaction.sourceEntityId;
+      if (!accountId) return '';
+      
+      const account = accountStore.getAccountById(accountId);
+      return account ? account.name : '';
+    } else if (props.transaction.type === 'transfer') {
+      // Для перевода показываем оба счета
+      const sourceId = props.transaction.sourceEntityId;
+      const destId = props.transaction.destinationEntityId;
+      
+      const sourceAccount = sourceId ? accountStore.getAccountById(sourceId) : null;
+      const destAccount = destId ? accountStore.getAccountById(destId) : null;
+      
+      if (sourceAccount && destAccount) {
+        return `${sourceAccount.name} → ${destAccount.name}`;
+      } else if (sourceAccount) {
+        return `From: ${sourceAccount.name}`;
+      } else if (destAccount) {
+        return `To: ${destAccount.name}`;
+      }
+    }
     
-    const account = accountStore.getAccountById(accountId);
-    return account ? account.name : '';
-  } else {
-    // Для расхода показываем счет источника
-    const accountId = props.transaction.sourceEntityId;
-    if (!accountId) return '';
-    
-    const account = accountStore.getAccountById(accountId);
-    return account ? account.name : '';
-  }
-});
+    return '';
+  });
 </script>

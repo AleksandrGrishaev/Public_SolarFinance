@@ -449,13 +449,14 @@ const handleClick = (event) => {
 */
 
 .item-info {
-  width: 100%;
-  text-align: right;
-  color: var(--text-usual);
-  font-size: var(--font-small-size);
-  line-height: var(--font-small-line-height);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+    width: 100%;
+    text-align: right;
+    color: var(--text-usual);
+    font-size: var(--font-small-size);
+    line-height: var(--font-small-line-height);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+  }
 </style>
