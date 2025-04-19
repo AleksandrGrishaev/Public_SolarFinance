@@ -1,3 +1,4 @@
+<!-- src/views/book/page/components/BookFinanceSummary.vue -->
 <template>
   <div class="financial-info">
     <!-- Состояние загрузки -->
@@ -9,46 +10,45 @@
     <!-- Загруженные данные -->
     <div v-else>
       <!-- Верхняя строка с суммами и иконкой редактирования -->
-<!-- Верхняя строка с суммами и иконкой редактирования -->
-<div class="header-container">
-    <div class="summary-row">
-      <!-- Общая сумма - использует bookAmount -->
-      <div class="summary-total">
-        <div class="amount" :class="getTotalClass(bookData?.totalAmount || 0)">
-          {{ formatAmount(bookData?.totalAmount || 0) }}
+      <div class="header-container">
+        <div class="summary-row">
+          <!-- Общая сумма - используем форматирование balance -->
+          <div class="summary-total">
+            <div class="amount" :class="getTotalClass(bookData?.totalAmount || 0)">
+              {{ formatBalanceAmount(bookData?.totalAmount || 0) }}
+            </div>
+            <div class="label">Total</div>
+          </div>
+          
+          <!-- Доход - используем форматирование balance -->
+          <div class="summary-income">
+            <div class="amount amount-positive">
+              {{ formatBalanceAmount(bookData?.incomeAmount || 0) }}
+            </div>
+            <div class="label">Income</div>
+          </div>
+          
+          <!-- Расход - используем форматирование balance -->
+          <div class="summary-expense">
+            <div class="amount amount-negative">
+              {{ formatBalanceAmount(bookData?.expenseAmount || 0) }}
+            </div>
+            <div class="label">Expense</div>
+          </div>
         </div>
-        <div class="label">Total</div>
-      </div>
-      
-      <!-- Доход - использует bookAmount -->
-      <div class="summary-income">
-        <div class="amount amount-positive">
-          {{ formatAmount(bookData?.incomeAmount || 0) }}
+        
+        <!-- Иконка редактирования -->
+        <div class="summary-edit">
+          <BaseIcon 
+            :icon="IconPencil" 
+            size="lg"
+            color="#808080"
+            :customStyle="{backgroundColor: '#F7F9F8'}"
+            clickable
+            @click="handleEditClick"
+          />
         </div>
-        <div class="label">Income</div>
       </div>
-      
-      <!-- Расход - использует bookAmount -->
-      <div class="summary-expense">
-        <div class="amount amount-negative">
-          {{ formatAmount(bookData?.expenseAmount || 0) }}
-        </div>
-        <div class="label">Expense</div>
-      </div>
-    </div>
-    
-    <!-- Иконка редактирования -->
-    <div class="summary-edit">
-      <BaseIcon 
-        :icon="IconPencil" 
-        size="lg"
-        color="#808080"
-        :customStyle="{backgroundColor: '#F7F9F8'}"
-        clickable
-        @click="handleEditClick"
-      />
-    </div>
-  </div>
       
       <!-- Секция распределения между владельцами (слайдер) -->
       <div v-if="shouldShowDistribution">
@@ -82,7 +82,7 @@
             <div class="owner-name">{{ ownerSides[0]?.name || 'No data' }}</div>
             <div class="owner-details">
               <span class="owner-percentage">{{ Math.round(ownerSides[0]?.percentage || 0) }}%</span>
-              <span class="owner-amount">{{ formatCurrency(getParticipantAmount(0)) }}</span>
+              <span class="owner-amount">{{ formatBalanceAmount(getParticipantAmount(0)) }}</span>
             </div>
           </div>
           
@@ -93,7 +93,7 @@
           >
             <div class="owner-name">{{ ownerSides[1]?.name || 'No data' }}</div>
             <div class="owner-details">
-              <span class="owner-amount">{{ formatCurrency(getParticipantAmount(1)) }}</span>
+              <span class="owner-amount">{{ formatBalanceAmount(getParticipantAmount(1)) }}</span>
               <span class="owner-percentage">{{ Math.round(ownerSides[1]?.percentage || 0) }}%</span>
             </div>
           </div>
@@ -119,6 +119,7 @@ import BaseIcon from '@/components/ui/icons/BaseIcon.vue';
 import DateFilter from '@/components/ui/filters/DateFilter.vue';
 import { useBookFinanceSummary } from '../composables/useBookFinanceSummary';
 import { usePercentageSlider } from '../composables/usePercentageSlider';
+import { useFormatBalance } from '@/composables/transaction/useFormatBalance';
 
 console.log('[BookFinanceSummary] Component setup started');
 
@@ -134,6 +135,14 @@ const {
   hasDistributionRules,
   updateDateFilter
 } = useBookFinanceSummary();
+
+// Импортируем и используем composable для форматирования баланса
+const { formatBalance } = useFormatBalance();
+
+// Создаем функцию форматирования с использованием нашего нового composable
+const formatBalanceAmount = (amount) => {
+  return formatBalance(amount, 5, bookData.value?.currency);
+};
 
 // Создаем локальную копию фильтра для v-model
 const localDateFilter = ref(JSON.parse(JSON.stringify(dateFilter.value)));

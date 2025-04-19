@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { useBookContext } from './useBookContext';
 import { useUserStore } from '@/stores/user';
 import { useCurrencyStore } from '@/stores/currency';
+import { useFormatBalance } from '@/composables/transaction/useFormatBalance';
 import { format, isEqual, isValid, parseISO } from 'date-fns';
 
 // Вспомогательная функция для нормализации даты
@@ -82,30 +83,33 @@ export function useBookFinanceSummary() {
   
   const userStore = useUserStore();
   const currencyStore = useCurrencyStore();
+  const { formatBalance, getCurrencySymbol } = useFormatBalance();
   
   // Получаем финансовые данные
   const bookData = computed(() => {
     return getBookFinancialData();
   });
   
-  // Форматирование суммы с валютой
+  // Форматирование суммы с валютой (сохраняем для обратной совместимости)
   const formatAmount = (amount) => {
     if (amount === undefined || amount === null) return '0';
     
     try {
       const currencyCode = bookData.value.currency;
-      return currencyStore.formatCurrency(amount, currencyCode);
+      // Используем новое форматирование без десятичных знаков
+      return formatBalance(amount, 5, currencyCode);
     } catch (error) {
       console.error('[useBookFinanceSummary] Error formatting amount:', error);
       return amount.toString();
     }
   };
   
-  // Форматирование только валюты
+  // Форматирование только валюты (сохраняем для обратной совместимости)
   const formatCurrency = (value) => {
     try {
       const currencyCode = bookData.value.currency;
-      return currencyStore.formatCurrency(value || 0, currencyCode);
+      // Используем новое форматирование без десятичных знаков
+      return formatBalance(value || 0, 5, currencyCode);
     } catch (error) {
       console.error('[useBookFinanceSummary] Error formatting currency:', error);
       return (value || 0).toString();

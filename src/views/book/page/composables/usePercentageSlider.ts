@@ -2,12 +2,14 @@
 import { computed } from 'vue';
 import { useBookContext } from './useBookContext';
 import { useUserStore } from '@/stores/user';
+import { useFormatBalance } from '@/composables/transaction/useFormatBalance';
 
 export function usePercentageSlider() {
   console.log('[usePercentageSlider] Initializing...');
   
   const { hasDistributionRules, currentBook, getFilteredTransactions } = useBookContext();
   const userStore = useUserStore();
+  const { formatBalance } = useFormatBalance();
   
   // Безопасный метод получения пользователя
   const getUser = (userId) => {
@@ -80,59 +82,62 @@ export function usePercentageSlider() {
     return Math.round(ownerSides.value[0].percentage);
   });
   
-  // Расчет суммы для каждого участника
-// Обновленная функция в usePercentageSlider.ts для расчета сумм для владельцев
-// с использованием bookAmount и правил распределения
-
-// Расчет суммы для каждого участника
-const getParticipantAmount = (index) => {
-  console.log(`[usePercentageSlider] Calculating amount for participant index ${index}`);
-  
-  if (!ownerSides.value[index]) {
-    console.log('[usePercentageSlider] Participant not found for index', index);
-    return 0;
-  }
-  
-  const transactions = getFilteredTransactions();
-  console.log(`[usePercentageSlider] Processing ${transactions.length} transactions for participant calculations`);
-  
-  // Общие траты
-  let participantTotal = 0;
-  
-  // Получаем ID владельца
-  const ownerId = ownerSides.value[index].id;
-  console.log(`[usePercentageSlider] Processing for ownerId: ${ownerId}`);
-  
-  // Перебираем все транзакции расходов
-  transactions.forEach(transaction => {
-    if (transaction.type !== 'expense') return;
+  // Расчет суммы для каждого участника с использованием bookAmount и правил распределения
+  const getParticipantAmount = (index) => {
+    console.log(`[usePercentageSlider] Calculating amount for participant index ${index}`);
     
-    // Используем bookAmount вместо amount
-    const transactionAmount = Math.abs(transaction.bookAmount || transaction.amount);
-    
-    // Проверяем, есть ли правила распределения в транзакции
-    if (transaction.distributionRules && transaction.distributionRules.length > 0) {
-      // Находим правило для текущего владельца
-      const rule = transaction.distributionRules.find(rule => rule.ownerId === ownerId);
-      
-      if (rule) {
-        // Рассчитываем сумму согласно проценту в правиле
-        const amountForOwner = transactionAmount * (rule.percentage / 100);
-        console.log(`[usePercentageSlider] Transaction ${transaction.id}: ${amountForOwner} for owner ${ownerId} (${rule.percentage}%)`);
-        participantTotal += amountForOwner;
-      }
-    } else if (transaction.responsibleOwnerIds.includes(ownerId)) {
-      // Если нет правил, но пользователь ответственен за транзакцию
-      // Делим поровну между всеми ответственными владельцами
-      const shareAmount = transactionAmount / transaction.responsibleOwnerIds.length;
-      console.log(`[usePercentageSlider] Transaction ${transaction.id}: ${shareAmount} for owner ${ownerId} (equal share)`);
-      participantTotal += shareAmount;
+    if (!ownerSides.value[index]) {
+      console.log('[usePercentageSlider] Participant not found for index', index);
+      return 0;
     }
-  });
+    
+    const transactions = getFilteredTransactions();
+    console.log(`[usePercentageSlider] Processing ${transactions.length} transactions for participant calculations`);
+    
+    // Общие траты
+    let participantTotal = 0;
+    
+    // Получаем ID владельца
+    const ownerId = ownerSides.value[index].id;
+    console.log(`[usePercentageSlider] Processing for ownerId: ${ownerId}`);
+    
+    // Перебираем все транзакции расходов
+    transactions.forEach(transaction => {
+      if (transaction.type !== 'expense') return;
+      
+      // Используем bookAmount вместо amount
+      const transactionAmount = Math.abs(transaction.bookAmount || transaction.amount);
+      
+      // Проверяем, есть ли правила распределения в транзакции
+      if (transaction.distributionRules && transaction.distributionRules.length > 0) {
+        // Находим правило для текущего владельца
+        const rule = transaction.distributionRules.find(rule => rule.ownerId === ownerId);
+        
+        if (rule) {
+          // Рассчитываем сумму согласно проценту в правиле
+          const amountForOwner = transactionAmount * (rule.percentage / 100);
+          console.log(`[usePercentageSlider] Transaction ${transaction.id}: ${amountForOwner} for owner ${ownerId} (${rule.percentage}%)`);
+          participantTotal += amountForOwner;
+        }
+      } else if (transaction.responsibleOwnerIds && transaction.responsibleOwnerIds.includes(ownerId)) {
+        // Если нет правил, но пользователь ответственен за транзакцию
+        // Делим поровну между всеми ответственными владельцами
+        const shareAmount = transactionAmount / transaction.responsibleOwnerIds.length;
+        console.log(`[usePercentageSlider] Transaction ${transaction.id}: ${shareAmount} for owner ${ownerId} (equal share)`);
+        participantTotal += shareAmount;
+      }
+    });
+    
+    console.log(`[usePercentageSlider] Total for participant ${ownerId}: ${participantTotal}`);
+    return participantTotal;
+  };
   
-  console.log(`[usePercentageSlider] Total for participant ${ownerId}: ${participantTotal}`);
-  return participantTotal;
-};
+  // Форматирование суммы с новым форматом
+  const formatParticipantAmount = (index) => {
+    const amount = getParticipantAmount(index);
+    const currency = currentBook.value?.currency;
+    return formatBalance(amount, 5, currency);
+  };
   
   // Получение стиля для слайдера
   const getSliderStyle = () => {
@@ -180,6 +185,7 @@ const getParticipantAmount = (index) => {
     ownerSides,
     actualOwnerDistribution,
     getParticipantAmount,
+    formatParticipantAmount,
     getSliderStyle,
     getParticipantStyle,
     updateOwnerDistribution
