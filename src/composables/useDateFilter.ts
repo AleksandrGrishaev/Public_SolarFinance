@@ -45,6 +45,11 @@ type EmitFunction = (event: 'update:modelValue', value: DateFilterModelValue) =>
 export function useDateFilter(props: DateFilterProps, emit: EmitFunction) {
   // Состояние
   const currentPeriod = ref<'daily' | 'monthly' | 'yearly'>(props.modelValue.period || 'monthly');
+  // Временный период (который еще не подтвержден)
+  const tempPeriod = ref<'daily' | 'monthly' | 'yearly'>(props.modelValue.period || 'monthly');
+  
+  // Флаг, который указывает, что период был изменен, но выбор еще не подтвержден
+  const periodChanged = ref<boolean>(false);
   
   // Нормализуем даты через date-fns
   const normalizeDate = (date: Date | string | undefined): Date => {
@@ -52,7 +57,20 @@ export function useDateFilter(props: DateFilterProps, emit: EmitFunction) {
     return typeof date === 'string' ? parseISO(date) : new Date(date);
   };
   
-  const selectedDate = ref<Date>(normalizeDate(props.modelValue.date));
+  // Нормализация дат для корректного использования в компоненте
+  const normalizeInitialDate = (date: Date | string | undefined, period: 'daily' | 'monthly' | 'yearly'): Date => {
+    const normalDate = normalizeDate(date);
+    
+    if (period === 'monthly') {
+      return startOfMonth(normalDate);
+    } else if (period === 'yearly') {
+      return startOfYear(normalDate);
+    }
+    
+    return normalDate;
+  };
+  
+  const selectedDate = ref<Date>(normalizeInitialDate(props.modelValue.date, props.modelValue.period || 'monthly'));
   
   const normalizeDateRange = (range?: [Date | string, Date | string]): [Date, Date] => {
     if (!range) {
@@ -68,11 +86,22 @@ export function useDateFilter(props: DateFilterProps, emit: EmitFunction) {
   
   const dateRange = ref<[Date, Date]>(normalizeDateRange(props.modelValue.dateRange));
   const showCalendar = ref<boolean>(false);
-  const currentViewDate = ref<Date>(normalizeDate(
-    currentPeriod.value === 'daily' && dateRange.value ? 
-    dateRange.value[0] : 
-    props.modelValue.date
-  ));
+  
+  // Инициализация даты просмотра в зависимости от периода
+  const initialViewDate = (): Date => {
+    const period = props.modelValue.period || 'monthly';
+    
+    if (period === 'daily' && props.modelValue.dateRange && props.modelValue.dateRange[0]) {
+      return normalizeDate(props.modelValue.dateRange[0]);
+    } else if (props.modelValue.date) {
+      return normalizeInitialDate(props.modelValue.date, period);
+    }
+    
+    return period === 'monthly' ? startOfMonth(new Date()) : 
+           period === 'yearly' ? startOfYear(new Date()) : new Date();
+  };
+  
+  const currentViewDate = ref<Date>(initialViewDate());
   const tempRange = ref<[Date | null, Date | null]>([null, null]);
 
   // Дни недели (можно использовать локализацию date-fns)
@@ -87,7 +116,7 @@ export function useDateFilter(props: DateFilterProps, emit: EmitFunction) {
   // Заголовок календаря
   const calendarTitle = computed<string>(() => {
     const date = currentViewDate.value;
-    if (currentPeriod.value === 'yearly') {
+    if (tempPeriod.value === 'yearly') {
       const decade = Math.floor(getYear(date) / 10) * 10;
       return `${decade} - ${decade + 9}`;
     }
@@ -190,7 +219,7 @@ export function useDateFilter(props: DateFilterProps, emit: EmitFunction) {
 
   // Проверка, входит ли дата в выбранный диапазон
   const isInRange = (date: Date): boolean => {
-    if (currentPeriod.value !== 'daily') return false;
+    if (tempPeriod.value !== 'daily') return false;
     
     let start: Date, end: Date;
     
@@ -226,40 +255,52 @@ export function useDateFilter(props: DateFilterProps, emit: EmitFunction) {
   };
 
   // Методы
+  // Устанавливаем период - теперь открывает календарь и не сразу применяет фильтр
   const setPeriod = (period: 'daily' | 'monthly' | 'yearly'): void => {
-    currentPeriod.value = period;
+    console.log(`[useDateFilter] Setting period to ${period} (current is ${currentPeriod.value})`);
     
-    // Обновляем состояние в соответствии с выбранным периодом
+    // Если период изменился, сохраняем временно и открываем календарь
+    if (period !== currentPeriod.value) {
+      tempPeriod.value = period;
+      periodChanged.value = true;
+      
+      // Открываем календарь для выбора конкретной даты/диапазона
+      showCalendar.value = true;
+      
+      // Подготавливаем данные для выбора
+      prepareTempPeriodData(period);
+    } else {
+      // Если период тот же, просто открываем/закрываем календарь
+      toggleCalendar();
+    }
+  };
+  
+  // Подготовка данных для временного периода
+  const prepareTempPeriodData = (period: 'daily' | 'monthly' | 'yearly'): void => {
     if (period === 'daily') {
-      if (!props.modelValue.dateRange) {
+      // Подготавливаем диапазон дат для daily
+      if (!dateRange.value || !dateRange.value[0] || !dateRange.value[1]) {
         const today = new Date();
         const weekAgo = addDays(today, -7);
-        dateRange.value = [startOfDay(weekAgo), endOfDay(today)];
+        tempRange.value = [startOfDay(weekAgo), endOfDay(today)];
       } else {
-        dateRange.value = [
-          startOfDay(normalizeDate(props.modelValue.dateRange[0])), 
-          endOfDay(normalizeDate(props.modelValue.dateRange[1]))
-        ];
+        tempRange.value = [dateRange.value[0], dateRange.value[1]];
       }
-    } else if (period === 'monthly') {
-      selectedDate.value = props.modelValue.date 
-        ? startOfMonth(normalizeDate(props.modelValue.date))
-        : startOfMonth(new Date());
+      
+      // Устанавливаем текущую дату просмотра на начало диапазона
+      currentViewDate.value = new Date(tempRange.value[0] || new Date());
     } else {
-      selectedDate.value = props.modelValue.date 
-        ? startOfYear(normalizeDate(props.modelValue.date))
-        : startOfYear(new Date());
+      // Для monthly и yearly используем текущую дату или сегодня
+      const baseDate = selectedDate.value || new Date();
+      
+      if (period === 'monthly') {
+        // Если переходим на monthly, устанавливаем на текущий месяц
+        currentViewDate.value = startOfMonth(baseDate);
+      } else {
+        // Если переходим на yearly, устанавливаем на текущий год
+        currentViewDate.value = startOfYear(baseDate);
+      }
     }
-    
-    // Обновляем currentViewDate для правильного отображения календаря
-    if (period === 'daily' && dateRange.value && dateRange.value[0]) {
-      currentViewDate.value = new Date(dateRange.value[0]);
-    } else {
-      currentViewDate.value = new Date(selectedDate.value);
-    }
-    
-    // Обновляем модель
-    updateModelValue();
   };
 
   const toggleCalendar = (): void => {
@@ -268,12 +309,20 @@ export function useDateFilter(props: DateFilterProps, emit: EmitFunction) {
     if (showCalendar.value) {
       // Сброс временного выбора при открытии календаря
       tempRange.value = [null, null];
+      periodChanged.value = false;
+      tempPeriod.value = currentPeriod.value;
     }
   };
 
   const hideCalendar = (): void => {
     showCalendar.value = false;
     tempRange.value = [null, null];
+    
+    // Сбрасываем временный период если пользователь отменил выбор
+    if (periodChanged.value) {
+      tempPeriod.value = currentPeriod.value;
+      periodChanged.value = false;
+    }
   };
 
   const navigateDate = (direction: number): void => {
@@ -289,23 +338,30 @@ export function useDateFilter(props: DateFilterProps, emit: EmitFunction) {
       
       dateRange.value = [startOfDay(newStartDate), endOfDay(newEndDate)];
       currentViewDate.value = new Date(newStartDate);
+      
+      // Автоматически обновляем модель при навигации
+      updateModelValue();
     } else if (currentPeriod.value === 'monthly') {
       // Для monthly перемещаемся по месяцам
       const newDate = addMonths(selectedDate.value, direction);
       selectedDate.value = startOfMonth(newDate);
       currentViewDate.value = new Date(selectedDate.value);
+      
+      // Автоматически обновляем модель при навигации
+      updateModelValue();
     } else {
       // Для yearly перемещаемся по годам
       const newDate = addYears(selectedDate.value, direction);
       selectedDate.value = startOfYear(newDate);
       currentViewDate.value = new Date(selectedDate.value);
+      
+      // Автоматически обновляем модель при навигации
+      updateModelValue();
     }
-    
-    updateModelValue();
   };
 
   const navigateMonth = (direction: number): void => {
-    if (currentPeriod.value === 'yearly') {
+    if (tempPeriod.value === 'yearly') {
       // Для yearly перемещаемся по декадам
       currentViewDate.value = addYears(currentViewDate.value, direction * 10);
     } else {
@@ -315,7 +371,7 @@ export function useDateFilter(props: DateFilterProps, emit: EmitFunction) {
   };
 
   const selectDate = (date: Date): void => {
-    if (currentPeriod.value !== 'daily') return;
+    if (tempPeriod.value !== 'daily') return;
     
     // В режиме диапазона
     if (!tempRange.value[0]) {
@@ -342,8 +398,8 @@ export function useDateFilter(props: DateFilterProps, emit: EmitFunction) {
     selectedDate.value = startOfMonth(newDate);
     currentViewDate.value = new Date(selectedDate.value);
     
-    updateModelValue();
-    hideCalendar();
+    // Применяем период и обновляем модель
+    applyPeriodAndUpdateModel();
   };
 
   const selectYear = (year: number): void => {
@@ -351,21 +407,37 @@ export function useDateFilter(props: DateFilterProps, emit: EmitFunction) {
     selectedDate.value = startOfMonth(newDate);
     currentViewDate.value = new Date(selectedDate.value);
     
-    updateModelValue();
-    hideCalendar();
+    // Применяем период и обновляем модель
+    applyPeriodAndUpdateModel();
   };
 
+  // Подтверждение выбора и закрытие календаря
   const confirmSelection = (): void => {
-    if (tempRange.value[0] && tempRange.value[1]) {
+    // Если выбор диапазона завершен
+    if (tempPeriod.value === 'daily' && tempRange.value[0] && tempRange.value[1]) {
       dateRange.value = [
         startOfDay(tempRange.value[0]),
         endOfDay(tempRange.value[1])
       ];
       
       tempRange.value = [null, null];
-      updateModelValue();
-      hideCalendar();
     }
+    
+    // Применяем период и обновляем модель
+    applyPeriodAndUpdateModel();
+  };
+  
+  // Метод для применения периода и обновления модели
+  const applyPeriodAndUpdateModel = (): void => {
+    // Если период был изменен, применяем его
+    if (periodChanged.value) {
+      currentPeriod.value = tempPeriod.value;
+      periodChanged.value = false;
+    }
+    
+    // Обновляем модель и закрываем календарь
+    updateModelValue();
+    hideCalendar();
   };
 
   const updateModelValue = (): void => {
@@ -391,6 +463,7 @@ export function useDateFilter(props: DateFilterProps, emit: EmitFunction) {
   watch(() => props.modelValue, (newValue) => {
     if (newValue.period && newValue.period !== currentPeriod.value) {
       currentPeriod.value = newValue.period;
+      tempPeriod.value = newValue.period;
     }
     
     if (newValue.period === 'daily' && newValue.dateRange) {
@@ -421,6 +494,8 @@ export function useDateFilter(props: DateFilterProps, emit: EmitFunction) {
   return {
     // Состояние
     currentPeriod,
+    tempPeriod,
+    periodChanged,
     selectedDate,
     dateRange,
     showCalendar,
@@ -453,6 +528,7 @@ export function useDateFilter(props: DateFilterProps, emit: EmitFunction) {
     selectMonth,
     selectYear,
     confirmSelection,
-    updateModelValue
+    updateModelValue,
+    applyPeriodAndUpdateModel
   };
 }

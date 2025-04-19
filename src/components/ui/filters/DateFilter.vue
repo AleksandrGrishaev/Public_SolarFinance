@@ -1,4 +1,4 @@
-<!-- src/components/ui/filters/DateFilter.vue с использованием date-fns -->
+<!-- src/components/ui/filters/DateFilter.vue с улучшенным поведением выбора периода -->
 <template>
   <div class="date-filter">
     <!-- Переключатели D-M-Y слева -->
@@ -46,8 +46,13 @@
         <button class="nav-button" @click="navigateMonth(12)">&gt;&gt;</button>
       </div>
       
+      <!-- Индикатор изменения периода -->
+      <div v-if="periodChanged" class="period-changed-notice">
+        <div class="notice-text">Выберите {{ getPeriodName(tempPeriod) }} и нажмите "Применить"</div>
+      </div>
+      
       <!-- Календарь для Daily -->
-      <div v-if="currentPeriod === 'daily'" class="calendar daily-calendar">
+      <div v-if="tempPeriod === 'daily'" class="calendar daily-calendar">
         <!-- Дни недели -->
         <div class="weekday-header">
           <div v-for="day in weekDays" :key="day" class="weekday">{{ day }}</div>
@@ -80,7 +85,7 @@
       </div>
       
       <!-- Выбор месяца -->
-      <div v-else-if="currentPeriod === 'monthly'" class="calendar month-calendar">
+      <div v-else-if="tempPeriod === 'monthly'" class="calendar month-calendar">
         <div class="months-grid">
           <div 
             v-for="(month, index) in monthNames" 
@@ -92,10 +97,16 @@
             {{ month }}
           </div>
         </div>
+        
+        <!-- Кнопки действий для месячного режима -->
+        <div v-if="periodChanged" class="calendar-footer">
+          <button class="action-button cancel" @click="hideCalendar">Отмена</button>
+          <button class="action-button confirm" @click="confirmSelection">Применить</button>
+        </div>
       </div>
       
       <!-- Выбор года -->
-      <div v-else-if="currentPeriod === 'yearly'" class="calendar year-calendar">
+      <div v-else-if="tempPeriod === 'yearly'" class="calendar year-calendar">
         <div class="years-grid">
           <div 
             v-for="year in yearsList" 
@@ -107,6 +118,12 @@
             {{ year }}
           </div>
         </div>
+        
+        <!-- Кнопки действий для годового режима -->
+        <div v-if="periodChanged" class="calendar-footer">
+          <button class="action-button cancel" @click="hideCalendar">Отмена</button>
+          <button class="action-button confirm" @click="confirmSelection">Применить</button>
+        </div>
       </div>
     </div>
   </div>
@@ -114,6 +131,7 @@
 
 <script setup lang="ts">
 import { onMounted, watch, ref, onUnmounted } from 'vue';
+import { startOfMonth } from 'date-fns';
 import { useDateFilter } from '@/composables/useDateFilter';
 
 interface DateFilterModelValue {
@@ -143,12 +161,13 @@ const emit = defineEmits<{
 
 // Ссылка на контейнер календаря
 const calendarContainerRef = ref(null);
-const dateFilterRef = ref(null);
 
 // Используем composable с расширенными функциями
 const {
   // Состояние
   currentPeriod,
+  tempPeriod,
+  periodChanged,
   selectedDate,
   dateRange,
   showCalendar,
@@ -200,21 +219,66 @@ const confirmSelection = () => {
   emit('calendar-visibility-change', false);
 };
 
+// Вспомогательная функция для отображения названия периода
+const getPeriodName = (period: 'daily' | 'monthly' | 'yearly'): string => {
+  switch (period) {
+    case 'daily':
+      return 'диапазон дат';
+    case 'monthly':
+      return 'месяц';
+    case 'yearly':
+      return 'год';
+    default:
+      return 'период';
+  }
+};
+
 // Предоставляем метод для внешнего закрытия календаря
 const forceCloseCalendar = () => {
   hideCalendar();
 };
 
-// Инициализация и управление кликами
+// Инициализация компонента
 onMounted(() => {
-  if (!props.modelValue.period) {
-    setPeriod('monthly');
+  console.log('[DateFilter] Initializing with props:', props.modelValue);
+  
+  // Определяем начальные настройки
+  const initialPeriod = props.modelValue.period || 'monthly';
+  
+  // Установка начальной даты в зависимости от периода
+  if (initialPeriod === 'monthly' && props.modelValue.date) {
+    // Устанавливаем на первое число месяца
+    selectedDate.value = startOfMonth(new Date(props.modelValue.date));
+  } else if (initialPeriod === 'yearly' && props.modelValue.date) {
+    // Для годового периода устанавливаем на первое января
+    const year = new Date(props.modelValue.date).getFullYear();
+    selectedDate.value = new Date(year, 0, 1);
+  } else if (initialPeriod === 'daily' && props.modelValue.dateRange) {
+    // Для диапазона используем переданный диапазон
+    dateRange.value = [
+      new Date(props.modelValue.dateRange[0]),
+      new Date(props.modelValue.dateRange[1])
+    ];
+  }
+  
+  // Устанавливаем начальные периоды
+  currentPeriod.value = initialPeriod;
+  tempPeriod.value = initialPeriod;
+  
+  // Устанавливаем текущую дату просмотра
+  if (initialPeriod === 'daily' && dateRange.value && dateRange.value[0]) {
+    currentViewDate.value = new Date(dateRange.value[0]);
   } else {
-    setPeriod(props.modelValue.period as 'daily' | 'monthly' | 'yearly');
+    currentViewDate.value = new Date(selectedDate.value);
   }
   
   // Убедимся, что календарь закрыт при старте
+  showCalendar.value = false;
   emit('calendar-visibility-change', false);
+  
+  // Автоматически обновляем модель после инициализации
+  console.log('[DateFilter] Initial model update with period:', initialPeriod);
+  updateModelValue();
   
   // Добавляем глобальный обработчик кликов
   const handleDocumentClick = (event: MouseEvent) => {
@@ -240,7 +304,7 @@ onMounted(() => {
     
     // Если клик не на дате-селекторе, закрываем календарь
     if (!isDateSelector) {
-      console.log('Click outside calendar detected, closing calendar');
+      console.log('[DateFilter] Click outside calendar detected, closing calendar');
       hideCalendar();
     }
   };
@@ -256,7 +320,7 @@ onMounted(() => {
 
 // Отладочный вывод для отслеживания изменений модели
 watch(() => props.modelValue, (newValue) => {
-  console.log('Model changed in DateFilter:', newValue);
+  console.log('[DateFilter] Model changed:', newValue);
 }, { deep: true });
 
 // Экспортируем метод для внешнего доступа
@@ -507,5 +571,20 @@ defineExpose({
 .action-button.confirm {
   background-color: #53B794;
   color: white;
+}
+
+/* Стили для уведомления об изменении периода */
+.period-changed-notice {
+  background-color: rgba(83, 183, 148, 0.1);
+  padding: 6px 10px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.notice-text {
+  font-size: 12px;
+  color: #ccc;
+  font-weight: 500;
 }
 </style>
