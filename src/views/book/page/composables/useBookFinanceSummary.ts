@@ -1,78 +1,96 @@
 // src/views/book/page/composables/useBookFinanceSummary.ts
-import useBookData from './useBookData';
-import useOwnerDistribution from './useOwnerDistribution';
-import useFormatting from './useFormatting';
+import { computed } from 'vue';
+import { useBookContext } from './useBookContext';
+import { useUserStore } from '@/stores/user';
+import { useCurrencyStore } from '@/stores/currency';
 
-/**
- * Основной композабл для финансовой сводки книги, объединяющий все три компонента
- * и обеспечивающий обратную совместимость с исходным кодом
- */
-export default function useBookFinanceSummary(bookIdProp: string, emit: any) {
-  // Получаем данные о книге и транзакциях
-  const {
-    dateFilter,
-    bookData,
-    isAllBooks,
-    refreshData,
-    initStores,
-    isLoading,
-    onCalendarVisibilityChange,
-    bookDetail,
-    isBookDataReady,
-    hasDistributionRules: bookDataHasRules,
-    bookStore
-  } = useBookData(bookIdProp, emit);
+export function useBookFinanceSummary() {
+  console.log('[useBookFinanceSummary] Initializing...');
   
-  // Получаем данные о распределении между владельцами
-  const {
-    ownerSides,
-    actualOwnerDistribution,
-    getParticipantAmount,
-    updateOwnerDistribution,
-    hasDistributionRules: ownerDistributionHasRules,
-    bookDistributionRules
-  } = useOwnerDistribution(bookIdProp, emit);
+  const { 
+    currentBook, 
+    isLoading, 
+    dateFilter, 
+    hasDistributionRules,
+    getBookFinancialData,
+    setDateFilter
+  } = useBookContext();
   
-  // Получаем функции форматирования для отображения
-  const {
-    formatAmount,
-    formatCurrency,
-    getTotalClass,
-    getSliderStyle,
-    getParticipantStyle
-  } = useFormatting(bookIdProp, emit);
+  const userStore = useUserStore();
+  const currencyStore = useCurrencyStore();
   
-  // Объединенная проверка наличия правил распределения
-  const hasDistributionRules = ownerDistributionHasRules;
+  // Получаем финансовые данные
+  const bookData = computed(() => {
+    return getBookFinancialData();
+  });
+  
+  // Форматирование суммы с валютой
+  const formatAmount = (amount) => {
+    if (amount === undefined || amount === null) return '0';
+    
+    try {
+      const currencyCode = bookData.value.currency;
+      return currencyStore.formatCurrency(amount, currencyCode);
+    } catch (error) {
+      console.error('[useBookFinanceSummary] Error formatting amount:', error);
+      return amount.toString();
+    }
+  };
+  
+  // Форматирование только валюты
+  const formatCurrency = (value) => {
+    try {
+      const currencyCode = bookData.value.currency;
+      return currencyStore.formatCurrency(value || 0, currencyCode);
+    } catch (error) {
+      console.error('[useBookFinanceSummary] Error formatting currency:', error);
+      return (value || 0).toString();
+    }
+  };
+  
+  // Получение CSS класса для общей суммы
+  const getTotalClass = (amount) => {
+    try {
+      if (amount > 0) return 'amount-positive';
+      if (amount < 0) return 'amount-negative';
+      return '';
+    } catch (error) {
+      console.error('[useBookFinanceSummary] Error getting total class:', error);
+      return '';
+    }
+  };
+  
+  // Обработчик изменения видимости календаря
+  const onCalendarVisibilityChange = (isVisible) => {
+    console.log('[useBookFinanceSummary] Calendar visibility changed:', isVisible);
+    // Дополнительная логика, если нужна
+  };
+  
+  // Обновление фильтра даты
+  const updateDateFilter = (filter) => {
+    // Проверка на реальное изменение перед обновлением
+    const currentFilterJson = JSON.stringify(dateFilter.value);
+    const newFilterJson = JSON.stringify(filter);
+    
+    if (currentFilterJson !== newFilterJson) {
+      console.log('[useBookFinanceSummary] Updating date filter:', filter);
+      setDateFilter(filter);
+    } else {
+      console.log('[useBookFinanceSummary] Skipping update, filter not changed');
+    }
+  };
+  
+  console.log('[useBookFinanceSummary] Initialized with book:', currentBook.value?.name || 'None');
   
   return {
-    // Из useBookData
-    dateFilter,
     bookData,
-    isAllBooks,
-    refreshData,
-    initStores,
     isLoading,
-    onCalendarVisibilityChange,
-    bookDetail,
-    isBookDataReady,
-    
-    // Из useOwnerDistribution
-    ownerSides,
-    actualOwnerDistribution,
-    getParticipantAmount,
-    updateOwnerDistribution,
-    hasDistributionRules,
-    bookDistributionRules,
-    
-    // Из useFormatting
+    dateFilter,
     formatAmount,
     formatCurrency,
     getTotalClass,
-    getSliderStyle,
-    getParticipantStyle,
-    
-    // Предоставляем доступ к хранилищу книг
-    bookStore
+    onCalendarVisibilityChange,
+    hasDistributionRules,
+    updateDateFilter
   };
 }

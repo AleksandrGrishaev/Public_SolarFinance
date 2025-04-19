@@ -44,6 +44,17 @@ src/views/book/page/components/BookTransactionsList.vue
 ## BookFinanceSummary.vue
 Это инфомрация по книги и фильтр
 
+Информация по выбранной книги и фильтру - useBookData.ts
+Понять какая книга выбрана, и какие фильтры по дате выбраны. 
+
+По сути мне надо получить данные 
+Total, income, expense - за это отвечает [создать отдельный composable]
+Данные для слайдера - за это отвечает useOwnerDistribution.ts
+
+за стили отвечает - useFormatting.ts
+
+
+
 ### src/components/ui/filters/DateFilter.vue
 
 ### src/views/book/page/components/BookPercentageSlider.vue

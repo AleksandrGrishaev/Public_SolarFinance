@@ -1,32 +1,37 @@
-<!-- src/views/book/page/components/BookFinanceSummary.vue -->
-<template>
+  <template>
   <div class="financial-info">
     <!-- Состояние загрузки -->
     <div v-if="isLoading" class="loading-state">
       <div class="loading-spinner"></div>
-      <p>Загрузка данных...</p>
+      <p>Loading data...</p>
     </div>
     
-    <!-- Данные загружены -->
+    <!-- Загруженные данные -->
     <div v-else>
-      <!-- Контейнер для верхней строки с суммами и иконкой -->
+      <!-- Верхняя строка с суммами и иконкой редактирования -->
       <div class="header-container">
         <div class="summary-row">
-          <!-- Итоговая сумма -->
+          <!-- Общая сумма - с проверкой на undefined -->
           <div class="summary-total">
-            <div class="amount" :class="getTotalClass(bookData.totalAmount)">{{ formatAmount(bookData.totalAmount) }}</div>
+            <div class="amount" :class="getTotalClass(bookData?.totalAmount || 0)">
+              {{ formatAmount(bookData?.totalAmount || 0) }}
+            </div>
             <div class="label">Total</div>
           </div>
           
-          <!-- Доход -->
+          <!-- Доход - с проверкой на undefined -->
           <div class="summary-income">
-            <div class="amount amount-positive">{{ formatAmount(bookData.incomeAmount) }}</div>
+            <div class="amount amount-positive">
+              {{ formatAmount(bookData?.incomeAmount || 0) }}
+            </div>
             <div class="label">Income</div>
           </div>
           
-          <!-- Расход -->
+          <!-- Расход - с проверкой на undefined -->
           <div class="summary-expense">
-            <div class="amount amount-negative">{{ formatAmount(bookData.expenseAmount) }}</div>
+            <div class="amount amount-negative">
+              {{ formatAmount(bookData?.expenseAmount || 0) }}
+            </div>
             <div class="label">Expense</div>
           </div>
         </div>
@@ -44,11 +49,11 @@
         </div>
       </div>
       
-      <!-- Слайдер распределения между владельцами -->
+      <!-- Секция распределения между владельцами (слайдер) -->
       <div v-if="shouldShowDistribution">
         <!-- Заголовок секции -->
         <div class="distribution-header">
-          <span>Распределение расходов</span>
+          <span>Expense Distribution</span>
         </div>
         
         <!-- Слайдер (только для отображения) -->
@@ -66,9 +71,9 @@
           />
         </div>
         
-        <!-- Информация об участниках -->
+        <!-- Информация о владельцах -->
         <div class="distribution-info">
-          <!-- Левый пользователь -->
+          <!-- Левый владелец -->
           <div 
             class="owner-info left-owner"
             :style="getParticipantStyle(0)"
@@ -80,7 +85,7 @@
             </div>
           </div>
           
-          <!-- Правый пользователь -->
+          <!-- Правый владелец -->
           <div 
             class="owner-info right-owner"
             :style="getParticipantStyle(1)"
@@ -96,99 +101,65 @@
       
       <!-- Фильтр даты -->
       <div class="date-filter-wrapper">
-        <DateFilter v-model="dateFilter" @calendar-visibility-change="onCalendarVisibilityChange" />
+        <DateFilter 
+  v-model="dateFilter" 
+  @update:modelValue="onDateFilterChange" 
+  @calendar-visibility-change="onCalendarVisibilityChange" 
+/>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, watch, ref, computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { IconPencil } from '@tabler/icons-vue';
 import BaseIcon from '@/components/ui/icons/BaseIcon.vue';
 import DateFilter from '@/components/ui/filters/DateFilter.vue';
-import useBookFinanceSummary from '../composables/useBookFinanceSummary';
-import { useBookStore } from '@/stores/book';
+import { useBookFinanceSummary } from '../composables/useBookFinanceSummary';
+import { usePercentageSlider } from '../composables/usePercentageSlider';
 
-const props = defineProps({
-  bookId: {
-    type: String,
-    required: true
-  }
-});
+console.log('[BookFinanceSummary] Component setup started');
 
-const emit = defineEmits(['update:dateFilter']);
-
-// Создаем реактивную ссылку для отслеживания изменений bookId
-const currentBookId = ref(props.bookId);
-
-// Прямой доступ к хранилищу книг для проверки правил распределения
-const bookStore = useBookStore();
-
-// Используем композабл вместо локальной логики
+// Используем composables для финансовой сводки
 const {
-  actualOwnerDistribution,
-  dateFilter,
   bookData,
-  ownerSides,
+  isLoading,
+  dateFilter,
   formatAmount,
   formatCurrency,
   getTotalClass,
+  onCalendarVisibilityChange,
+  hasDistributionRules,
+  updateDateFilter
+} = useBookFinanceSummary();
+
+// Используем composable для слайдера процентов
+const {
+  ownerSides,
+  actualOwnerDistribution,
+  getParticipantAmount,
   getSliderStyle,
   getParticipantStyle,
-  getParticipantAmount,
-  updateOwnerDistribution,
-  onCalendarVisibilityChange,
-  initStores,
-  refreshData,
-  isLoading,
-  hasDistributionRules,
-  bookDistributionRules
-} = useBookFinanceSummary(currentBookId.value, emit);
+  updateOwnerDistribution
+} = usePercentageSlider();
 
-// Непосредственно получаем книгу из хранилища для проверки правил распределения
-const bookFromStore = computed(() => {
-  return bookStore.getBookById(currentBookId.value);
-});
-
-// Проверяем, есть ли правила распределения в книге напрямую из хранилища
-const hasRules = computed(() => {
-  const book = bookFromStore.value;
-  return book && 
-         book.distributionRules && 
-         book.distributionRules.length >= 2;
-});
-
-// Решаем, показывать ли раздел распределения
+// Решаем, показывать ли секцию распределения
 const shouldShowDistribution = computed(() => {
-  return hasRules.value && !isLoading.value;
+  return hasDistributionRules && !isLoading.value;
 });
 
-// Обработчик клика по иконке редактирования
+// Обработчик клика по кнопке редактирования
 const handleEditClick = () => {
-  console.log('Edit button clicked');
-  // Здесь можно добавить логику редактирования
+  console.log('[BookFinanceSummary] Edit button clicked');
+  // Добавьте вашу логику редактирования здесь
 };
 
-// Отслеживаем изменение bookId из свойства компонента
-watch(() => props.bookId, async (newBookId) => {
-  console.log(`[BookFinanceSummary] BookId changed to ${newBookId}`);
-  currentBookId.value = newBookId;
-  
-  // Принудительно обновляем данные
-  await refreshData();
-}, { immediate: true });
-
-// Инициализация компонента
-onMounted(async () => {
-  console.log('[BookFinanceSummary] Mounted, initializing stores');
-  await initStores();
-  
-  // Принудительно обновляем данные после инициализации
-  console.log('[BookFinanceSummary] Refreshing data after initialization');
-  await refreshData();
+onMounted(() => {
+  console.log('[BookFinanceSummary] Component mounted');
 });
 </script>
+
 
 <style scoped>
 .financial-info {
