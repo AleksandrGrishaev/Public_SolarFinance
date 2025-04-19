@@ -1,29 +1,49 @@
-Давай еще раз, проанализируем логику работы страницы.
+Эта диаграмма последовательности показывает весь процесс взаимодействия пользователя с приложением - от выбора книги до отображения данных. Рассмотрим ключевые этапы:
+1. Инициализация
 
-# структура файлов: 
+BooksView запускает useBookContextProvider(), который создает центральный контекст
+Контекст инициализирует все необходимые хранилища данных (stores)
+После загрузки данных контекст предоставляется компонентам
 
-src/components/ui/filters/DateFilter.vue
-src/composables/transaction/useFormatBalance.ts
-src/composables/useDateFilter.ts
+2. Выбор книги
 
-src/views/book
-src/views/book/page
-src/views/book/page/components
-src/views/book/page/components/BaseAddIcon.vue
-src/views/book/page/components/BookFinanceSummary.vue
-src/views/book/page/components/BookPercentageSlider.vue
-src/views/book/page/components/BookSelector.vue
-src/views/book/page/components/BookTransactionGroup.vue
-src/views/book/page/components/BookTransactionItem.vue
-src/views/book/page/components/BookTransactionsList.vue
-src/views/book/page/components/DashBoardBook.vue
-src/views/book/page/composables
-src/views/book/page/composables/useBookData.ts
-src/views/book/page/composables/useBookFinanceSummary.ts
-src/views/book/page/composables/useFormatting.ts
-src/views/book/page/composables/useOwnerDistribution.ts
-src/views/book/page/BooksView.vue
+Пользователь кликает по книге в компоненте BookSelector
+toggleBook() вызывает selectBook() в контексте
+Контекст обновляет массив выбранных книг и запускает refreshData()
+Происходит обновление данных через хранилища и применение фильтров
+Вычисляемое свойство currentBook обновляется
 
+3. Отображение панели книги
+
+BooksView отображает DashBoardBook (условный рендеринг через v-if)
+DashBoardBook отображает BookFinanceSummary и BookTransactionsList
+
+4. Получение финансовых данных
+
+BookFinanceSummary использует useBookFinanceSummary(), который получает данные из контекста
+Контекст предоставляет доступ к фильтрам и методу получения финансовых данных
+Выполняется расчет и форматирование сумм доходов и расходов
+
+5. Распределение расходов по владельцам
+
+Через usePercentageSlider() получаются данные о правилах распределения
+Отображается слайдер с процентами владения для каждого участника
+
+6. Получение транзакций
+
+BookTransactionsList использует useBookTransactions() для получения транзакций
+Контекст применяет фильтры по книге и датам и возвращает отфильтрованные транзакции
+Транзакции группируются по дате для удобного отображения
+
+7. Изменение фильтра дат
+
+Пользователь меняет период или дату в фильтре
+onDateFilterChange() проверяет, действительно ли изменились данные
+При реальном изменении вызывается updateDateFilter(), который обновляет контекст
+Контекст запускает обновление данных и применяет новые фильтры
+Обновленные данные отображаются в компонентах
+
+Эта архитектура обеспечивает четкое разделение ответственности между компонентами, централизованное управление состоянием через контекст и эффективное обновление данных при взаимодействии пользователя с приложением.
 
 
 ## BooksView.vue

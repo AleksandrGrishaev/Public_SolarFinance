@@ -149,6 +149,19 @@ const shouldShowDistribution = computed(() => {
   return hasDistributionRules && !isLoading.value;
 });
 
+const onDateFilterChange = (newFilterValue) => {
+  // Проверка на действительное изменение перед обновлением
+  const oldValue = JSON.stringify(dateFilter.value);
+  const newValue = JSON.stringify(newFilterValue);
+  
+  if (oldValue !== newValue) {
+    console.log('[BookFinanceSummary] Date filter changed:', newFilterValue);
+    updateDateFilter(newFilterValue);
+  } else {
+    console.log('[BookFinanceSummary] Skipping update, filter not changed');
+  }
+};
+
 // Обработчик клика по кнопке редактирования
 const handleEditClick = () => {
   console.log('[BookFinanceSummary] Edit button clicked');
