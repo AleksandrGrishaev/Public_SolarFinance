@@ -44,7 +44,6 @@
         <div class="content-main">
           <div class="item-title" v-if="title">{{ title }}</div>
           <div class="item-description" v-if="description">{{ description }}</div>
-          
         </div>
         <div class="item-subtitle" v-if="subtitle">{{ subtitle }}</div>
       </slot>
@@ -58,7 +57,6 @@
             {{ formattedAmount }}
           </div>
         </div>
-        <!-- Всегда показываем item-info без условия v-if -->
         <div class="item-info" :class="{ 'has-info': !!info }">
           {{ info }}
         </div>
@@ -334,6 +332,7 @@ const handleClick = (event) => {
 </script>
 
 <style scoped>
+
 .base-transaction-item {
   padding: var(--spacing-xs) var(--spacing-md) var(--spacing-xs) var(--spacing-sm);
   display: flex;
@@ -341,7 +340,6 @@ const handleClick = (event) => {
   gap: var(--spacing-sm);
   position: relative;
   transition: background-color var(--transition-speed) var(--transition-fn);
-  /* Уменьшим внешний отступ, если он есть */
   margin: 0;
 }
 
@@ -359,7 +357,7 @@ const handleClick = (event) => {
 
 .item-icon {
   min-width: 37px;
-  height: 48px; /* Уменьшаем с 54px до 48px */
+  height: 48px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -396,8 +394,8 @@ const handleClick = (event) => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-width: 0; /* Для корректной работы text-overflow */
-  height: 48px; /* Фиксированная высота для контентной области */
+  min-width: 0;
+  height: 48px;
 }
 
 .content-main {
@@ -405,6 +403,7 @@ const handleClick = (event) => {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  min-width: 0;
 }
 
 .item-title {
@@ -414,6 +413,18 @@ const handleClick = (event) => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+.item-description {
+  color: var(--text-grey);
+  font-size: var(--font-super-small-size);
+  line-height: var(--font-super-small-line-height);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-top: 2px;
+  min-width: 0;
 }
 
 .item-subtitle {
@@ -425,21 +436,13 @@ const handleClick = (event) => {
   overflow: hidden;
   text-overflow: ellipsis;
   padding-top: 2px;
-}
-.item-description {
-  flex: 1;
-  color: var(--text-grey);
-  font-size: var(--font-super-small-size);
-  line-height: var(--font-super-small-line-height);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  padding-top: 2px;
+  min-width: 0;
 }
 
 .item-amount {
   min-width: 110px;
-  height: 48px; /* Фиксированная высота для блока с суммой */
+  max-width: 110px;
+  height: 48px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -451,6 +454,7 @@ const handleClick = (event) => {
   flex-direction: column;
   justify-content: center;
   align-items: flex-end;
+  min-width: 0;
 }
 
 .amount {
@@ -470,17 +474,15 @@ const handleClick = (event) => {
   color: var(--text-grey);
   font-size: var(--font-super-small-size);
   line-height: var(--font-super-small-line-height);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   padding-top: 2px;
 }
 
 .item-info.has-info {
-  color: var(--text-usual); /* Более контрастный цвет, когда есть информация */
+  color: var(--text-usual);
+  white-space: normal; /* Позволит переносить слова */
+  overflow: visible; /* Убираем скрытие переполнения */
 }
 
-/* Цветовые классы для сумм */
 .color-success {
   color: var(--color-success);
 }
@@ -488,39 +490,4 @@ const handleClick = (event) => {
 .color-warning {
   color: var(--color-warning);
 }
-/* Специальные стили для элементов транзакций книги */
-:global(.book-transaction-item) .item-title {
-  font-weight: 500;
-  width: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  padding-right: 4px;
-}
-
-:global(.book-transaction-item) .item-description {
-  width: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  padding-right: 4px;
-}
-
-:global(.book-transaction-item) .content-main {
-  width: 100%;
-}
-
-:global(.book-transaction-item) .item-content {
-  min-width: 0;
-  max-width: 100%;
-  overflow: hidden;
-}
-
-/* Удаляем лишнее */
-:global(.book-transaction-item) .item-subtitle {
-  font-size: var(--font-super-small-size);
-  margin-top: 0;
-  padding-top: 0;
-}
-
 </style>

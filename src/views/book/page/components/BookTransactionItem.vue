@@ -12,7 +12,6 @@
     :categoryColor="categoryColor"
     :initials="initials"
     withBorder
-    customClass="book-transaction-item"
     @click="$emit('click', transaction)"
   />
 </template>
@@ -214,7 +213,5 @@ const accountInfoWithAmount = computed(() => {
 </script>
 
 <style scoped>
-.book-transaction-item {
-  /* Дополнительные стили для элемента транзакции */
-}
+/* При необходимости можно добавить дополнительные стили для компонента */
 </style>
