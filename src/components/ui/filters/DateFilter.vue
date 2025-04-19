@@ -1,4 +1,4 @@
-<!-- src/components/ui/filters/DateFilter.vue с ручной обработкой кликов -->
+<!-- src/components/ui/filters/DateFilter.vue с использованием date-fns -->
 <template>
   <div class="date-filter">
     <!-- Переключатели D-M-Y слева -->
@@ -39,11 +39,11 @@
     <div v-if="showCalendar" class="calendar-container" ref="calendarContainerRef">
       <!-- Навигация по месяцам и годам -->
       <div class="calendar-header">
-        <button class="nav-button" @click="navigateMonth(-1)">&lt;&lt;</button>
+        <button class="nav-button" @click="navigateMonth(-12)">&lt;&lt;</button>
         <button class="nav-button" @click="navigateMonth(-1)">&lt;</button>
         <span class="calendar-title">{{ calendarTitle }}</span>
         <button class="nav-button" @click="navigateMonth(1)">&gt;</button>
-        <button class="nav-button" @click="navigateMonth(1)">&gt;&gt;</button>
+        <button class="nav-button" @click="navigateMonth(12)">&gt;&gt;</button>
       </div>
       
       <!-- Календарь для Daily -->
@@ -74,8 +74,8 @@
         
         <!-- Кнопки действий -->
         <div class="calendar-footer">
-          <button class="action-button cancel" @click="hideCalendar">Cancel</button>
-          <button class="action-button confirm" @click="confirmSelection">Confirm</button>
+          <button class="action-button cancel" @click="hideCalendar">Отмена</button>
+          <button class="action-button confirm" @click="confirmSelection">Применить</button>
         </div>
       </div>
       
@@ -274,8 +274,8 @@ defineExpose({
   width: 100%;
   gap: 12px;
   justify-content: center;
-  margin-bottom: 16px; /* Увеличен отступ для календаря */
-  padding-bottom: 8px; /* Дополнительный отступ снизу */
+  margin-bottom: 16px;
+  padding-bottom: 8px;
 }
 
 .periods-container {

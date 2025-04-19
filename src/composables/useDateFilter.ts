@@ -1,5 +1,26 @@
 // src/composables/useDateFilter.ts
-import { ref, computed, watch} from 'vue';
+import { ref, computed, watch } from 'vue';
+import { 
+  format, 
+  startOfDay, 
+  endOfDay, 
+  startOfMonth, 
+  startOfYear, 
+  addDays, 
+  addMonths, 
+  addYears, 
+  isSameDay, 
+  isWithinInterval, 
+  isToday as isTodayFn, 
+  isSameMonth, 
+  isSameYear, 
+  getDate, 
+  getMonth,
+  getYear,
+  parseISO, 
+  differenceInDays
+} from 'date-fns';
+import { ru } from 'date-fns/locale';
 
 interface DateFilterModelValue {
   period?: 'daily' | 'monthly' | 'yearly';
@@ -24,37 +45,58 @@ type EmitFunction = (event: 'update:modelValue', value: DateFilterModelValue) =>
 export function useDateFilter(props: DateFilterProps, emit: EmitFunction) {
   // Состояние
   const currentPeriod = ref<'daily' | 'monthly' | 'yearly'>(props.modelValue.period || 'monthly');
-  const selectedDate = ref<Date>(props.modelValue.date || new Date());
-  const dateRange = ref<[Date, Date]>(props.modelValue.dateRange || [
-    new Date(new Date().setDate(new Date().getDate() - 7)), 
-    new Date()
-  ]);
+  
+  // Нормализуем даты через date-fns
+  const normalizeDate = (date: Date | string | undefined): Date => {
+    if (!date) return new Date();
+    return typeof date === 'string' ? parseISO(date) : new Date(date);
+  };
+  
+  const selectedDate = ref<Date>(normalizeDate(props.modelValue.date));
+  
+  const normalizeDateRange = (range?: [Date | string, Date | string]): [Date, Date] => {
+    if (!range) {
+      const today = new Date();
+      const weekAgo = addDays(today, -7);
+      return [startOfDay(weekAgo), endOfDay(today)];
+    }
+    return [
+      startOfDay(normalizeDate(range[0])), 
+      endOfDay(normalizeDate(range[1]))
+    ];
+  };
+  
+  const dateRange = ref<[Date, Date]>(normalizeDateRange(props.modelValue.dateRange));
   const showCalendar = ref<boolean>(false);
-  const currentViewDate = ref<Date>(new Date());
-  const tempRange = ref<[Date | null, Date | null]>([null, null]); // Временное хранение выбора диапазона
+  const currentViewDate = ref<Date>(normalizeDate(
+    currentPeriod.value === 'daily' && dateRange.value ? 
+    dateRange.value[0] : 
+    props.modelValue.date
+  ));
+  const tempRange = ref<[Date | null, Date | null]>([null, null]);
 
-  // Дни недели
-  const weekDays: string[] = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+  // Дни недели (можно использовать локализацию date-fns)
+  const weekDays: string[] = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
 
-  // Названия месяцев
-  const monthNames: string[] = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
+  // Названия месяцев (используем локализацию date-fns)
+  const monthNames: string[] = Array.from({ length: 12 }, (_, i) => 
+    format(new Date(2000, i, 1), 'LLLL', { locale: ru })
+      .charAt(0).toUpperCase() + format(new Date(2000, i, 1), 'LLLL', { locale: ru }).slice(1)
+  );
 
   // Заголовок календаря
   const calendarTitle = computed<string>(() => {
     const date = currentViewDate.value;
     if (currentPeriod.value === 'yearly') {
-      const decade = Math.floor(date.getFullYear() / 10) * 10;
+      const decade = Math.floor(getYear(date) / 10) * 10;
       return `${decade} - ${decade + 9}`;
     }
-    return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+    return format(date, 'LLLL yyyy', { locale: ru });
   });
 
   // Список годов для выбора (декада)
   const yearsList = computed<number[]>(() => {
-    const year = currentViewDate.value.getFullYear();
+    const year = getYear(currentViewDate.value);
     const decade = Math.floor(year / 10) * 10;
     const years: number[] = [];
     for (let i = decade - 1; i <= decade + 10; i++) {
@@ -67,27 +109,21 @@ export function useDateFilter(props: DateFilterProps, emit: EmitFunction) {
   const formattedDateValue = computed<string>(() => {
     if (currentPeriod.value === 'daily') {
       if (!dateRange.value || !dateRange.value[0] || !dateRange.value[1]) {
-        return 'Select range';
+        return 'Выберите диапазон';
       }
       
-      const formatDate = (date: Date): string => {
-        const day = date.getDate();
-        const month = date.getMonth() + 1;
-        return `${day < 10 ? '0' + day : day}.${month < 10 ? '0' + month : month}.${date.getFullYear()}`;
-      };
-      
-      return `${formatDate(dateRange.value[0])} - ${formatDate(dateRange.value[1])}`;
+      return `${format(dateRange.value[0], 'dd.MM.yyyy')} - ${format(dateRange.value[1], 'dd.MM.yyyy')}`;
     } else if (currentPeriod.value === 'monthly') {
-      return `${monthNames[selectedDate.value.getMonth()]} ${selectedDate.value.getFullYear()}`;
+      return format(selectedDate.value, 'LLLL yyyy', { locale: ru });
     } else {
-      return `${selectedDate.value.getFullYear()}`;
+      return format(selectedDate.value, 'yyyy');
     }
   });
 
   // Генерирует массив дней для текущего месяца в календаре
   const calendarDays = computed<CalendarDay[]>(() => {
-    const year = currentViewDate.value.getFullYear();
-    const month = currentViewDate.value.getMonth();
+    const year = getYear(currentViewDate.value);
+    const month = getMonth(currentViewDate.value);
     
     // Первый день месяца
     const firstDay = new Date(year, month, 1);
@@ -95,10 +131,10 @@ export function useDateFilter(props: DateFilterProps, emit: EmitFunction) {
     
     // Последний день месяца
     const lastDay = new Date(year, month + 1, 0);
-    const daysInMonth = lastDay.getDate();
+    const daysInMonth = getDate(lastDay);
     
     // Дни предыдущего месяца
-    const prevMonthLastDay = new Date(year, month, 0).getDate();
+    const prevMonthLastDay = getDate(new Date(year, month, 0));
     
     const days: CalendarDay[] = [];
     
@@ -137,31 +173,19 @@ export function useDateFilter(props: DateFilterProps, emit: EmitFunction) {
   // Проверка, является ли дата началом выбранного диапазона
   const isSelectedStart = (date: Date): boolean => {
     if (!tempRange.value[0] || !tempRange.value[1]) {
-      return !!(dateRange.value && dateRange.value[0] && 
-        date.getDate() === dateRange.value[0].getDate() && 
-        date.getMonth() === dateRange.value[0].getMonth() && 
-        date.getFullYear() === dateRange.value[0].getFullYear());
+      return !!(dateRange.value && dateRange.value[0] && isSameDay(date, dateRange.value[0]));
     }
     
-    return !!(tempRange.value[0] && 
-      date.getDate() === tempRange.value[0].getDate() && 
-      date.getMonth() === tempRange.value[0].getMonth() && 
-      date.getFullYear() === tempRange.value[0].getFullYear());
+    return !!(tempRange.value[0] && isSameDay(date, tempRange.value[0]));
   };
 
   // Проверка, является ли дата концом выбранного диапазона
   const isSelectedEnd = (date: Date): boolean => {
     if (!tempRange.value[0] || !tempRange.value[1]) {
-      return !!(dateRange.value && dateRange.value[1] && 
-        date.getDate() === dateRange.value[1].getDate() && 
-        date.getMonth() === dateRange.value[1].getMonth() && 
-        date.getFullYear() === dateRange.value[1].getFullYear());
+      return !!(dateRange.value && dateRange.value[1] && isSameDay(date, dateRange.value[1]));
     }
     
-    return !!(tempRange.value[1] && 
-      date.getDate() === tempRange.value[1].getDate() && 
-      date.getMonth() === tempRange.value[1].getMonth() && 
-      date.getFullYear() === tempRange.value[1].getFullYear());
+    return !!(tempRange.value[1] && isSameDay(date, tempRange.value[1]));
   };
 
   // Проверка, входит ли дата в выбранный диапазон
@@ -180,27 +204,25 @@ export function useDateFilter(props: DateFilterProps, emit: EmitFunction) {
       return false;
     }
     
-    const time = date.getTime();
-    return time > start.getTime() && time < end.getTime();
+    return isWithinInterval(date, { start, end });
   };
 
   // Проверка, является ли дата сегодняшней
   const isToday = (date: Date): boolean => {
-    const today = new Date();
-    return date.getDate() === today.getDate() && 
-           date.getMonth() === today.getMonth() && 
-           date.getFullYear() === today.getFullYear();
+    return isTodayFn(date);
   };
 
   // Проверка, является ли месяц выбранным
   const isSelectedMonth = (month: number): boolean => {
-    return selectedDate.value.getMonth() === month && 
-           selectedDate.value.getFullYear() === currentViewDate.value.getFullYear();
+    return isSameMonth(
+      selectedDate.value, 
+      new Date(getYear(currentViewDate.value), month, 1)
+    );
   };
 
   // Проверка, является ли год выбранным
   const isSelectedYear = (year: number): boolean => {
-    return selectedDate.value.getFullYear() === year;
+    return isSameYear(selectedDate.value, new Date(year, 0, 1));
   };
 
   // Методы
@@ -211,28 +233,26 @@ export function useDateFilter(props: DateFilterProps, emit: EmitFunction) {
     if (period === 'daily') {
       if (!props.modelValue.dateRange) {
         const today = new Date();
-        const weekAgo = new Date();
-        weekAgo.setDate(weekAgo.getDate() - 7);
-        dateRange.value = [weekAgo, today];
+        const weekAgo = addDays(today, -7);
+        dateRange.value = [startOfDay(weekAgo), endOfDay(today)];
       } else {
-        dateRange.value = [new Date(props.modelValue.dateRange[0]), new Date(props.modelValue.dateRange[1])];
+        dateRange.value = [
+          startOfDay(normalizeDate(props.modelValue.dateRange[0])), 
+          endOfDay(normalizeDate(props.modelValue.dateRange[1]))
+        ];
       }
+    } else if (period === 'monthly') {
+      selectedDate.value = props.modelValue.date 
+        ? startOfMonth(normalizeDate(props.modelValue.date))
+        : startOfMonth(new Date());
     } else {
-      if (!props.modelValue.date) {
-        if (period === 'monthly') {
-          const now = new Date();
-          selectedDate.value = new Date(now.getFullYear(), now.getMonth(), 1);
-        } else {
-          const now = new Date();
-          selectedDate.value = new Date(now.getFullYear(), 0, 1);
-        }
-      } else {
-        selectedDate.value = new Date(props.modelValue.date);
-      }
+      selectedDate.value = props.modelValue.date 
+        ? startOfYear(normalizeDate(props.modelValue.date))
+        : startOfYear(new Date());
     }
     
     // Обновляем currentViewDate для правильного отображения календаря
-    if (period === 'daily') {
+    if (period === 'daily' && dateRange.value && dateRange.value[0]) {
       currentViewDate.value = new Date(dateRange.value[0]);
     } else {
       currentViewDate.value = new Date(selectedDate.value);
@@ -262,43 +282,36 @@ export function useDateFilter(props: DateFilterProps, emit: EmitFunction) {
       const startDate = new Date(dateRange.value[0]);
       const endDate = new Date(dateRange.value[1]);
       
-      const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+      const diffDays = differenceInDays(endDate, startDate) + 1;
       
-      startDate.setDate(startDate.getDate() + direction * diffDays);
-      endDate.setDate(endDate.getDate() + direction * diffDays);
+      const newStartDate = addDays(startDate, direction * diffDays);
+      const newEndDate = addDays(endDate, direction * diffDays);
       
-      dateRange.value = [startDate, endDate];
-      currentViewDate.value = new Date(startDate);
+      dateRange.value = [startOfDay(newStartDate), endOfDay(newEndDate)];
+      currentViewDate.value = new Date(newStartDate);
     } else if (currentPeriod.value === 'monthly') {
       // Для monthly перемещаемся по месяцам
-      const date = new Date(selectedDate.value);
-      date.setMonth(date.getMonth() + direction);
-      selectedDate.value = date;
-      currentViewDate.value = new Date(date);
+      const newDate = addMonths(selectedDate.value, direction);
+      selectedDate.value = startOfMonth(newDate);
+      currentViewDate.value = new Date(selectedDate.value);
     } else {
       // Для yearly перемещаемся по годам
-      const date = new Date(selectedDate.value);
-      date.setFullYear(date.getFullYear() + direction);
-      selectedDate.value = date;
-      currentViewDate.value = new Date(date);
+      const newDate = addYears(selectedDate.value, direction);
+      selectedDate.value = startOfYear(newDate);
+      currentViewDate.value = new Date(selectedDate.value);
     }
     
     updateModelValue();
   };
 
   const navigateMonth = (direction: number): void => {
-    const date = new Date(currentViewDate.value);
-    
     if (currentPeriod.value === 'yearly') {
       // Для yearly перемещаемся по декадам
-      date.setFullYear(date.getFullYear() + direction * 10);
+      currentViewDate.value = addYears(currentViewDate.value, direction * 10);
     } else {
       // Для остальных по месяцам
-      date.setMonth(date.getMonth() + direction);
+      currentViewDate.value = addMonths(currentViewDate.value, direction);
     }
-    
-    currentViewDate.value = date;
   };
 
   const selectDate = (date: Date): void => {
@@ -307,38 +320,36 @@ export function useDateFilter(props: DateFilterProps, emit: EmitFunction) {
     // В режиме диапазона
     if (!tempRange.value[0]) {
       // Первый выбор
-      tempRange.value = [new Date(date), null];
+      tempRange.value = [startOfDay(date), null];
     } else if (!tempRange.value[1]) {
       // Второй выбор
       const firstDate = tempRange.value[0]!;
       
       // Убедимся, что даты в правильном порядке
       if (date < firstDate) {
-        tempRange.value = [new Date(date), new Date(firstDate)];
+        tempRange.value = [startOfDay(date), endOfDay(firstDate)];
       } else {
-        tempRange.value = [new Date(firstDate), new Date(date)];
+        tempRange.value = [startOfDay(firstDate), endOfDay(date)];
       }
     } else {
       // Сброс и начало нового выбора
-      tempRange.value = [new Date(date), null];
+      tempRange.value = [startOfDay(date), null];
     }
   };
 
   const selectMonth = (month: number): void => {
-    const date = new Date(currentViewDate.value);
-    date.setMonth(month);
-    selectedDate.value = date;
-    currentViewDate.value = date;
+    const newDate = new Date(getYear(currentViewDate.value), month, 1);
+    selectedDate.value = startOfMonth(newDate);
+    currentViewDate.value = new Date(selectedDate.value);
     
     updateModelValue();
     hideCalendar();
   };
 
   const selectYear = (year: number): void => {
-    const date = new Date(selectedDate.value);
-    date.setFullYear(year);
-    selectedDate.value = date;
-    currentViewDate.value = date;
+    const newDate = new Date(year, getMonth(selectedDate.value), 1);
+    selectedDate.value = startOfMonth(newDate);
+    currentViewDate.value = new Date(selectedDate.value);
     
     updateModelValue();
     hideCalendar();
@@ -347,8 +358,8 @@ export function useDateFilter(props: DateFilterProps, emit: EmitFunction) {
   const confirmSelection = (): void => {
     if (tempRange.value[0] && tempRange.value[1]) {
       dateRange.value = [
-        new Date(tempRange.value[0]),
-        new Date(tempRange.value[1])
+        startOfDay(tempRange.value[0]),
+        endOfDay(tempRange.value[1])
       ];
       
       tempRange.value = [null, null];
@@ -383,9 +394,19 @@ export function useDateFilter(props: DateFilterProps, emit: EmitFunction) {
     }
     
     if (newValue.period === 'daily' && newValue.dateRange) {
-      dateRange.value = [new Date(newValue.dateRange[0]), new Date(newValue.dateRange[1])];
+      dateRange.value = [
+        startOfDay(normalizeDate(newValue.dateRange[0])), 
+        endOfDay(normalizeDate(newValue.dateRange[1]))
+      ];
     } else if (newValue.date) {
-      selectedDate.value = new Date(newValue.date);
+      selectedDate.value = normalizeDate(newValue.date);
+      
+      // Нормализация даты в соответствии с периодом
+      if (currentPeriod.value === 'monthly') {
+        selectedDate.value = startOfMonth(selectedDate.value);
+      } else if (currentPeriod.value === 'yearly') {
+        selectedDate.value = startOfYear(selectedDate.value);
+      }
     }
     
     // Обновляем текущую отображаемую дату
