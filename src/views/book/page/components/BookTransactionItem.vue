@@ -3,7 +3,7 @@
   <BaseTransactionItem 
     :title="transaction.description || 'Unnamed transaction'"
     :subtitle="ownerName"
-    :info="accountInfo"
+    :info="accountInfoWithAmount"
     :amount="transaction.bookAmount"
     :currency="transaction.bookCurrency"
     :type="transaction.type"
@@ -21,6 +21,7 @@ import BaseTransactionItem from '@/components/ui/views/BaseTransactionItem.vue';
 import { useUserStore } from '@/stores/user';
 import { useAccountStore } from '@/stores/account';
 import { useCategoryStore } from '@/stores/category';
+import { useBookContext } from '../composables/useBookContext';
 
 const props = defineProps({
 transaction: {
@@ -35,6 +36,7 @@ const emit = defineEmits(['click']);
 const userStore = useUserStore();
 const accountStore = useAccountStore();
 const categoryStore = useCategoryStore();
+const { currentBook } = useBookContext();
 const accountsInitialized = ref(false);
 
 // Инициализация хранилища аккаунтов, если оно еще не было инициализировано
@@ -101,6 +103,37 @@ if (!accountsInitialized.value) return null;
 return accountStore.getAccountById(accountId);
 };
 
+// Определяем, отличается ли валюта счета от валюты книги
+const isAccountCurrencyDifferent = (account) => {
+if (!account || !account.currency) return false;
+if (!props.transaction.bookCurrency) return false;
+
+return account.currency !== props.transaction.bookCurrency;
+};
+
+// Форматирование суммы с символом валюты
+const formatAmountWithCurrency = (amount, currency) => {
+if (amount === undefined || amount === null) return '';
+
+const absAmount = Math.abs(amount);
+let currencySymbol = '';
+
+// Определяем символ валюты
+if (currency) {
+  if (currency === 'IDR' || currency === 'Rp') {
+    currencySymbol = 'Rp ';
+  } else if (currency === 'USD') {
+    currencySymbol = '$ ';
+  } else if (currency === 'RUB') {
+    currencySymbol = '₽ ';
+  } else {
+    currencySymbol = `${currency} `;
+  }
+}
+
+return `${currencySymbol}${absAmount.toLocaleString()}`;
+};
+
 // Информация о счете
 const accountInfo = computed(() => {
 if (props.transaction.type === 'income') {
@@ -135,5 +168,37 @@ if (props.transaction.type === 'income') {
 }
 
 return '';
+});
+
+// Информация о счете с оригинальной суммой в валюте счета
+const accountInfoWithAmount = computed(() => {
+let account = null;
+
+if (props.transaction.type === 'income') {
+  const accountId = props.transaction.destinationEntityId;
+  account = getAccount(accountId);
+} else if (props.transaction.type === 'expense') {
+  const accountId = props.transaction.sourceEntityId;
+  account = getAccount(accountId);
+} else if (props.transaction.type === 'transfer') {
+  // Для переводов используем стандартную информацию о счетах
+  return accountInfo.value;
+}
+
+// Если счет не найден, возвращаем стандартную информацию
+if (!account) return accountInfo.value;
+
+// Проверяем, отличается ли валюта счета от валюты книги
+if (!isAccountCurrencyDifferent(account)) {
+  return account.name;
+}
+
+// Формируем строку с суммой в валюте счета
+const originalAmount = props.transaction.amount;
+const originalCurrency = props.transaction.currency;
+const formattedAmount = formatAmountWithCurrency(originalAmount, originalCurrency);
+
+// Возвращаем информацию в формате "Счет | символ сумма"
+return `${account.name} | ${formattedAmount}`;
 });
 </script>

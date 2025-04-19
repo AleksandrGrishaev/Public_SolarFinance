@@ -143,7 +143,6 @@ const formattedAmount = computed(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--spacing-xs);
 }
 
 .group-title {
@@ -165,7 +164,7 @@ const formattedAmount = computed(() => {
   min-width: 120px;
   justify-content: flex-end;
   font-size: var(--font-small-size);
-  font-weight: var(--font-small-weight);
+  font-weight: var(--font-heading-weight);
   line-height: var(--font-small-line-height);
 }
 
