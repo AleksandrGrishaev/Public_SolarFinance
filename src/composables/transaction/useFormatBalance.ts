@@ -29,20 +29,65 @@ export function useFormatBalance() {
   };
   
   /**
+   * Helper function to format numbers with decimal places and space as thousand separator
+   */
+  const formatNumberWithDecimals = (
+    value: number, 
+    decimalPlaces: number = 0, 
+    showDecimalsOnWhole: boolean = false
+  ): string => {
+    // Determine if the number is a whole number
+    const isWholeNumber = value % 1 === 0;
+    
+    // If it's a whole number and we don't want to show decimals on whole numbers,
+    // use 0 decimal places, otherwise use the specified amount
+    const effectiveDecimalPlaces = (isWholeNumber && !showDecimalsOnWhole) ? 0 : decimalPlaces;
+    
+    // Format with space as thousand separator
+    // Use 'ru-RU' locale which uses spaces as thousand separators
+    const formatted = value.toLocaleString('ru-RU', {
+      minimumFractionDigits: effectiveDecimalPlaces,
+      maximumFractionDigits: effectiveDecimalPlaces
+    });
+    
+    // Replace comma with dot for decimal separator (Russian uses comma, we want dot)
+    return formatted.replace(',', '.');
+  };
+  
+  /**
    * Format a balance with appropriate suffixes (K, M, B) based on size
    * @param amount - The amount to format
-   * @param maxLength - Maximum length of the formatted number (not including suffix)
+   * @param decimalPlaces - Number of decimal places to show (0 by default)
    * @param currencyCode - Currency code for symbol retrieval
-   * @param symbol - Optional currency symbol (overrides currencyCode)
+   * @param options - Additional formatting options
    */
   const formatBalance = (
     amount: number | undefined | null,
-    maxLength: number = 5,
+    decimalPlaces: number = 0,
     currencyCode?: string,
-    symbol?: string
+    options: {
+      symbol?: string,
+      useAbbreviations?: boolean,
+      minValueToAbbreviate?: number,
+      symbolAfterNegative?: boolean,
+      showDecimalsOnWhole?: boolean
+    } = {}
   ): string => {
+    // Default options
+    const {
+      symbol,
+      useAbbreviations = true,
+      minValueToAbbreviate = 1000000, // Сокращать значения от миллиона и выше по умолчанию
+      symbolAfterNegative = true,
+      showDecimalsOnWhole = false // Не показывать десятичные знаки для целых чисел по умолчанию
+    } = options;
+    
     // Handle empty values
     if (amount === undefined || amount === null) return '';
+    
+    // Determine if amount is negative
+    const isNegative = amount < 0;
+    const absAmount = Math.abs(amount);
     
     // Get the currency symbol
     let currencySymbol = symbol;
@@ -55,45 +100,61 @@ export function useFormatBalance() {
       currencySymbol = '$';
     }
     
-    // Format with suffix based on magnitude
+    // Format with suffix based on magnitude if abbreviations are enabled
     let formattedAmount = '';
-    const absAmount = Math.abs(amount);
     
-    if (absAmount >= 1_000_000_000) {
-      // Billions
-      formattedAmount = (amount / 1_000_000_000).toFixed(1) + 'B';
-    } else if (absAmount >= 1_000_000) {
-      // Millions
-      formattedAmount = (amount / 1_000_000).toFixed(1) + 'M';
-    } else if (absAmount >= 1_000) {
-      // Thousands
-      formattedAmount = (amount / 1_000).toFixed(1) + 'K';
+    if (useAbbreviations && absAmount >= minValueToAbbreviate) {
+      if (absAmount >= 1_000_000_000) {
+        // Billions
+        formattedAmount = (absAmount / 1_000_000_000).toFixed(1) + 'B';
+      } else if (absAmount >= 1_000_000) {
+        // Millions
+        formattedAmount = (absAmount / 1_000_000).toFixed(1) + 'M';
+      } else {
+        // Форматируем обычным способом, если не достигли порога для сокращения
+        formattedAmount = formatNumberWithDecimals(absAmount, decimalPlaces, showDecimalsOnWhole);
+      }
+      
+      // Remove trailing zeros after decimal point for abbreviations
+      if (!showDecimalsOnWhole) {
+        formattedAmount = formattedAmount.replace(/\.0([KMB]?)$/, '$1');
+      }
     } else {
-      // Regular number
-      formattedAmount = amount.toString();
+      // Format number with locale and specified decimal places
+      formattedAmount = formatNumberWithDecimals(absAmount, decimalPlaces, showDecimalsOnWhole);
     }
     
-    // Remove trailing zeros after decimal point
-    formattedAmount = formattedAmount.replace(/\.0([KMB]?)$/, '$1');
+    // Add space after currency symbol for better readability
+    const currencyWithSpace = `${currencySymbol} `;
     
-    // Truncate if the number part exceeds maxLength
-    const parts = formattedAmount.split(/([KMB])$/);
-    const numberPart = parts[0];
-    const suffix = parts[1] || '';
-    
-    if (numberPart.length > maxLength) {
-      const truncated = numberPart.substring(0, maxLength);
-      formattedAmount = `${truncated}${suffix}`;
+    // Apply negative sign if needed
+    if (isNegative) {
+      if (symbolAfterNegative) {
+        // Символ валюты после знака минус
+        return `-${currencyWithSpace}${formattedAmount}`;
+      } else {
+        // Символ валюты перед знаком минус
+        return `${currencyWithSpace}-${formattedAmount}`;
+      }
+    } else {
+      // Положительное число - символ валюты в начале
+      return `${currencyWithSpace}${formattedAmount}`;
     }
-    
-    // Return formatted string with currency symbol
-    return `${currencySymbol} ${formattedAmount}`;
   };
   
   /**
    * Format account balance with currency symbol
    */
-  const formatAccountBalance = (account: any, maxLength: number = 5): string => {
+  const formatAccountBalance = (
+    account: any, 
+    decimalPlaces: number = 0,
+    options: {
+      useAbbreviations?: boolean,
+      minValueToAbbreviate?: number,
+      symbolAfterNegative?: boolean,
+      showDecimalsOnWhole?: boolean
+    } = {}
+  ): string => {
     if (!account) return '';
     
     // Используем currentBalance вместо balance
@@ -114,15 +175,19 @@ export function useFormatBalance() {
     
     return formatBalance(
       balance,
-      maxLength,
+      decimalPlaces,
       account.currency,
-      account.symbol
+      {
+        symbol: account.symbol,
+        ...options
+      }
     );
   };
   
   return {
     getCurrencySymbol,
     formatBalance,
-    formatAccountBalance
+    formatAccountBalance,
+    formatNumberWithDecimals
   };
 }

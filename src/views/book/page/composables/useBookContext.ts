@@ -105,10 +105,25 @@ export function useBookContextProvider() {
   });
   
   const hasDistributionRules = computed(() => {
-    if (isAllBooks.value) return false;
+    if (isAllBooks.value) {
+      console.log('[useBookContext] hasDistributionRules: false (All books selected)');
+      return false;
+    }
     
     const book = currentBook.value;
-    return !!(book && book.distributionRules && book.distributionRules.length >= 2);
+    
+    // Проверяем, есть ли книга и есть ли у неё непустой массив правил распределения с минимум 2 элементами
+    const result = !!(book && 
+                     book.distributionRules && 
+                     Array.isArray(book.distributionRules) && 
+                     book.distributionRules.length >= 2);
+    
+    console.log('[useBookContext] hasDistributionRules check for book:', book?.name);
+    console.log('[useBookContext] distributionRules:', book?.distributionRules ? 
+      `Array with ${book.distributionRules.length} items` : 'undefined or empty');
+    console.log('[useBookContext] hasDistributionRules result:', result);
+    
+    return result;
   });
   
   // Методы выбора книги

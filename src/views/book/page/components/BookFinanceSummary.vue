@@ -160,15 +160,14 @@ const { formatBalance, getCurrencySymbol } = useFormatBalance();
 
 // Создаем функцию форматирования с использованием нашего нового composable
 const formatBalanceAmount = (amount) => {
-  // Добавляем отладку
   const currency = bookData.value?.currency || 'Unknown';
-  console.log(`[BookFinanceSummary] Formatting ${amount} with currency: ${currency}`);
   
-  // Получим и выведем символ валюты
-  const currencySymbol = getCurrencySymbol(currency);
-  console.log(`[BookFinanceSummary] Currency symbol for ${currency}: ${currencySymbol}`);
-  
-  return formatBalance(amount, 5, currency);
+  // Используем обновленную функцию с нужными настройками
+  return formatBalance(amount, 0, currency, {
+    useAbbreviations: true,
+    minValueToAbbreviate: 1000000, // Сокращать от миллиона
+    symbolAfterNegative: true      // Знак минус перед символом валюты
+  });
 };
 
 // Создаем локальную копию фильтра для v-model
@@ -192,7 +191,19 @@ const {
 
 // Решаем, показывать ли секцию распределения
 const shouldShowDistribution = computed(() => {
-  return hasDistributionRules && !isLoading.value;
+  // Проверяем условие: нет загрузки и есть правила распределения
+  const result = hasDistributionRules.value && !isLoading.value;
+  
+  console.log('[BookFinanceSummary] shouldShowDistribution check:');
+  console.log('[BookFinanceSummary] - hasDistributionRules:', hasDistributionRules.value);
+  console.log('[BookFinanceSummary] - isLoading:', isLoading.value);
+  console.log('[BookFinanceSummary] - result:', result);
+  console.log('[BookFinanceSummary] - bookData distributionRules:', 
+    bookData.value?.distributionRules ? 
+    `Array with ${bookData.value.distributionRules.length} items` : 
+    'undefined or empty');
+  
+  return result;
 });
 
 // Отслеживаем изменения в bookData
