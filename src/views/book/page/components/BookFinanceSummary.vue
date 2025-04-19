@@ -120,8 +120,18 @@ import DateFilter from '@/components/ui/filters/DateFilter.vue';
 import { useBookFinanceSummary } from '../composables/useBookFinanceSummary';
 import { usePercentageSlider } from '../composables/usePercentageSlider';
 import { useFormatBalance } from '@/composables/transaction/useFormatBalance';
+import { useBookContext } from '../composables/useBookContext';
 
 console.log('[BookFinanceSummary] Component setup started');
+
+// Получаем bookContext напрямую для отладки
+const bookContext = useBookContext();
+console.log('[BookFinanceSummary] Direct bookContext.currentBook:', 
+  bookContext.currentBook.value ? {
+    id: bookContext.currentBook.value.id,
+    name: bookContext.currentBook.value.name,
+    currency: bookContext.currentBook.value.currency
+  } : 'null');
 
 // Используем composables для финансовой сводки
 const {
@@ -136,12 +146,29 @@ const {
   updateDateFilter
 } = useBookFinanceSummary();
 
+// Добавим отладочную информацию о bookData
+console.log('[BookFinanceSummary] Initial bookData:', bookData.value ? {
+  name: bookData.value.name,
+  currency: bookData.value.currency,
+  incomeAmount: bookData.value.incomeAmount,
+  expenseAmount: bookData.value.expenseAmount,
+  totalAmount: bookData.value.totalAmount
+} : 'null');
+
 // Импортируем и используем composable для форматирования баланса
-const { formatBalance } = useFormatBalance();
+const { formatBalance, getCurrencySymbol } = useFormatBalance();
 
 // Создаем функцию форматирования с использованием нашего нового composable
 const formatBalanceAmount = (amount) => {
-  return formatBalance(amount, 5, bookData.value?.currency);
+  // Добавляем отладку
+  const currency = bookData.value?.currency || 'Unknown';
+  console.log(`[BookFinanceSummary] Formatting ${amount} with currency: ${currency}`);
+  
+  // Получим и выведем символ валюты
+  const currencySymbol = getCurrencySymbol(currency);
+  console.log(`[BookFinanceSummary] Currency symbol for ${currency}: ${currencySymbol}`);
+  
+  return formatBalance(amount, 5, currency);
 };
 
 // Создаем локальную копию фильтра для v-model
@@ -168,6 +195,32 @@ const shouldShowDistribution = computed(() => {
   return hasDistributionRules && !isLoading.value;
 });
 
+// Отслеживаем изменения в bookData
+watch(() => bookData.value, (newData, oldData) => {
+  console.log('[BookFinanceSummary] bookData changed:', {
+    name: newData?.name,
+    fromCurrency: oldData?.currency,
+    toCurrency: newData?.currency,
+    incomeAmount: newData?.incomeAmount,
+    expenseAmount: newData?.expenseAmount,
+    totalAmount: newData?.totalAmount
+  });
+}, { deep: true, immediate: true });
+
+// Добавим наблюдение за currentBook из контекста напрямую
+watch(() => bookContext.currentBook.value, (newBook) => {
+  console.log('[BookFinanceSummary] bookContext.currentBook changed:', newBook ? {
+    id: newBook.id,
+    name: newBook.name,
+    currency: newBook.currency
+  } : 'null');
+}, { immediate: true });
+
+// Добавим наблюдение за selectedBookIds
+watch(() => bookContext.selectedBookIds.value, (newSelection) => {
+  console.log('[BookFinanceSummary] bookContext.selectedBookIds changed:', newSelection);
+}, { immediate: true });
+
 const onDateFilterChange = (newFilterValue) => {
   console.log('[BookFinanceSummary] Date filter input received:', newFilterValue);
   
@@ -188,18 +241,21 @@ onMounted(() => {
   
   // При монтировании обеспечиваем синхронизацию локального фильтра с глобальным
   localDateFilter.value = JSON.parse(JSON.stringify(dateFilter.value));
+  
+  // Выводим информацию о текущих данных для отладки
+  console.log('[BookFinanceSummary] At mount - bookData:', bookData.value ? {
+    name: bookData.value.name,
+    currency: bookData.value.currency,
+    totalAmount: bookData.value.totalAmount
+  } : 'null');
+  
+  console.log('[BookFinanceSummary] At mount - currentBook:', bookContext.currentBook.value ? {
+    id: bookContext.currentBook.value.id,
+    name: bookContext.currentBook.value.name,
+    currency: bookContext.currentBook.value.currency
+  } : 'null');
 });
-
-watch(() => bookData.value, (newData) => {
-  console.log('[BookFinanceSummary] Book data updated:', {
-    incomeAmount: newData?.incomeAmount,
-    expenseAmount: newData?.expenseAmount,
-    totalAmount: newData?.totalAmount,
-    currency: newData?.currency
-  });
-}, { deep: true });
 </script>
-
 
 <style scoped>
 .financial-info {

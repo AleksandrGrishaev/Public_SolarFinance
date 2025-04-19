@@ -217,13 +217,24 @@ export function useBookContextProvider() {
   
   // Получение отфильтрованных транзакций
   const getFilteredTransactions = () => {
-    return transactionStore.filteredTransactions;
+    const transactions = transactionStore.filteredTransactions;
+    console.log(`[useBookContext] Got ${transactions.length} filtered transactions`);
+    return transactions;
   };
   
   // Расчет финансовых данных книги
 // Модифицированная функция getBookFinancialData в useBookContext.ts
 const getBookFinancialData = (): BookFinancialData => {
   console.log('[useBookContext] Calculating financial data...');
+  console.log('[useBookContext] Selected book IDs:', selectedBookIds.value);
+  console.log('[useBookContext] isAllBooks:', isAllBooks.value);
+  console.log('[useBookContext] Current book details:', 
+    currentBook.value ? {
+      id: currentBook.value.id,
+      name: currentBook.value.name,
+      currency: currentBook.value.currency,
+      distributionRules: currentBook.value.distributionRules?.length || 0
+    } : 'null');
   
   let incomeAmount = 0;
   let expenseAmount = 0;
@@ -232,11 +243,18 @@ const getBookFinancialData = (): BookFinancialData => {
   console.log(`[useBookContext] Processing ${transactions.length} transactions for financial data`);
   
   // Получаем валюту книги или пользователя, если выбрано несколько книг
-  const currency = currentBook.value?.currency || userStore.currentUser?.settings?.baseCurrency || currencyStore.userBaseCurrency;
-  console.log(`[useBookContext] Using currency: ${currency}`);
+  // Явно проверяем currentBook.value и его свойства
+  const bookCurrency = currentBook.value?.currency;
+  const userBaseCurrency = userStore.currentUser?.settings?.baseCurrency || currencyStore.userBaseCurrency;
+  const currency = bookCurrency || userBaseCurrency;
+  
+  console.log(`[useBookContext] Selected book currency: ${bookCurrency}`);
+  console.log(`[useBookContext] User base currency: ${userBaseCurrency}`);
+  console.log(`[useBookContext] Using currency for calculations: ${currency}`);
   
   // Если выбрано несколько книг, возможно с разными валютами
   const useUserCurrency = isAllBooks.value || selectedBookIds.value.length > 1;
+  console.log(`[useBookContext] Using user currency for conversions: ${useUserCurrency}`);
   
   transactions.forEach(transaction => {
     // Используем bookAmount вместо amount для расчетов
@@ -263,7 +281,8 @@ const getBookFinancialData = (): BookFinancialData => {
   
   console.log(`[useBookContext] Calculated totals - Income: ${incomeAmount}, Expense: ${expenseAmount}, Currency: ${currency}`);
   
-  return {
+  // При возврате данных добавим отладку
+  const result = {
     name: currentBook.value?.name || 'All Books',
     incomeAmount,
     expenseAmount,
@@ -271,35 +290,47 @@ const getBookFinancialData = (): BookFinancialData => {
     distributionRules: currentBook.value?.distributionRules || [],
     currency
   };
+  
+  console.log('[useBookContext] Returning financial data:', {
+    name: result.name,
+    currency: result.currency,
+    incomeAmount: result.incomeAmount,
+    expenseAmount: result.expenseAmount,
+    totalAmount: result.totalAmount,
+    distributionRules: result.distributionRules?.length || 0
+  });
+  
+  return result;
 };
-  // Создаем объект контекста
-  const context: BookContext = {
-    // Состояние
-    selectedBookIds,
-    dateFilter,
-    isLoading,
-    
-    // Вычисляемые свойства
-    currentBook,
-    isAllBooks,
-    hasDistributionRules,
-    
-    // Методы
-    selectBook,
-    selectMultipleBooks,
-    setDateFilter,
-    refreshData,
-    getFilteredTransactions,
-    getBookFinancialData
-  };
+
+// Создаем объект контекста
+const context: BookContext = {
+  // Состояние
+  selectedBookIds,
+  dateFilter,
+  isLoading,
   
-  // Предоставляем контекст дочерним компонентам
-  provide(BookContextKey, context);
+  // Вычисляемые свойства
+  currentBook,
+  isAllBooks,
+  hasDistributionRules,
   
-  // Инициализируем хранилища при создании
-  initStores();
-  
-  return context;
+  // Методы
+  selectBook,
+  selectMultipleBooks,
+  setDateFilter,
+  refreshData,
+  getFilteredTransactions,
+  getBookFinancialData
+};
+
+// Предоставляем контекст дочерним компонентам
+provide(BookContextKey, context);
+
+// Инициализируем хранилища при создании
+initStores();
+
+return context;
 }
 
 // Используйте эту функцию для доступа к контексту в дочерних компонентах
