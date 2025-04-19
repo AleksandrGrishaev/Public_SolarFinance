@@ -150,11 +150,13 @@ watch(() => props.bookId, (newBookId) => {
 
 // Инициализация компонента
 onMounted(async () => {
+  console.log('[BookFinanceSummary] Mounted, initializing stores');
   await initStores();
   
   // Используем setTimeout для предотвращения обновления перед полной загрузкой данных
   setTimeout(() => {
     // Принудительно обновляем данные после инициализации
+    console.log('[BookFinanceSummary] Refreshing data after initialization');
     refreshData();
   }, 100);
 });

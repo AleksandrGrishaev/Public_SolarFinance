@@ -16,5 +16,6 @@ export interface UserSettings {
   language: string;
   defaultBookId?: string;
   baseCurrency: string; 
+  color?: string; // Добавлено новое поле для цвета пользователя
   // Другие настройки пользователя
 }

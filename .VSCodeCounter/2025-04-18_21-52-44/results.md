@@ -1,25 +1,25 @@
 # Summary
 
-Date : 2025-04-18 20:42:35
+Date : 2025-04-18 21:52:44
 
 Directory /Users/peaker/dev/solar-finance/src
 
-Total : 147 files,  21572 codes, 1584 comments, 3366 blanks, all 26522 lines
+Total : 147 files,  21739 codes, 1612 comments, 3392 blanks, all 26743 lines
 
 Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
 ## Languages
 | language | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| Vue | 72 | 12,824 | 270 | 1,819 | 14,913 |
-| TypeScript | 62 | 5,598 | 1,234 | 1,008 | 7,840 |
+| Vue | 72 | 12,877 | 271 | 1,832 | 14,980 |
+| TypeScript | 62 | 5,712 | 1,261 | 1,021 | 7,994 |
 | Markdown | 5 | 2,654 | 0 | 420 | 3,074 |
 | SCSS | 8 | 496 | 80 | 119 | 695 |
 
 ## Directories
 | path | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| . | 147 | 21,572 | 1,584 | 3,366 | 26,522 |
+| . | 147 | 21,739 | 1,612 | 3,392 | 26,743 |
 | . (Files) | 2 | 65 | 9 | 10 | 84 |
 | about | 5 | 2,654 | 0 | 420 | 3,074 |
 | about (Files) | 2 | 711 | 0 | 149 | 860 |
@@ -53,10 +53,10 @@ Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-
 | services (Files) | 1 | 54 | 22 | 11 | 87 |
 | services/api | 2 | 82 | 31 | 36 | 149 |
 | services/system | 2 | 110 | 58 | 23 | 191 |
-| stores | 36 | 3,280 | 668 | 521 | 4,469 |
+| stores | 36 | 3,283 | 668 | 521 | 4,472 |
 | stores (Files) | 1 | 71 | 10 | 10 | 91 |
 | stores/account | 5 | 643 | 164 | 119 | 926 |
-| stores/book | 5 | 269 | 64 | 42 | 375 |
+| stores/book | 5 | 272 | 64 | 42 | 378 |
 | stores/category | 5 | 671 | 104 | 120 | 895 |
 | stores/common | 1 | 9 | 1 | 1 | 11 |
 | stores/currency | 5 | 360 | 60 | 69 | 489 |
@@ -68,18 +68,18 @@ Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-
 | styles/components | 2 | 167 | 17 | 28 | 212 |
 | styles/themes | 4 | 239 | 49 | 71 | 359 |
 | types | 1 | 5 | 0 | 0 | 5 |
-| views | 36 | 7,002 | 434 | 1,096 | 8,532 |
+| views | 36 | 7,166 | 462 | 1,122 | 8,750 |
 | views (Files) | 6 | 1,555 | 26 | 176 | 1,757 |
 | views/account | 9 | 2,279 | 122 | 380 | 2,781 |
 | views/account/popup | 9 | 2,279 | 122 | 380 | 2,781 |
 | views/account/popup (Files) | 4 | 1,732 | 43 | 285 | 2,060 |
 | views/account/popup/components | 2 | 337 | 2 | 55 | 394 |
 | views/account/popup/composables | 3 | 210 | 77 | 40 | 327 |
-| views/book | 11 | 1,506 | 95 | 256 | 1,857 |
-| views/book/page | 10 | 1,476 | 94 | 251 | 1,821 |
+| views/book | 11 | 1,670 | 123 | 282 | 2,075 |
+| views/book/page | 10 | 1,640 | 122 | 277 | 2,039 |
 | views/book/page (Files) | 1 | 74 | 6 | 12 | 92 |
-| views/book/page/components | 8 | 1,026 | 26 | 161 | 1,213 |
-| views/book/page/composables | 1 | 376 | 62 | 78 | 516 |
+| views/book/page/components | 8 | 1,079 | 27 | 174 | 1,280 |
+| views/book/page/composables | 1 | 487 | 89 | 91 | 667 |
 | views/book/popup | 1 | 30 | 1 | 5 | 36 |
 | views/currency | 1 | 162 | 3 | 25 | 190 |
 | views/currency/popup | 1 | 162 | 3 | 25 | 190 |

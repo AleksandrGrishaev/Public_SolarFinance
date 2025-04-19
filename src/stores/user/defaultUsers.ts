@@ -1,4 +1,4 @@
-// src/stores/user/defaultUsers.ts - обновленная версия
+// src/stores/user/defaultUsers.ts
 import type { User } from './types';
 
 /**
@@ -20,7 +20,8 @@ export const defaultUsers: User[] = [
     settings: {
       theme: 'system',
       language: 'en',
-      baseCurrency: 'USD' // Базовая валюта пользователя - USD
+      baseCurrency: 'USD', // Базовая валюта пользователя - USD
+      color: '4E8090' // Добавлен цвет для Alex
     }
   },
   { 
@@ -36,7 +37,8 @@ export const defaultUsers: User[] = [
     settings: {
       theme: 'light',
       language: 'ru',
-      baseCurrency: 'RUB' // Базовая валюта пользователя - RUB
+      baseCurrency: 'RUB', // Базовая валюта пользователя - RUB
+      color: 'DB9894' // Добавлен цвет для Sasha
     }
   },
 ];

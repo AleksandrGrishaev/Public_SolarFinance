@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 import { UserService } from './userService';
 import type { User, UserSettings } from './types';
 
-import { useCurrencyStore } from '../currency';
+import { useCurrencyStore } from '../currency/currencyStore';
 
 export const useUserStore = defineStore('user', {
   state: () => ({
@@ -186,6 +186,23 @@ export const useUserStore = defineStore('user', {
         settings: this.currentUser.settings
       });
     },
+
+    /**
+ * Обновление цвета пользователя
+ */
+async updateUserColor(color: string): Promise<boolean> {
+  if (!this.currentUser) return false;
+  
+  // Обновляем настройки пользователя
+  this.updateUserSettings({
+    color: color
+  });
+  
+  // Сохраняем изменения в базе данных
+  return await this.userService.updateUser(this.currentUser.id, {
+    settings: this.currentUser.settings
+  });
+},
     
     /**
      * Получение всех пользователей

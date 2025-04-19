@@ -1,0 +1,6 @@
+"filename", "language", "TypeScript", "Vue", "comment", "blank", "total"
+"/Users/peaker/dev/solar-finance/src/stores/book/defaultBooks.ts", "TypeScript", 3, 0, 0, 0, 3
+"/Users/peaker/dev/solar-finance/src/views/book/page/components/BookFinanceSummary.vue", "Vue", 0, 32, 1, 6, 39
+"/Users/peaker/dev/solar-finance/src/views/book/page/components/DashBoardBook.vue", "Vue", 0, 21, 0, 7, 28
+"/Users/peaker/dev/solar-finance/src/views/book/page/composables/useBookFinanceSummary.ts", "TypeScript", 111, 0, 27, 13, 151
+"Total", "-", 114, 53, 28, 26, 221
