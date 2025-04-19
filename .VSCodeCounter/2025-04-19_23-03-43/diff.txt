@@ -1,0 +1,48 @@
+Date : 2025-04-19 23:03:43
+Directory : /Users/peaker/dev/solar-finance/src
+Total : 11 files,  231 codes, 5 comments, 43 blanks, all 279 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| Vue      |         10 |        230 |          5 |         44 |        279 |
+| SCSS     |          1 |          1 |          0 |         -1 |          0 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++-----------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                    | files      | code       | comment    | blank      | total      |
++-----------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                       |         11 |        231 |          5 |         43 |        279 |
+| components                                                                              |          2 |        296 |          4 |         48 |        348 |
+| components/ui                                                                           |          2 |        296 |          4 |         48 |        348 |
+| components/ui/selectors                                                                 |          1 |        238 |          3 |         40 |        281 |
+| components/ui/views                                                                     |          1 |         58 |          1 |          8 |         67 |
+| styles                                                                                  |          1 |          1 |          0 |         -1 |          0 |
+| styles/themes                                                                           |          1 |          1 |          0 |         -1 |          0 |
+| views                                                                                   |          8 |        -66 |          1 |         -4 |        -69 |
+| views/book                                                                              |          8 |        -66 |          1 |         -4 |        -69 |
+| views/book/page                                                                         |          7 |       -101 |          0 |         -9 |       -110 |
+| views/book/page (Files)                                                                 |          1 |          0 |          1 |          4 |          5 |
+| views/book/page/components                                                              |          6 |       -101 |         -1 |        -13 |       -115 |
+| views/book/popup                                                                        |          1 |         35 |          1 |          5 |         41 |
++-----------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-----------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                                                | language | code       | comment    | blank      | total      |
++-----------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| /Users/peaker/dev/solar-finance/src/components/ui/selectors/BooksFilter.vue             | Vue      |        238 |          3 |         40 |        281 |
+| /Users/peaker/dev/solar-finance/src/components/ui/views/BaseBookHeader.vue              | Vue      |         58 |          1 |          8 |         67 |
+| /Users/peaker/dev/solar-finance/src/styles/themes/_variables.scss                       | SCSS     |          1 |          0 |         -1 |          0 |
+| /Users/peaker/dev/solar-finance/src/views/book/page/BooksView.vue                       | Vue      |          0 |          1 |          4 |          5 |
+| /Users/peaker/dev/solar-finance/src/views/book/page/components/BaseAddIcon.vue          | Vue      |        -90 |         -1 |        -12 |       -103 |
+| /Users/peaker/dev/solar-finance/src/views/book/page/components/BookFilterView.vue       | Vue      |         52 |          1 |         10 |         63 |
+| /Users/peaker/dev/solar-finance/src/views/book/page/components/BookFinanceSummary.vue   | Vue      |        -19 |         -1 |         -2 |        -22 |
+| /Users/peaker/dev/solar-finance/src/views/book/page/components/BookHeader.vue           | Vue      |         36 |          1 |          7 |         44 |
+| /Users/peaker/dev/solar-finance/src/views/book/page/components/BookSelector.vue         | Vue      |        -75 |         -1 |        -14 |        -90 |
+| /Users/peaker/dev/solar-finance/src/views/book/page/components/BookTransactionsList.vue | Vue      |         -5 |          0 |         -2 |         -7 |
+| /Users/peaker/dev/solar-finance/src/views/book/popup/EditBookPopup.vue                  | Vue      |         35 |          1 |          5 |         41 |
+| Total                                                                                   |          |        231 |          5 |         43 |        279 |
++-----------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+

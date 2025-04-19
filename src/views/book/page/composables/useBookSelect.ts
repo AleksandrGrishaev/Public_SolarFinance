@@ -1,5 +1,5 @@
 // src/views/book/page/composables/useBookSelect.ts
-import { computed, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useBookContext } from './useBookContext';
 import { useBookStore } from '@/stores/book';
 
@@ -7,7 +7,10 @@ export function useBookSelect(multiSelect = false) {
   console.log('[useBookSelect] Initializing with multiSelect:', multiSelect);
   
   const bookStore = useBookStore();
-  const { selectedBookIds, selectBook, selectMultipleBooks } = useBookContext();
+  const { selectedBookIds: contextSelectedBookIds, selectBook, selectMultipleBooks } = useBookContext();
+  
+  // Создаем локальное реактивное значение для режима одиночного выбора
+  const singleSelectedBookId = ref('');
   
   // Выведем доступные книги в хранилище
   console.log('[useBookSelect] Available books in bookStore:', 
@@ -33,21 +36,57 @@ export function useBookSelect(multiSelect = false) {
     return options;
   });
   
+  // Инициализируем начальное значение для режима одиночного выбора
+  if (!multiSelect && contextSelectedBookIds.value.length > 0) {
+    singleSelectedBookId.value = contextSelectedBookIds.value[0];
+  }
+  
+  // Вычисляемое свойство для возврата значения в правильном формате в зависимости от режима
+  const selectedBookIds = computed({
+    get() {
+      if (multiSelect) {
+        return contextSelectedBookIds.value;
+      } else {
+        // Для режима одиночного выбора возвращаем строку, а не массив
+        return singleSelectedBookId.value || (contextSelectedBookIds.value.length > 0 ? contextSelectedBookIds.value[0] : '');
+      }
+    },
+    set(newValue) {
+      if (multiSelect) {
+        // Для мультивыбора передаем массив
+        selectMultipleBooks(Array.isArray(newValue) ? newValue : [newValue]);
+      } else {
+        // Для одиночного выбора обновляем локальное значение и контекст
+        const bookId = Array.isArray(newValue) ? newValue[0] : newValue;
+        singleSelectedBookId.value = bookId;
+        selectBook(bookId);
+      }
+    }
+  });
+  
   // Проверка, выбрана ли книга
   const isBookSelected = (bookId: string) => {
-    const result = selectedBookIds.value.includes(bookId);
-    console.log(`[useBookSelect] isBookSelected check for ${bookId}:`, result);
-    return result;
+    if (multiSelect) {
+      const result = contextSelectedBookIds.value.includes(bookId);
+      console.log(`[useBookSelect] isBookSelected check for ${bookId}:`, result);
+      return result;
+    } else {
+      const result = singleSelectedBookId.value === bookId || 
+                   (contextSelectedBookIds.value.length > 0 && contextSelectedBookIds.value[0] === bookId);
+      console.log(`[useBookSelect] isBookSelected check for ${bookId}:`, result);
+      return result;
+    }
   };
   
   // Переключение выбора книги
   const toggleBook = (bookId: string) => {
     console.log(`[useBookSelect] toggleBook called for ${bookId}`);
-    console.log(`[useBookSelect] Current selection:`, selectedBookIds.value);
+    console.log(`[useBookSelect] Current selection:`, multiSelect ? contextSelectedBookIds.value : singleSelectedBookId.value);
     console.log(`[useBookSelect] multiSelect mode:`, multiSelect);
     
     if (!multiSelect) {
       console.log(`[useBookSelect] Single select mode - selecting book: ${bookId}`);
+      singleSelectedBookId.value = bookId;
       selectBook(bookId);
       return;
     }
@@ -59,7 +98,7 @@ export function useBookSelect(multiSelect = false) {
       return;
     }
     
-    let newSelection = [...selectedBookIds.value];
+    let newSelection = [...contextSelectedBookIds.value];
     
     // Если "All" в данный момент выбран, удаляем его
     if (newSelection.includes('all')) {
@@ -85,8 +124,11 @@ export function useBookSelect(multiSelect = false) {
   };
   
   // Добавим наблюдение за изменением выбранных книг
-  watch(() => selectedBookIds.value, (newSelection) => {
+  watch(() => contextSelectedBookIds.value, (newSelection) => {
     console.log('[useBookSelect] selectedBookIds changed:', newSelection);
+    if (!multiSelect && newSelection.length > 0) {
+      singleSelectedBookId.value = newSelection[0];
+    }
   }, { immediate: true });
   
   return {

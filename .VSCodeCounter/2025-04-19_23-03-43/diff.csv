@@ -1,0 +1,13 @@
+"filename", "language", "SCSS", "Vue", "comment", "blank", "total"
+"/Users/peaker/dev/solar-finance/src/components/ui/selectors/BooksFilter.vue", "Vue", 0, 238, 3, 40, 281
+"/Users/peaker/dev/solar-finance/src/components/ui/views/BaseBookHeader.vue", "Vue", 0, 58, 1, 8, 67
+"/Users/peaker/dev/solar-finance/src/styles/themes/_variables.scss", "SCSS", 1, 0, 0, -1, 0
+"/Users/peaker/dev/solar-finance/src/views/book/page/BooksView.vue", "Vue", 0, 0, 1, 4, 5
+"/Users/peaker/dev/solar-finance/src/views/book/page/components/BaseAddIcon.vue", "Vue", 0, -90, -1, -12, -103
+"/Users/peaker/dev/solar-finance/src/views/book/page/components/BookFilterView.vue", "Vue", 0, 52, 1, 10, 63
+"/Users/peaker/dev/solar-finance/src/views/book/page/components/BookFinanceSummary.vue", "Vue", 0, -19, -1, -2, -22
+"/Users/peaker/dev/solar-finance/src/views/book/page/components/BookHeader.vue", "Vue", 0, 36, 1, 7, 44
+"/Users/peaker/dev/solar-finance/src/views/book/page/components/BookSelector.vue", "Vue", 0, -75, -1, -14, -90
+"/Users/peaker/dev/solar-finance/src/views/book/page/components/BookTransactionsList.vue", "Vue", 0, -5, 0, -2, -7
+"/Users/peaker/dev/solar-finance/src/views/book/popup/EditBookPopup.vue", "Vue", 0, 35, 1, 5, 41
+"Total", "-", 1, 230, 5, 43, 279
