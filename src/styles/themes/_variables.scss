@@ -1,5 +1,4 @@
 // src/styles/themes/_variables.scss
-
 // Основные переменные для приложения
 // Импортируем цвета и типографику
 @import 'colors';
@@ -75,6 +74,7 @@
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-tabs: 0px 4px 4px rgba(0, 0, 0, 0.25); // Тень для табов и селекторов
   
   // Размеры компонентов
   --input-height: 36px;

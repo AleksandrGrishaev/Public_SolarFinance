@@ -1,10 +1,9 @@
 <!-- src/views/book/page/BooksView.vue -->
 <template>
   <div class="books-view-container">
-    <!-- Верхняя часть с BookSelector -->
+    <!-- Верхняя часть с BookFilterView -->
     <div class="books-header bg-screen">
-      <BookSelector :multiSelect="false" />
-      <BaseAddIcon @click="showNewBookPopup = true" />
+      <BookFilterView :multiSelect="false" @click="showNewBookPopup = true" />
     </div>
     
     <!-- Нижняя часть с контентом -->
@@ -27,8 +26,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
-import BookSelector from './components/BookSelector.vue';
-import BaseAddIcon from './components/BaseAddIcon.vue';
+import BookFilterView from './components/BookFilterView.vue';
 import NewBookPopup from '../popup/NewBookPopup.vue';
 import DashBoardBook from './components/DashBoardBook.vue';
 import { useBookContextProvider } from './composables/useBookContext';
@@ -54,38 +52,38 @@ onMounted(() => {
 });
 </script>
 
-  <style scoped>
-  .books-view-container {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    width: 100%;
-  }
-  
-  .books-header {
-    height: 10%;
-    min-height: 100px;
-    padding-top: var(--spacing-lg);
-    padding-bottom: var(--spacing-xs);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--spacing-sm);
-  }
-  
-  .books-content {
-    height: 90%;
-    border-top-left-radius: var(--border-radius-xxxl);
-    border-top-right-radius: var(--border-radius-xxxl);
-    padding: var(--spacing-md);
-    overflow-y: auto;
-  }
-  
-  .empty-selection {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    text-align: center;
-  }
-  </style>
+<style scoped>
+.books-view-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.books-header {
+  height: 10%;
+  min-height: 100px;
+  padding-top: var(--spacing-lg);
+  padding-bottom: var(--spacing-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.books-content {
+  height: 90%;
+  border-top-left-radius: var(--border-radius-xxxl);
+  border-top-right-radius: var(--border-radius-xxxl);
+  padding: var(--spacing-md);
+  overflow-y: auto;
+}
+
+.empty-selection {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  text-align: center;
+}
+</style>
