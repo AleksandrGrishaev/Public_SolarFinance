@@ -86,12 +86,37 @@ export function usePercentageSlider() {
   const getParticipantAmount = (index) => {
     console.log(`[usePercentageSlider] Calculating amount for participant index ${index}`);
     
+    // Проверка на валидный индекс
+    if (index === undefined || index === null) {
+      console.error('[usePercentageSlider] ERROR: Invalid index provided', index);
+      return 0;
+    }
+    
+    // Проверка наличия данных о сторонах
+    if (!ownerSides.value || !ownerSides.value) {
+      console.error('[usePercentageSlider] ERROR: ownerSides is not available');
+      return 0;
+    }
+    
     if (!ownerSides.value[index]) {
-      console.log('[usePercentageSlider] Participant not found for index', index);
+      console.error('[usePercentageSlider] ERROR: Participant not found for index', index);
+      return 0;
+    }
+    
+    // Проверка наличия функции получения транзакций
+    if (!getFilteredTransactions || typeof getFilteredTransactions !== 'function') {
+      console.error('[usePercentageSlider] ERROR: getFilteredTransactions is not a function');
       return 0;
     }
     
     const transactions = getFilteredTransactions();
+    
+    // Проверка валидности транзакций
+    if (!transactions || !Array.isArray(transactions)) {
+      console.error('[usePercentageSlider] ERROR: Invalid transactions data', transactions);
+      return 0;
+    }
+    
     console.log(`[usePercentageSlider] Processing ${transactions.length} transactions for participant calculations`);
     
     // Общие траты
@@ -101,12 +126,37 @@ export function usePercentageSlider() {
     const ownerId = ownerSides.value[index].id;
     console.log(`[usePercentageSlider] Processing for ownerId: ${ownerId}`);
     
+    // Отладка: проверка ID владельца
+    if (!ownerId) {
+      console.error('[usePercentageSlider] ERROR: Invalid owner ID for index', index);
+      return 0;
+    }
+    
+    // Счетчик обработанных транзакций
+    let processedCount = 0;
+    
     // Перебираем все транзакции расходов
-    transactions.forEach(transaction => {
-      if (transaction.type !== 'expense') return;
+    transactions.forEach((transaction, idx) => {
+      // Проверка на тип транзакции
+      if (!transaction) {
+        console.warn(`[usePercentageSlider] WARNING: Null transaction at index ${idx}`);
+        return;
+      }
+      
+      if (transaction.type !== 'expense') {
+        return;
+      }
+      
+      processedCount++;
       
       // Используем bookAmount вместо amount
-      const transactionAmount = Math.abs(transaction.bookAmount || transaction.amount);
+      const transactionAmount = Math.abs(transaction.bookAmount || transaction.amount || 0);
+      
+      // Отладка: значение транзакции
+      if (isNaN(transactionAmount)) {
+        console.warn(`[usePercentageSlider] WARNING: Invalid transaction amount for ID ${transaction.id}`);
+        return;
+      }
       
       // Проверяем, есть ли правила распределения в транзакции
       if (transaction.distributionRules && transaction.distributionRules.length > 0) {
@@ -114,6 +164,12 @@ export function usePercentageSlider() {
         const rule = transaction.distributionRules.find(rule => rule.ownerId === ownerId);
         
         if (rule) {
+          // Проверка наличия процента в правиле
+          if (rule.percentage === undefined || rule.percentage === null) {
+            console.warn(`[usePercentageSlider] WARNING: Missing percentage in rule for transaction ${transaction.id}`);
+            return;
+          }
+          
           // Рассчитываем сумму согласно проценту в правиле
           const amountForOwner = transactionAmount * (rule.percentage / 100);
           console.log(`[usePercentageSlider] Transaction ${transaction.id}: ${amountForOwner} for owner ${ownerId} (${rule.percentage}%)`);
@@ -121,6 +177,12 @@ export function usePercentageSlider() {
         }
       } else if (transaction.responsibleOwnerIds && transaction.responsibleOwnerIds.includes(ownerId)) {
         // Если нет правил, но пользователь ответственен за транзакцию
+        // Проверка на валидность списка ответственных
+        if (!Array.isArray(transaction.responsibleOwnerIds) || transaction.responsibleOwnerIds.length === 0) {
+          console.warn(`[usePercentageSlider] WARNING: Invalid responsibleOwnerIds for transaction ${transaction.id}`);
+          return;
+        }
+        
         // Делим поровну между всеми ответственными владельцами
         const shareAmount = transactionAmount / transaction.responsibleOwnerIds.length;
         console.log(`[usePercentageSlider] Transaction ${transaction.id}: ${shareAmount} for owner ${ownerId} (equal share)`);
@@ -128,9 +190,50 @@ export function usePercentageSlider() {
       }
     });
     
-    console.log(`[usePercentageSlider] Total for participant ${ownerId}: ${participantTotal}`);
+    console.log(`[usePercentageSlider] Total for participant ${ownerId}: ${participantTotal} (processed ${processedCount} transactions)`);
+    
+    // Финальная проверка на валидность результата
+    if (isNaN(participantTotal)) {
+      console.error('[usePercentageSlider] ERROR: Calculated amount is NaN');
+      return 0;
+    }
+    
     return participantTotal;
   };
+  
+  // НОВАЯ ФУНКЦИЯ: Рассчитываем реальное процентное распределение на основе фактических трат
+  const actualPercentages = computed(() => {
+    console.log('[usePercentageSlider] Calculating actual percentages...');
+    
+    // Получаем суммы для каждого участника
+    const amount1 = getParticipantAmount(0);
+    const amount2 = getParticipantAmount(1);
+    
+    console.log(`[usePercentageSlider] DEBUG: Amount for participant 0: ${amount1}`);
+    console.log(`[usePercentageSlider] DEBUG: Amount for participant 1: ${amount2}`);
+    
+    const total = amount1 + amount2;
+    console.log(`[usePercentageSlider] DEBUG: Total amount: ${total}`);
+    
+    // Защита от деления на ноль
+    if (total === 0 || isNaN(total)) {
+      console.log('[usePercentageSlider] WARNING: Total amount is zero or NaN, returning default 50/50');
+      return [50, 50]; // По умолчанию 50/50
+    }
+    
+    const percent1 = Math.round((amount1 / total) * 100);
+    const percent2 = 100 - percent1; // Чтобы было точно 100% в сумме
+    
+    console.log(`[usePercentageSlider] Actual percentage distribution: ${percent1}% / ${percent2}%`);
+    
+    // Дополнительная проверка на валидность результата
+    if (isNaN(percent1) || isNaN(percent2)) {
+      console.log('[usePercentageSlider] ERROR: Calculated percentages are NaN, returning default 50/50');
+      return [50, 50];
+    }
+    
+    return [percent1, percent2];
+  });
   
   // Форматирование суммы с новым форматом
   const formatParticipantAmount = (index) => {
@@ -141,7 +244,19 @@ export function usePercentageSlider() {
   
   // Получение стиля для слайдера
   const getSliderStyle = () => {
-    const percentage = actualOwnerDistribution.value;
+    console.log('[usePercentageSlider] Getting slider style');
+    
+    // Выбираем процентное значение
+    // Если есть актуальные проценты, используем их, иначе используем базовые
+    let percentage = 50; // значение по умолчанию
+    
+    if (actualPercentages.value && actualPercentages.value.length >= 2) {
+      percentage = actualPercentages.value[0];
+      console.log(`[usePercentageSlider] Using actual percentage for gradient: ${percentage}%`);
+    } else {
+      percentage = actualOwnerDistribution.value;
+      console.log(`[usePercentageSlider] Using default percentage for gradient: ${percentage}%`);
+    }
     
     // Цвета по умолчанию
     let leftColor = '#4E8090';
@@ -157,6 +272,8 @@ export function usePercentageSlider() {
         rightColor = `#${ownerSides.value[1].color}`;
       }
     }
+    
+    console.log(`[usePercentageSlider] Using colors for gradient - left: ${leftColor}, right: ${rightColor}`);
     
     return {
       background: `linear-gradient(to right, ${leftColor} 0%, ${leftColor} ${percentage}%, ${rightColor} ${percentage}%, ${rightColor} 100%)`
@@ -184,6 +301,7 @@ export function usePercentageSlider() {
   return {
     ownerSides,
     actualOwnerDistribution,
+    actualPercentages, // Экспортируем новую функцию
     getParticipantAmount,
     formatParticipantAmount,
     getSliderStyle,

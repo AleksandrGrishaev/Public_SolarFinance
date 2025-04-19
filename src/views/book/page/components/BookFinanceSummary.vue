@@ -1,4 +1,4 @@
-// src/views/book/page/components/BookFinanceSummary.vue 
+<!-- Обновленный компонент BookFinanceSummary.vue с исправленными процентами -->
 <template>
   <div class="financial-info">
     <!-- Состояние загрузки -->
@@ -44,18 +44,18 @@
         
         <!-- Слайдер (только для отображения) -->
         <div class="slider-container">
-          <input 
-            type="range" 
-            class="slider" 
-            :value="actualOwnerDistribution"
-            @input="updateOwnerDistribution"
-            min="0" 
-            max="100" 
-            step="1"
-            :style="getSliderStyle()"
-            disabled
-          />
-        </div>
+  <input 
+    type="range" 
+    class="slider" 
+    :value="actualPercentages ? actualPercentages[0] : actualOwnerDistribution"
+    @input="updateOwnerDistribution"
+    min="0" 
+    max="100" 
+    step="1"
+    :style="getSliderStyle()"
+    disabled
+  />
+</div>
         
         <!-- Информация о владельцах -->
         <div class="distribution-info">
@@ -66,7 +66,8 @@
           >
             <div class="owner-name">{{ ownerSides[0]?.name || 'No data' }}</div>
             <div class="owner-details">
-              <span class="owner-percentage">{{ Math.round(ownerSides[0]?.percentage || 0) }}%</span>
+              <!-- Вместо плановых процентов используем фактические -->
+              <span class="owner-percentage">{{ actualPercentages ? actualPercentages[0] : Math.round(ownerSides[0]?.percentage || 0) }}%</span>
               <span class="owner-amount">{{ formatBalanceAmount(getParticipantAmount(0)) }}</span>
             </div>
           </div>
@@ -79,7 +80,8 @@
             <div class="owner-name">{{ ownerSides[1]?.name || 'No data' }}</div>
             <div class="owner-details">
               <span class="owner-amount">{{ formatBalanceAmount(getParticipantAmount(1)) }}</span>
-              <span class="owner-percentage">{{ Math.round(ownerSides[1]?.percentage || 0) }}%</span>
+              <!-- Вместо плановых процентов используем фактические -->
+              <span class="owner-percentage">{{ actualPercentages ? actualPercentages[1] : Math.round(ownerSides[1]?.percentage || 0) }}%</span>
             </div>
           </div>
         </div>
@@ -166,11 +168,20 @@ watch(() => dateFilter.value, (newValue) => {
 const {
   ownerSides,
   actualOwnerDistribution,
+  actualPercentages, // Добавляем фактические проценты
   getParticipantAmount,
   getSliderStyle,
   getParticipantStyle,
   updateOwnerDistribution
 } = usePercentageSlider();
+
+// Выводим actualPercentages при инициализации для отладки
+console.log('[BookFinanceSummary] Initial actualPercentages:', actualPercentages?.value);
+
+// Отслеживаем изменения в actualPercentages для отладки
+watch(() => actualPercentages.value, (newValue) => {
+  console.log('[BookFinanceSummary] actualPercentages changed:', newValue);
+}, { immediate: true });
 
 // Решаем, показывать ли секцию распределения
 const shouldShowDistribution = computed(() => {
@@ -185,6 +196,7 @@ const shouldShowDistribution = computed(() => {
     bookData.value?.distributionRules ? 
     `Array with ${bookData.value.distributionRules.length} items` : 
     'undefined or empty');
+  console.log('[BookFinanceSummary] - actualPercentages:', actualPercentages.value);
   
   return result;
 });
@@ -242,6 +254,17 @@ onMounted(() => {
     name: bookContext.currentBook.value.name,
     currency: bookContext.currentBook.value.currency
   } : 'null');
+  
+  // Дополнительно выводим actualPercentages при монтировании
+  console.log('[BookFinanceSummary] At mount - actualPercentages:', actualPercentages.value);
+  
+  // Принудительно запрашиваем значения для обоих участников при монтировании
+  // для гарантии расчета фактических процентов
+  setTimeout(() => {
+    const amount0 = getParticipantAmount(0);
+    const amount1 = getParticipantAmount(1);
+    console.log(`[BookFinanceSummary] Forced participant amounts - [0]: ${amount0}, [1]: ${amount1}`);
+  }, 500);
 });
 </script>
 
