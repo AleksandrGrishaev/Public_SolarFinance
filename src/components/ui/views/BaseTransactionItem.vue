@@ -53,7 +53,10 @@
         <div class="amount" :class="amountColorClass" v-if="amount !== undefined">
           {{ formattedAmount }}
         </div>
-        <div class="item-info" v-if="info">{{ info }}</div>
+        <!-- Всегда показываем item-info без условия v-if -->
+        <div class="item-info" :class="{ 'has-info': !!info }">
+          {{ info }}
+        </div>
       </slot>
     </div>
   </div>
@@ -379,7 +382,9 @@ const handleClick = (event) => {
 }
 
 .category-icon {
-  /* Стили для иконки категории */
+  color: var(--text-contrast);
+  width: 20px;
+  height: 20px;
 }
 
 .item-content {
@@ -437,26 +442,20 @@ const handleClick = (event) => {
   white-space: nowrap;
 }
 
-/* Удаляем автоматический минус, так как теперь управляем им вручную */
-/* 
-.color-warning.amount::before {
-  content: "";
-  width: 3px;
-  height: 1px;
-  background: var(--color-warning);
-  margin-right: 2px;
-}
-*/
-
 .item-info {
-    width: 100%;
-    text-align: right;
-    color: var(--text-usual);
-    font-size: var(--font-small-size);
-    line-height: var(--font-small-line-height);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-top: 2px;
-  }
+  width: 100%;
+  text-align: right;
+  color: var(--text-grey);
+  font-size: var(--font-small-size);
+  line-height: var(--font-small-line-height);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+  min-height: 16px; /* Минимальная высота, чтобы элемент всегда был видим */
+}
+
+.item-info.has-info {
+  color: var(--text-usual); /* Более контрастный цвет, когда есть информация */
+}
 </style>
