@@ -1,4 +1,4 @@
-<!-- src/views/book/page/components/BookFinanceSummary.vue -->
+// src/views/book/page/components/BookFinanceSummary.vue 
 <template>
   <div class="financial-info">
     <!-- Состояние загрузки -->
@@ -40,10 +40,7 @@
       
       <!-- Секция распределения между владельцами (слайдер) -->
       <div v-if="shouldShowDistribution">
-        <!-- Заголовок секции -->
-        <div class="distribution-header">
-          <span>Expense Distribution</span>
-        </div>
+        <!-- Удалена надпись "Expense Distribution" -->
         
         <!-- Слайдер (только для отображения) -->
         <div class="slider-container">
@@ -284,7 +281,7 @@ onMounted(() => {
 .header-container {
   display: flex;
   justify-content: center;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
 }
 
 .summary-row {
@@ -303,7 +300,7 @@ onMounted(() => {
 .amount {
   font-size: var(--font-subheading-size);
   font-weight: 500;
-  color: var(--text-usual);
+  color: var(--text-grey);
 }
 
 .amount-positive {
@@ -317,15 +314,6 @@ onMounted(() => {
 .label {
   font-size: var(--font-small-size);
   color: var(--text-grey);
-}
-
-.distribution-header {
-  display: flex;
-  justify-content: center;
-  margin: var(--spacing-md) 0 var(--spacing-sm) 0;
-  font-size: var(--font-small-size);
-  color: var(--text-grey);
-  font-weight: 500;
 }
 
 /* Стили для слайдера */
