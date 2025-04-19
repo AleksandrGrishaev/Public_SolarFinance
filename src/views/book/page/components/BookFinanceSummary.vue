@@ -9,7 +9,7 @@
     
     <!-- Загруженные данные -->
     <div v-else>
-      <!-- Верхняя строка с суммами и иконкой редактирования -->
+      <!-- Верхняя строка с суммами -->
       <div class="header-container">
         <div class="summary-row">
           <!-- Общая сумма - используем форматирование balance -->
@@ -35,18 +35,6 @@
             </div>
             <div class="label">Expense</div>
           </div>
-        </div>
-        
-        <!-- Иконка редактирования -->
-        <div class="summary-edit">
-          <BaseIcon 
-            :icon="IconPencil" 
-            size="lg"
-            color="#808080"
-            :customStyle="{backgroundColor: '#F7F9F8'}"
-            clickable
-            @click="handleEditClick"
-          />
         </div>
       </div>
       
@@ -114,8 +102,6 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
-import { IconPencil } from '@tabler/icons-vue';
-import BaseIcon from '@/components/ui/icons/BaseIcon.vue';
 import DateFilter from '@/components/ui/filters/DateFilter.vue';
 import { useBookFinanceSummary } from '../composables/useBookFinanceSummary';
 import { usePercentageSlider } from '../composables/usePercentageSlider';
@@ -241,12 +227,6 @@ const onDateFilterChange = (newFilterValue) => {
   updateDateFilter(newFilterValue);
 };
 
-// Обработчик клика по кнопке редактирования
-const handleEditClick = () => {
-  console.log('[BookFinanceSummary] Edit button clicked');
-  // Добавьте вашу логику редактирования здесь
-};
-
 onMounted(() => {
   console.log('[BookFinanceSummary] Component mounted');
   
@@ -300,11 +280,10 @@ onMounted(() => {
   100% { transform: rotate(360deg); }
 }
 
-/* Контейнер для верхней строки и иконки */
+/* Контейнер для верхней строки */
 .header-container {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: center;
   margin-bottom: var(--spacing-md);
 }
 
@@ -313,7 +292,6 @@ onMounted(() => {
   justify-content: center;
   gap: var(--spacing-lg);
   align-items: flex-end;
-  flex: 1;
 }
 
 .summary-total, .summary-income, .summary-expense {

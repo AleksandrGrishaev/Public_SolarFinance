@@ -1,10 +1,6 @@
 <!-- src/views/book/page/components/BookTransactionsList.vue -->
 <template>
   <div class="book-transactions-list">
-    <div class="list-header">
-      <h3 class="en-subheading text-header">Recent Transactions</h3>
-    </div>
-    
     <div v-if="isLoading" class="loading-state">
       <p class="text-grey">Loading transactions...</p>
     </div>
@@ -53,29 +49,26 @@ onMounted(() => {
 });
 </script>
   
-  <style scoped>
-  .book-transactions-list {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-  }
-  
-  .list-header {
-    margin-bottom: var(--spacing-md);
-  }
-  
-  .loading-state, .empty-state {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100px;
-    padding: var(--spacing-md);
-    text-align: center;
-  }
-  
-  .transaction-groups {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xs);
-  }
-  </style>
+<style scoped>
+.book-transactions-list {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding-top: var(--spacing-md);
+}
+
+.loading-state, .empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  padding: var(--spacing-md);
+  text-align: center;
+}
+
+.transaction-groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+</style>

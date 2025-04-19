@@ -35,7 +35,7 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    padding-bottom: var(--spacing-sm);
+    padding-bottom: var(--spacing-md);
     width: 100%;
     gap: var(--spacing-sm);
   }
