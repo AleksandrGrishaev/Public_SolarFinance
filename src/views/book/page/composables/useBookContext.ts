@@ -7,6 +7,7 @@ import { useTransactionStore } from '@/stores/transaction';
 import { useCurrencyStore } from '@/stores/currency';
 import type { Book } from '@/stores/book/types';
 import type { Transaction } from '@/stores/transaction/types';
+import { startOfDay, endOfDay, startOfMonth, endOfMonth, startOfYear, endOfYear, parseISO } from 'date-fns';
 
 // Типы для контекста
 interface DateFilterValue {
@@ -25,6 +26,12 @@ interface BookFinancialData {
   distributionRules: any[];
   currency: string;
 }
+
+// Вспомогательная функция для нормализации даты
+const normalizeDate = (date: Date | string | undefined): Date => {
+  if (!date) return new Date();
+  return typeof date === 'string' ? parseISO(date) : new Date(date);
+};
 
 // Определение типа контекста
 export interface BookContext {
@@ -52,7 +59,7 @@ export const BookContextKey: InjectionKey<BookContext> = Symbol('BookContext');
 
 // Основной composable
 export function useBookContextProvider() {
-    console.log('[useBookContext] Creating context provider');
+  console.log('[useBookContext] Creating context provider');
 
   // Инициализация хранилищ
   const bookStore = useBookStore();
@@ -119,7 +126,37 @@ export function useBookContextProvider() {
   
   // Методы управления фильтром дат
   const setDateFilter = (filter: DateFilterValue) => {
-    dateFilter.value = filter;
+    console.log('[useBookContext] Setting date filter:', filter);
+    
+    // Нормализуем даты перед установкой в фильтр
+    const normalizedFilter: DateFilterValue = {
+      period: filter.period
+    };
+    
+    if (filter.period === 'daily' && filter.dateRange) {
+      // Нормализуем и устанавливаем правильные начало и конец дня для диапазона
+      const start = startOfDay(normalizeDate(filter.dateRange[0]));
+      const end = endOfDay(normalizeDate(filter.dateRange[1]));
+      
+      normalizedFilter.dateRange = [start, end];
+      normalizedFilter.dateFrom = start;
+      normalizedFilter.dateTo = end;
+    } else if (filter.date) {
+      const date = normalizeDate(filter.date);
+      
+      if (filter.period === 'monthly') {
+        // Устанавливаем первый день месяца
+        normalizedFilter.date = startOfMonth(date);
+      } else if (filter.period === 'yearly') {
+        // Устанавливаем первый день года
+        normalizedFilter.date = startOfYear(date);
+      } else {
+        normalizedFilter.date = date;
+      }
+    }
+    
+    // Обновляем фильтр и обновляем данные
+    dateFilter.value = normalizedFilter;
     refreshData();
   };
   
@@ -154,27 +191,24 @@ export function useBookContextProvider() {
     
     // Фильтр по дате
     if (dateFilter.value.period === 'daily' && dateFilter.value.dateRange) {
-      filters.dateFrom = dateFilter.value.dateRange[0];
-      filters.dateTo = dateFilter.value.dateRange[1];
+      // Используем dateFrom и dateTo, которые уже установлены в setDateFilter
+      filters.dateFrom = dateFilter.value.dateFrom || startOfDay(dateFilter.value.dateRange[0]);
+      filters.dateTo = dateFilter.value.dateTo || endOfDay(dateFilter.value.dateRange[1]);
     } else if (dateFilter.value.date) {
-      const selectedDate = new Date(dateFilter.value.date);
+      const selectedDate = normalizeDate(dateFilter.value.date);
       
       if (dateFilter.value.period === 'monthly') {
-        // Первый и последний день месяца
-        const startDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
-        const endDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0);
-        
-        filters.dateFrom = startDate;
-        filters.dateTo = endDate;
+        // Первый и последний день месяца с использованием date-fns
+        filters.dateFrom = startOfMonth(selectedDate);
+        filters.dateTo = endOfMonth(selectedDate);
       } else if (dateFilter.value.period === 'yearly') {
-        // Весь год
-        const startDate = new Date(selectedDate.getFullYear(), 0, 1);
-        const endDate = new Date(selectedDate.getFullYear(), 11, 31);
-        
-        filters.dateFrom = startDate;
-        filters.dateTo = endDate;
+        // Весь год с использованием date-fns
+        filters.dateFrom = startOfYear(selectedDate);
+        filters.dateTo = endOfYear(selectedDate);
       }
     }
+    
+    console.log('[useBookContext] Applying filters:', filters);
     
     // Применяем фильтры к хранилищу транзакций
     transactionStore.resetFilters();

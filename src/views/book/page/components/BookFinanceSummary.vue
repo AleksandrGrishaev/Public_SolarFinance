@@ -1,4 +1,4 @@
-  <template>
+<template>
   <div class="financial-info">
     <!-- Состояние загрузки -->
     <div v-if="isLoading" class="loading-state">
@@ -102,17 +102,17 @@
       <!-- Фильтр даты -->
       <div class="date-filter-wrapper">
         <DateFilter 
-  v-model="dateFilter" 
-  @update:modelValue="onDateFilterChange" 
-  @calendar-visibility-change="onCalendarVisibilityChange" 
-/>
+          v-model="localDateFilter" 
+          @update:modelValue="onDateFilterChange" 
+          @calendar-visibility-change="onCalendarVisibilityChange" 
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { IconPencil } from '@tabler/icons-vue';
 import BaseIcon from '@/components/ui/icons/BaseIcon.vue';
 import DateFilter from '@/components/ui/filters/DateFilter.vue';
@@ -134,6 +134,15 @@ const {
   updateDateFilter
 } = useBookFinanceSummary();
 
+// Создаем локальную копию фильтра для v-model
+const localDateFilter = ref(JSON.parse(JSON.stringify(dateFilter.value)));
+
+// Синхронизируем локальный фильтр с глобальным
+watch(() => dateFilter.value, (newValue) => {
+  console.log('[BookFinanceSummary] Global filter changed, updating local filter');
+  localDateFilter.value = JSON.parse(JSON.stringify(newValue));
+}, { deep: true });
+
 // Используем composable для слайдера процентов
 const {
   ownerSides,
@@ -150,16 +159,12 @@ const shouldShowDistribution = computed(() => {
 });
 
 const onDateFilterChange = (newFilterValue) => {
-  // Проверка на действительное изменение перед обновлением
-  const oldValue = JSON.stringify(dateFilter.value);
-  const newValue = JSON.stringify(newFilterValue);
+  console.log('[BookFinanceSummary] Date filter input received:', newFilterValue);
   
-  if (oldValue !== newValue) {
-    console.log('[BookFinanceSummary] Date filter changed:', newFilterValue);
-    updateDateFilter(newFilterValue);
-  } else {
-    console.log('[BookFinanceSummary] Skipping update, filter not changed');
-  }
+  // Вместо обновления локального состояния сразу передаем в глобальный контекст
+  // Сериализация/десериализация не нужна, так как в updateDateFilter 
+  // уже есть правильная обработка нормализации дат
+  updateDateFilter(newFilterValue);
 };
 
 // Обработчик клика по кнопке редактирования
@@ -170,6 +175,9 @@ const handleEditClick = () => {
 
 onMounted(() => {
   console.log('[BookFinanceSummary] Component mounted');
+  
+  // При монтировании обеспечиваем синхронизацию локального фильтра с глобальным
+  localDateFilter.value = JSON.parse(JSON.stringify(dateFilter.value));
 });
 </script>
 
