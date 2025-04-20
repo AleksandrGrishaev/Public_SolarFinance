@@ -49,12 +49,13 @@
         
         <!-- Слайдер отображается только если есть правила распределения в книге и это не перевод -->
         <percentage-slider 
-      :owners="distributionOwners" 
-      v-model="distributionPercentage"
-      :total-amount="parseFloat(amount) || 0"
-      :currency="sourceCurrencySymbol"
-      :class="{ 'invisible': !isSliderVisible }"
-    />
+  v-show="isSliderVisible"
+  :owners="distributionOwners" 
+  v-model="distributionPercentage"
+  :total-amount="parseFloat(amount) || 0"
+  :currency="sourceCurrencySymbol"
+  :class="{ 'invisible': !isSliderVisible }"
+/>
       </div>
       
       <div class="keypad-container">
@@ -565,6 +566,8 @@ watch([selectedAccount, destinationAccount, convertedAmount], () => {
     }
   }
 });
+
+
 </script>
 
 <style scoped>
@@ -645,9 +648,12 @@ watch([selectedAccount, destinationAccount, convertedAmount], () => {
 .invisible {
   visibility: hidden;
   opacity: 0;
-  /* Сохраняем размеры, чтобы не было смещения других элементов */
   pointer-events: none;
-  /* Элемент не реагирует на клики */
+  height: 0 !important;
+  overflow: hidden;
+  margin: 0 !important;
+  padding: 0 !important;
+  transition: opacity 0.3s, visibility 0.3s;
 }
 
 .keypad-container {
