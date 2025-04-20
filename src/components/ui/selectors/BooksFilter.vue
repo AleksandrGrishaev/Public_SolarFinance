@@ -22,9 +22,9 @@
     >
       <IconPlus 
         class="plus-icon" 
-        :size="addButtonSize - 12" 
+        :size="addButtonSize - 18" 
         :color="addButtonColor"
-        :stroke-width="2"
+        :stroke-width="1"
       />
     </div>
   </div>
@@ -262,8 +262,8 @@ watch([filteredBookOptions, () => props.modelValue], ([books, value]) => {
   justify-content: center;
   flex-shrink: 0;
   cursor: pointer;
-  width: v-bind('addButtonSize + "px"');
-  height: v-bind('addButtonSize + "px"');
+  width: v-bind('(addButtonSize-4) + "px"');
+  height: v-bind('(addButtonSize-4) + "px"');
   border: 1.5px dashed var(--bg-main);
   border-radius: 50%;
   transition: opacity var(--transition-speed, 0.2s) var(--transition-fn, ease);
@@ -271,7 +271,7 @@ watch([filteredBookOptions, () => props.modelValue], ([books, value]) => {
 }
 
 .plus-icon {
-  stroke-width: 2;
+  stroke-width: 1;
 }
 
 .add-button:hover {

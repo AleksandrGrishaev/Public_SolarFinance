@@ -81,6 +81,7 @@
 <script setup lang="ts">
 import { computed, defineAsyncComponent } from 'vue';
 import * as TablerIcons from '@tabler/icons-vue';
+import { useFormatBalance } from '@/composables/transaction/useFormatBalance';
 
 // Type definitions
 interface ItemClickEvent {
@@ -181,6 +182,9 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['click']);
+
+// Получаем методы форматирования
+const { formatNumberWithDecimals, getCurrencySymbol } = useFormatBalance();
 
 // Resolve Tabler icons
 const resolvedCategoryIcon = computed(() => {
@@ -310,27 +314,16 @@ const formattedAmount = computed(() => {
   const prefix = props.amountPrefix || '';
   const suffix = props.amountSuffix || '';
   
-  // Get currency symbol or use passed one
-  let currencySymbol = '';
+  // Get currency symbol
+  const currencySymbol = props.currency ? `${getCurrencySymbol(props.currency)} ` : '';
   
-  // Determine currency symbol
-  if (props.currency) {
-    if (props.currency === 'IDR' || props.currency === 'Rp') {
-      currencySymbol = 'Rp ';
-    } else if (props.currency === 'USD') {
-      currencySymbol = '$ ';
-    } else if (props.currency === 'RUB') {
-      currencySymbol = '₽ ';
-    } else {
-      currencySymbol = `${props.currency} `;
-    }
-  }
+  // Форматирование с пробелами как разделителями тысяч
+  const formattedValue = formatNumberWithDecimals(absAmount, 0);
   
-  // Format with thousands separators
   // For negative values, minus should go before currency symbol with 4px spacing
   return isNegative
-    ? `${prefix}- ${currencySymbol}${absAmount.toLocaleString()}${suffix}`
-    : `${prefix}${currencySymbol}${absAmount.toLocaleString()}${suffix}`;
+    ? `${prefix}- ${currencySymbol}${formattedValue}${suffix}`
+    : `${prefix}${currencySymbol}${formattedValue}${suffix}`;
 });
 
 // Click handler

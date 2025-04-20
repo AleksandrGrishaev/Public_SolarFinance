@@ -27,6 +27,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useFormatBalance } from '@/composables/transaction/useFormatBalance';
 
 const props = defineProps({
   // Basic group information
@@ -76,6 +77,9 @@ const props = defineProps({
   }
 });
 
+// Получаем методы форматирования
+const { formatNumberWithDecimals, getCurrencySymbol } = useFormatBalance();
+
 // Determine the class for the amount (positive/negative)
 const amountClass = computed(() => {
   // If amount type is set, use it
@@ -99,34 +103,26 @@ const amountClass = computed(() => {
 
 // Format the amount with currency symbol
 const formattedAmount = computed(() => {
-    // Use custom formatter if provided
-    if (typeof props.amountFormatter === 'function') {
-      return props.amountFormatter(props.amount, props.currency);
-    }
-    
-    // Standard formatting
-    const isNegative = props.amount < 0;
-    const absAmount = Math.abs(props.amount);
-    
-    // Determine currency symbol
-    let currencySymbol = '';
-    if (props.currency) {
-      if (props.currency === 'IDR' || props.currency === 'Rp') {
-        currencySymbol = 'Rp ';
-      } else if (props.currency === 'USD') {
-        currencySymbol = '$ ';
-      } else if (props.currency === 'RUB') {
-        currencySymbol = '₽ ';
-      } else {
-        currencySymbol = `${props.currency} `;
-      }
-    }
-    
-    // For negative values, minus should go before the currency symbol with 4px spacing
-    return isNegative
-      ? `- ${currencySymbol}${absAmount.toLocaleString()}`
-      : `${currencySymbol}${absAmount.toLocaleString()}`;
-  });
+  // Use custom formatter if provided
+  if (typeof props.amountFormatter === 'function') {
+    return props.amountFormatter(props.amount, props.currency);
+  }
+  
+  // Standard formatting
+  const isNegative = props.amount < 0;
+  const absAmount = Math.abs(props.amount);
+  
+  // Get currency symbol
+  const currencySymbol = props.currency ? `${getCurrencySymbol(props.currency)} ` : '';
+  
+  // Форматирование с пробелами как разделителями тысяч
+  const formattedValue = formatNumberWithDecimals(absAmount, 0);
+  
+  // For negative values, minus should go before the currency symbol with 4px spacing
+  return isNegative
+    ? `- ${currencySymbol}${formattedValue}`
+    : `${currencySymbol}${formattedValue}`;
+});
 </script>
 
 <style scoped>
