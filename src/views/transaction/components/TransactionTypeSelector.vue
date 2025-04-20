@@ -1,35 +1,37 @@
 <!-- src/views/transaction/components/TransactionTypeSelector.vue -->
 <template>
-  <div class="transaction-selector">
-    <!-- Контейнер для элементов -->
-    <div class="items-container">
-      <div 
-        v-for="item in displayedTypes" 
-        :key="item.id"
-        class="selector-item"
-        :class="{ 'active': selectedType === item.id }"
-        @click="updateValue(item.id)"
-      >
-        {{ item.name }}
+  <div class="selector-wrapper">
+    <div class="transaction-selector">
+      <!-- Контейнер для элементов -->
+      <div class="items-container">
+        <div 
+          v-for="item in displayedTypes" 
+          :key="item.id"
+          class="selector-item"
+          :class="{ 'active': selectedType === item.id }"
+          @click="handleItemClick(item)"
+        >
+          {{ item.name }}
+        </div>
       </div>
-    </div>
-    
-    <!-- Иконка переключения наборов типов -->
-    <div class="toggle-button" @click="toggleTypeSet">
-      <div class="toggle-icon" :class="{ 'rotated': isSecondSetActive }">
-        <svg 
-          xmlns="http://www.w3.org/2000/svg" 
-          width="20" 
-          height="20" 
-          viewBox="0 0 24 24" 
-          fill="none" 
-          stroke="currentColor" 
-          stroke-width="2" 
-          stroke-linecap="round" 
-          stroke-linejoin="round" 
-          class="icon">
-          <polyline points="9 18 15 12 9 6"></polyline>
-        </svg>
+      
+      <!-- Иконка переключения наборов типов -->
+      <div class="toggle-button" @click="toggleTypeSet">
+        <div class="toggle-icon" :class="{ 'rotated': isSecondSetActive }">
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            width="20" 
+            height="20" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            stroke-width="2" 
+            stroke-linecap="round" 
+            stroke-linejoin="round" 
+            class="icon">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </div>
       </div>
     </div>
   </div>
@@ -73,8 +75,16 @@ const toggleTypeSet = () => {
   // Если выбранный элемент не отображается в текущем наборе, выбираем первый доступный
   const currentTypeIds = displayedTypes.value.map(type => type.id);
   if (!currentTypeIds.includes(selectedType.value)) {
-    emit('update:modelValue', currentTypeIds[0]);
+    const newType = displayedTypes.value[0];
+    emit('update:modelValue', newType.id);
+    console.log('Автоматический выбор типа при переключении набора:', newType);
   }
+};
+
+// Обработчик клика по элементу
+const handleItemClick = (item) => {
+  console.log('Выбран тип транзакции:', item);
+  updateValue(item.id);
 };
 
 // Метод для обновления значения в родительском компоненте
@@ -84,14 +94,28 @@ const updateValue = (value: TransactionType) => {
 
 // При изменении типа транзакции извне, переключаем активный набор если необходимо
 watch(() => props.modelValue, (newValue) => {
+  // Находим объект типа транзакции для вывода в консоль
+  const selectedTypeObj = [...PRIMARY_TRANSACTION_TYPES, ...SECONDARY_TRANSACTION_TYPES]
+    .find(type => type.id === newValue);
+  
+  console.log('Изменение типа транзакции (извне):', selectedTypeObj);
+  
   const shouldBeSecondSet = isSecondaryTransactionType(newValue);
   if (shouldBeSecondSet !== isSecondSetActive.value) {
     isSecondSetActive.value = shouldBeSecondSet;
+    console.log('Переключение набора на:', shouldBeSecondSet ? 'дополнительный' : 'основной');
   }
 }, { immediate: true });
 </script>
 
 <style scoped>
+/* Обертка для центрирования */
+.selector-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
 .transaction-selector {
   display: inline-flex;
   align-items: center;
@@ -99,8 +123,7 @@ watch(() => props.modelValue, (newValue) => {
   border-radius: var(--border-radius-lg, 28px);
   padding: 0 2px 0 0px;
   gap: 6px;
-  width: auto;
-  align-self: flex-start;
+  max-width: 100%;
 }
 
 .items-container {

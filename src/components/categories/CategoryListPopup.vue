@@ -127,7 +127,7 @@
 import { ref, computed, watch } from 'vue';
 import BasePopup from '../ui/BasePopup.vue';
 import BookSelector from '../transactions/BookSelector.vue';
-import TransactionTypeSelector from '../transactions/TransactionTypeSelector.vue';
+import TransactionTypeSelector from '../../views/transaction/components/TransactionTypeSelector.vue';
 import CategoryIcon from './CategoryIcon.vue';
 import CategoryItem from './CategoryItem.vue';
 import CategoryFilterToggle from './CategoryFilterToggle.vue';
