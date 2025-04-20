@@ -9,58 +9,71 @@
     }"
     @click="handleClick"
   >
-    <!-- Левая часть с иконкой -->
-    <div class="item-icon">
-      <slot name="icon">
-        <div class="icon-wrapper" :style="iconStyle">
-          <slot name="icon-content">
-            <!-- Иконка категории (если передана) -->
-            <component 
-              v-if="resolvedCategoryIcon" 
-              :is="resolvedCategoryIcon" 
-              :size="iconSize" 
-              :stroke="1.5"
-              :color="iconTextColor" 
-              class="category-icon"
-            />
-            <!-- Стандартная иконка (если передана) -->
-            <component 
-              v-else-if="resolvedIcon" 
-              :is="resolvedIcon" 
-              :size="iconSize" 
-              :stroke="1.5"
-              :color="iconTextColor" 
-            />
-            <!-- Инициалы (если нет иконок) -->
-            <span v-else-if="initials" class="icon-placeholder">{{ initials }}</span>
-          </slot>
-        </div>
-      </slot>
-    </div>
-    
-    <!-- Центральная часть с названием и описанием -->
-    <div class="item-content">
-      <slot name="content">
-        <div class="content-main">
-          <div class="item-title" v-if="title">{{ title }}</div>
-          <div class="item-description" v-if="description">{{ description }}</div>
-        </div>
-        <div class="item-subtitle" v-if="subtitle">{{ subtitle }}</div>
-      </slot>
-    </div>
-    
-    <!-- Правая часть с суммой и дополнительной информацией -->
-    <div class="item-amount">
-      <slot name="amount">
-        <div class="amount-main">
-          <div class="amount" :class="amountColorClass" v-if="amount !== undefined">
-            {{ formattedAmount }}
+    <!-- Transaction container with rounded corners -->
+    <div class="transaction-container">
+      <!-- Left part with icon -->
+      <div class="item-icon">
+        <slot name="icon">
+          <div class="icon-wrapper" :style="iconStyle">
+            <slot name="icon-content">
+              <!-- Category icon (if provided) -->
+              <component 
+                v-if="resolvedCategoryIcon" 
+                :is="resolvedCategoryIcon" 
+                :size="iconSize" 
+                :stroke="1.5"
+                :color="iconTextColor" 
+                class="category-icon"
+              />
+              <!-- Standard icon (if provided) -->
+              <component 
+                v-else-if="resolvedIcon" 
+                :is="resolvedIcon" 
+                :size="iconSize" 
+                :stroke="1.5"
+                :color="iconTextColor" 
+              />
+              <!-- Initials (if no icons) -->
+              <span v-else-if="initials" class="icon-placeholder">{{ initials }}</span>
+            </slot>
+          </div>
+        </slot>
+      </div>
+      
+      <!-- Main content area with title, description and amount -->
+      <div class="transaction-content">
+        <!-- Center part with name and description -->
+        <div class="content-top-line">
+          <div class="item-name">
+            <slot name="content">
+              <div class="item-title" v-if="title">{{ title }}</div>
+              <div class="item-description" v-if="description">{{ description }}</div>
+            </slot>
+          </div>
+          
+          <!-- Right part with amount -->
+          <div class="item-money">
+            <slot name="amount">
+              <div class="amount-wrapper">
+                <div class="amount" :class="amountColorClass" v-if="amount !== undefined">
+                  {{ formattedAmount }}
+                </div>
+              </div>
+            </slot>
           </div>
         </div>
-        <div class="item-info" :class="{ 'has-info': !!info }">
-          {{ info }}
+        
+        <!-- Bottom line with subtitle and info -->
+        <div class="content-bottom-line">
+          <div class="item-owner">
+            <span class="owner-text" v-if="subtitle">{{ subtitle }}</span>
+          </div>
+          
+          <div class="item-account">
+            <span class="account-text" v-if="info">{{ info }}</span>
+          </div>
         </div>
-      </slot>
+      </div>
     </div>
   </div>
 </template>
@@ -69,14 +82,14 @@
 import { computed, defineAsyncComponent } from 'vue';
 import * as TablerIcons from '@tabler/icons-vue';
 
-// Определение типов
+// Type definitions
 interface ItemClickEvent {
   item: any;
   event: MouseEvent;
 }
 
 const props = defineProps({
-  // Основное содержимое
+  // Main content
   item: {
     type: Object,
     default: () => ({})
@@ -98,7 +111,7 @@ const props = defineProps({
     default: ''
   },
   
-  // Финансовые данные
+  // Financial data
   amount: {
     type: Number,
     default: undefined
@@ -116,7 +129,7 @@ const props = defineProps({
     default: ''
   },
   
-  // Иконка
+  // Icon
   icon: {
     type: [Object, Function, String],
     default: null
@@ -134,7 +147,7 @@ const props = defineProps({
     default: ''
   },
   
-  // Категория (новые свойства)
+  // Category properties
   categoryIcon: {
     type: [Object, Function, String],
     default: null
@@ -144,7 +157,7 @@ const props = defineProps({
     default: ''
   },
   
-  // Тип и стиль
+  // Type and style
   type: {
     type: String,
     default: '' // 'income', 'expense', 'transfer'
@@ -169,16 +182,16 @@ const props = defineProps({
 
 const emit = defineEmits(['click']);
 
-// Резолвинг иконок Tabler
+// Resolve Tabler icons
 const resolvedCategoryIcon = computed(() => {
   if (!props.categoryIcon) return null;
   
-  // Если передан объект или функция, используем как есть
+  // If an object or function is passed, use as is
   if (typeof props.categoryIcon !== 'string') {
     return props.categoryIcon;
   }
   
-  // Проверяем, является ли строка именем иконки Tabler (например 'IconCar')
+  // Check if string is a Tabler icon name (e.g. 'IconCar')
   if (props.categoryIcon.startsWith('Icon') && TablerIcons[props.categoryIcon]) {
     return TablerIcons[props.categoryIcon];
   }
@@ -186,16 +199,16 @@ const resolvedCategoryIcon = computed(() => {
   return null;
 });
 
-// Аналогично для обычной иконки
+// Same for standard icon
 const resolvedIcon = computed(() => {
   if (!props.icon) return null;
   
-  // Если передан объект или функция, используем как есть
+  // If an object or function is passed, use as is
   if (typeof props.icon !== 'string') {
     return props.icon;
   }
   
-  // Проверяем, является ли строка именем иконки Tabler (например 'IconCar')
+  // Check if string is a Tabler icon name (e.g. 'IconCar')
   if (props.icon.startsWith('Icon') && TablerIcons[props.icon]) {
     return TablerIcons[props.icon];
   }
@@ -203,19 +216,19 @@ const resolvedIcon = computed(() => {
   return null;
 });
 
-// Стиль иконки
+// Icon style
 const iconStyle = computed(() => {
-  // Приоритет 1: Если задан цвет категории, используем его
+  // Priority 1: If category color is set, use it
   if (props.categoryColor) {
     return { backgroundColor: props.categoryColor };
   }
   
-  // Приоритет 2: Если задан конкретный цвет иконки, используем его
+  // Priority 2: If specific icon color is set, use it
   if (props.iconColor) {
     return { backgroundColor: props.iconColor };
   }
   
-  // Приоритет 3: Определяем цвет на основе типа
+  // Priority 3: Determine color based on type
   if (props.type === 'income' || props.amountType === 'positive') {
     return { backgroundColor: 'var(--color-success)' };
   } 
@@ -226,7 +239,7 @@ const iconStyle = computed(() => {
     return { backgroundColor: 'var(--text-contrast)' };
   }
   
-  // Приоритет 4: Если тип не определен, но есть сумма
+  // Priority 4: If type is undefined but amount exists
   if (props.amount !== undefined) {
     if (props.amount > 0) {
       return { backgroundColor: 'var(--color-success)' };
@@ -236,24 +249,24 @@ const iconStyle = computed(() => {
     }
   }
   
-  // По умолчанию используем нейтральный цвет
-  return { backgroundColor: 'var(--bg-light)' };
+  // Default: use neutral color
+  return { backgroundColor: '#D9D9D9' };
 });
 
-// Цвет текста иконки
+// Icon text color
 const iconTextColor = computed(() => {
-  // Для трансферов используем темный цвет текста на светлом фоне
+  // For transfers, use dark text on light background
   if (props.type === 'transfer' || props.amountType === 'neutral') {
     return 'var(--bg-main)';
   }
   
-  // Для остальных белый текст
+  // For others use white text
   return 'var(--text-contrast)';
 });
 
-// Класс цвета для суммы
+// Amount color class
 const amountColorClass = computed(() => {
-  // Если задан конкретный тип, используем его
+  // If specific type is set, use it
   if (props.amountType === 'positive') {
     return 'color-success';
   } 
@@ -264,7 +277,7 @@ const amountColorClass = computed(() => {
     return '';
   }
   
-  // По типу транзакции
+  // By transaction type
   if (props.type === 'income') {
     return 'color-success';
   } 
@@ -272,7 +285,7 @@ const amountColorClass = computed(() => {
     return 'color-warning';
   }
   
-  // По значению суммы
+  // By amount value
   if (props.amount !== undefined) {
     if (props.amount > 0) {
       return 'color-success';
@@ -282,11 +295,11 @@ const amountColorClass = computed(() => {
     }
   }
   
-  // По умолчанию нет специального класса
+  // Default: no special class
   return '';
 });
 
-// Форматированная сумма с символом валюты
+// Formatted amount with currency symbol
 const formattedAmount = computed(() => {
   if (props.amount === undefined) {
     return '';
@@ -297,10 +310,10 @@ const formattedAmount = computed(() => {
   const prefix = props.amountPrefix || '';
   const suffix = props.amountSuffix || '';
   
-  // Получаем символ валюты или используем переданный
+  // Get currency symbol or use passed one
   let currencySymbol = '';
   
-  // Определяем символ валюты
+  // Determine currency symbol
   if (props.currency) {
     if (props.currency === 'IDR' || props.currency === 'Rp') {
       currencySymbol = 'Rp ';
@@ -313,14 +326,14 @@ const formattedAmount = computed(() => {
     }
   }
   
-  // Форматируем с разделителями тысяч
-  // Для отрицательных значений, минус должен идти перед символом валюты с отступом в 4px
+  // Format with thousands separators
+  // For negative values, minus should go before currency symbol with 4px spacing
   return isNegative
     ? `${prefix}- ${currencySymbol}${absAmount.toLocaleString()}${suffix}`
     : `${prefix}${currencySymbol}${absAmount.toLocaleString()}${suffix}`;
 });
 
-// Обработчик клика
+// Click handler
 const handleClick = (event) => {
   if (!props.isClickable) return;
   
@@ -332,35 +345,37 @@ const handleClick = (event) => {
 </script>
 
 <style scoped>
-
 .base-transaction-item {
-  padding: var(--spacing-xs) var(--spacing-md) var(--spacing-xs) var(--spacing-sm);
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  position: relative;
-  transition: background-color var(--transition-speed) var(--transition-fn);
-  margin: 0;
-}
-
-.is-clickable {
-  cursor: pointer;
-}
-
-.is-clickable:active {
-  background-color: rgba(255, 255, 255, 0.05);
-}
-
-.with-border {
-  border-bottom: 0.5px solid var(--border-color);
-}
-
-.item-icon {
-  min-width: 37px;
-  height: 48px;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 0;
+  margin-bottom: 10px;
+  margin: 0;
+}
+
+.transaction-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 6px 20px 6px 10px;
+  width: 100%;
+  /* Remove max-width to be responsive to parent container */
+  height: 68px;
+  background: #444444;
+  border-radius: 32px;
+  gap: 10px;
+  box-sizing: border-box;
+}
+
+.item-icon {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 37px;
+  height: 53px;
 }
 
 .icon-wrapper {
@@ -371,6 +386,7 @@ const handleClick = (event) => {
   justify-content: center;
   align-items: center;
   overflow: hidden;
+  background: #D9D9D9;
 }
 
 .icon-placeholder {
@@ -384,110 +400,172 @@ const handleClick = (event) => {
   color: var(--text-contrast);
 }
 
-.category-icon {
-  color: var(--text-contrast);
-  width: 20px;
-  height: 20px;
-}
-
-.item-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  height: 48px;
-}
-
-.content-main {
-  flex: 2;
+.transaction-content {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-width: 0;
+  align-items: flex-start;
+  padding: 0;
+  gap: 4px;
+  width: 297px;
+  height: 56px;
+}
+
+.content-top-line {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px 4px 0px 0px;
+  gap: 10px;
+  width: 100%;
+  height: 36px;
+}
+
+.item-name {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0px 10px;
+  gap: 2px;
+  flex: 1;
+  height: 34px;
 }
 
 .item-title {
-  color: var(--text-header);
-  font-size: var(--font-body-size);
-  line-height: var(--font-body-line-height);
+  font-family: 'Inter', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 20px;
+  display: flex;
+  align-items: center;
+  letter-spacing: -0.02em;
+  color: #FFFFFF;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-weight: 500;
 }
 
 .item-description {
-  color: var(--text-grey);
-  font-size: var(--font-super-small-size);
-  line-height: var(--font-super-small-line-height);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  padding-top: 2px;
-  min-width: 0;
-}
-
-.item-subtitle {
-  flex: 1;
-  color: var(--text-grey);
-  font-size: var(--font-super-small-size);
-  line-height: var(--font-super-small-line-height);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  padding-top: 2px;
-  min-width: 0;
-}
-
-.item-amount {
-  min-width: 110px;
-  max-width: 110px;
-  height: 48px;
+  font-family: 'Inter', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 10px;
+  line-height: 12px;
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
+  color: #949496;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.amount-main {
-  flex: 2;
+.item-money {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-end;
-  min-width: 0;
+  padding: 8px 0px;
+  gap: 2px;
+  flex: 1;
+  height: 36px;
+}
+
+.amount-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0px;
+  gap: 2px;
 }
 
 .amount {
+  font-family: 'Inter', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 20px;
   display: flex;
   align-items: center;
-  font-size: var(--font-body-size);
-  font-weight: var(--font-body-weight);
-  line-height: var(--font-body-line-height);
-  text-align: right;
+  letter-spacing: -0.02em;
+  color: #FFFFFF;
   white-space: nowrap;
 }
 
-.item-info {
-  flex: 1;
-  width: 100%;
-  text-align: right;
-  color: var(--text-grey);
-  font-size: var(--font-super-small-size);
-  line-height: var(--font-super-small-line-height);
-  padding-top: 2px;
-}
-
-.item-info.has-info {
-  color: var(--text-usual);
-  white-space: normal; /* Позволит переносить слова */
-  overflow: visible; /* Убираем скрытие переполнения */
+.color-warning {
+  color: #A44942;
 }
 
 .color-success {
   color: var(--color-success);
 }
 
-.color-warning {
-  color: var(--color-warning);
+.content-bottom-line {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px 4px 0px 0px;
+  gap: 10px;
+  width: 100%;
+  height: 16px;
+}
+
+.item-owner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0px 10px;
+  gap: 2px;
+  width: 199px;
+  height: 16px;
+}
+
+.owner-text {
+  font-family: 'Inter', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+  display: flex;
+  align-items: center;
+  color: #FFFFFF;
+}
+
+.item-account {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  padding: 0px;
+  gap: 2px;
+  height: 16px;
+}
+
+.account-text {
+  font-family: 'Inter', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+  display: flex;
+  align-items: center;
+  text-align: right;
+  color: #FFFFFF;
+}
+
+/* We can keep these utility classes from the original as they might be used elsewhere */
+.is-clickable {
+  cursor: pointer;
+}
+
+.is-clickable:active {
+  opacity: 0.9;
+}
+
+.with-border {
+  /* We'll remove the default border since we have a contained design now */
+  border-bottom: none;
 }
 </style>

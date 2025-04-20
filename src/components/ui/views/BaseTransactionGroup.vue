@@ -1,7 +1,7 @@
 <!-- src/components/ui/views/BaseTransactionGroup.vue -->
 <template>
   <div class="base-transaction-group">
-    <!-- Заголовок группы с датой или другой информацией -->
+    <!-- Group header with date or other information -->
     <div class="group-header">
       <slot name="header">
         <div class="group-title">{{ title }}</div>
@@ -11,10 +11,10 @@
       </slot>
     </div>
     
-    <!-- Контейнер для списка элементов -->
+    <!-- Container for the list of items -->
     <div class="group-content" :class="{ 'custom-content': $slots.default }">
       <slot>
-        <!-- Если дочерних элементов нет, показываем заглушку или пустое состояние -->
+        <!-- If there are no child elements, show placeholder or empty state -->
         <div class="empty-state" v-if="showEmptyState">
           <slot name="empty">
             <div class="empty-message">{{ emptyMessage }}</div>
@@ -29,13 +29,13 @@
 import { computed } from 'vue';
 
 const props = defineProps({
-  // Основная информация группы
+  // Basic group information
   title: {
     type: String,
     default: ''
   },
   
-  // Данные о сумме
+  // Amount data
   amount: {
     type: Number,
     default: 0
@@ -49,7 +49,7 @@ const props = defineProps({
     default: ''
   },
   
-  // Дополнительные опции
+  // Additional options
   showEmptyState: {
     type: Boolean,
     default: false
@@ -59,13 +59,13 @@ const props = defineProps({
     default: 'No items to display'
   },
   
-  // Форматирование
+  // Formatting
   amountFormatter: {
     type: Function,
     default: null
   },
   
-  // Стили
+  // Styles
   headerClass: {
     type: String,
     default: ''
@@ -76,9 +76,9 @@ const props = defineProps({
   }
 });
 
-// Определяем класс для суммы (положительная/отрицательная)
+// Determine the class for the amount (positive/negative)
 const amountClass = computed(() => {
-  // Если задан тип суммы, используем его
+  // If amount type is set, use it
   if (props.amountType === 'positive') {
     return 'color-success';
   } 
@@ -86,7 +86,7 @@ const amountClass = computed(() => {
     return 'color-warning';
   }
   
-  // Иначе определяем по значению
+  // Otherwise determine by value
   if (props.amount > 0) {
     return 'color-success';
   } 
@@ -94,21 +94,21 @@ const amountClass = computed(() => {
     return 'color-warning';
   }
   
-  return ''; // Нейтральный цвет
+  return ''; // Neutral color
 });
 
-// Форматируем сумму с символом валюты
+// Format the amount with currency symbol
 const formattedAmount = computed(() => {
-    // Используем пользовательский форматер, если он задан
+    // Use custom formatter if provided
     if (typeof props.amountFormatter === 'function') {
       return props.amountFormatter(props.amount, props.currency);
     }
     
-    // Стандартное форматирование
+    // Standard formatting
     const isNegative = props.amount < 0;
     const absAmount = Math.abs(props.amount);
     
-    // Определяем символ валюты
+    // Determine currency symbol
     let currencySymbol = '';
     if (props.currency) {
       if (props.currency === 'IDR' || props.currency === 'Rp') {
@@ -122,7 +122,7 @@ const formattedAmount = computed(() => {
       }
     }
     
-    // Для отрицательных значений, минус должен идти перед символом валюты с отступом в 4px
+    // For negative values, minus should go before the currency symbol with 4px spacing
     return isNegative
       ? `- ${currencySymbol}${absAmount.toLocaleString()}`
       : `${currencySymbol}${absAmount.toLocaleString()}`;
@@ -174,13 +174,13 @@ const formattedAmount = computed(() => {
   border-radius: var(--border-radius-lg);
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* Для соблюдения скругления углов */
+  overflow: hidden; /* To maintain rounded corners */
   margin: 0;
-  padding: 0;
+  gap: 8px; /* Add gap between transaction items */
 }
 
 .custom-content {
-  /* Пользовательский контент может иметь свои стили */
+  /* Custom content may have its own styles */
 }
 
 .empty-state {
@@ -196,7 +196,7 @@ const formattedAmount = computed(() => {
   text-align: center;
 }
 
-/* Стили для цветового выделения сумм */
+/* Styles for color highlighting of amounts */
 .color-success {
   color: var(--color-success);
 }
@@ -205,7 +205,7 @@ const formattedAmount = computed(() => {
   color: var(--color-warning);
 }
 
-/* Удаляем автоматический минус, так как теперь управляем им вручную */
+/* Remove automatic minus, as we now manage it manually */
 /* 
 .color-warning.group-amount::before {
   content: "";
