@@ -250,7 +250,7 @@ const iconStyle = computed(() => {
   }
   
   // Default: use neutral color
-  return { backgroundColor: '#D9D9D9' };
+  return { backgroundColor: 'var(--bg-light)' };
 });
 
 // Icon text color
@@ -351,7 +351,6 @@ const handleClick = (event) => {
   justify-content: center;
   align-items: center;
   padding: 0;
-  margin-bottom: 10px;
   margin: 0;
 }
 
@@ -359,14 +358,12 @@ const handleClick = (event) => {
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 6px 20px 6px 10px;
+  padding: 6px var(--spacing-md) 6px var(--spacing-sm);
   width: 100%;
-  /* Remove max-width to be responsive to parent container */
-  height: 68px;
-  background: #444444;
-  border-radius: 32px;
-  gap: 10px;
-  box-sizing: border-box;
+  min-height: 60px;
+  background: var(--bg-dropdown);
+  border-radius: var(--border-radius-lg);
+  gap: var(--spacing-sm);
 }
 
 .item-icon {
@@ -374,19 +371,19 @@ const handleClick = (event) => {
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  width: 37px;
-  height: 53px;
+  min-width: var(--icon-size-lg);
+  aspect-ratio: 1/1;
 }
 
 .icon-wrapper {
-  width: 37px;
-  height: 37px;
+  width: var(--icon-size-lg);
+  height: var(--icon-size-lg);
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  background: #D9D9D9;
+  background: var(--bg-light);
 }
 
 .icon-placeholder {
@@ -407,8 +404,8 @@ const handleClick = (event) => {
   align-items: flex-start;
   padding: 0;
   gap: 4px;
-  width: 297px;
-  height: 56px;
+  flex: 1;
+  overflow: hidden;
 }
 
 .content-top-line {
@@ -416,49 +413,47 @@ const handleClick = (event) => {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: 0px 4px 0px 0px;
-  gap: 10px;
+  padding: 0;
+  gap: var(--spacing-sm);
   width: 100%;
-  height: 36px;
 }
 
 .item-name {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 0px 10px;
+  padding: 0;
   gap: 2px;
   flex: 1;
-  height: 34px;
+  min-width: 0; /* Важно для переполнения */
+  overflow: hidden;
 }
 
 .item-title {
-  font-family: 'Inter', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 20px;
+  font-size: var(--font-body-size);
+  line-height: var(--font-body-line-height);
+  font-weight: var(--font-body-weight);
   display: flex;
   align-items: center;
   letter-spacing: -0.02em;
-  color: #FFFFFF;
+  color: var(--text-header);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  width: 100%;
 }
 
 .item-description {
-  font-family: 'Inter', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 10px;
-  line-height: 12px;
+  font-size: var(--font-super-small-size);
+  line-height: var(--font-super-small-line-height);
+  font-weight: var(--font-super-small-weight);
   display: flex;
   align-items: center;
-  color: #949496;
+  color: var(--text-grey);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  width: 100%;
 }
 
 .item-money {
@@ -466,35 +461,34 @@ const handleClick = (event) => {
   flex-direction: column;
   justify-content: center;
   align-items: flex-end;
-  padding: 8px 0px;
+  padding: 0;
   gap: 2px;
-  flex: 1;
-  height: 36px;
+  /* Не устанавливаем фиксированную ширину */
+  min-width: fit-content; /* Чтобы гарантировать, что текст не обрежется */
 }
 
 .amount-wrapper {
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 0px;
+  padding: 0;
   gap: 2px;
 }
 
 .amount {
-  font-family: 'Inter', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 20px;
+  font-size: var(--font-body-size);
+  line-height: var(--font-body-line-height);
+  font-weight: var(--font-body-weight);
   display: flex;
   align-items: center;
   letter-spacing: -0.02em;
-  color: #FFFFFF;
+  color: var(--text-header);
   white-space: nowrap;
+  text-align: right;
 }
 
 .color-warning {
-  color: #A44942;
+  color: var(--color-warning);
 }
 
 .color-success {
@@ -506,31 +500,33 @@ const handleClick = (event) => {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: 0px 4px 0px 0px;
-  gap: 10px;
+  padding: 0;
+  gap: var(--spacing-sm);
   width: 100%;
-  height: 16px;
 }
 
 .item-owner {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 0px 10px;
+  padding: 0;
   gap: 2px;
-  width: 199px;
-  height: 16px;
+  flex: 1;
+  min-width: 0; /* Важно для переполнения */
+  overflow: hidden;
 }
 
 .owner-text {
-  font-family: 'Inter', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 12px;
-  line-height: 16px;
+  font-size: var(--font-small-size);
+  line-height: var(--font-small-line-height);
+  font-weight: var(--font-small-weight);
   display: flex;
   align-items: center;
-  color: #FFFFFF;
+  color: var(--text-header);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
 }
 
 .item-account {
@@ -538,34 +534,33 @@ const handleClick = (event) => {
   flex-direction: column;
   justify-content: center;
   align-items: flex-end;
-  padding: 0px;
+  padding: 0;
   gap: 2px;
-  height: 16px;
+  min-width: fit-content; /* Чтобы гарантировать, что текст не обрежется */
 }
 
 .account-text {
-  font-family: 'Inter', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 12px;
-  line-height: 16px;
+  font-size: var(--font-small-size);
+  line-height: var(--font-small-line-height);
+  font-weight: var(--font-small-weight);
   display: flex;
   align-items: center;
   text-align: right;
-  color: #FFFFFF;
+  color: var(--text-header);
+  white-space: nowrap;
 }
 
-/* We can keep these utility classes from the original as they might be used elsewhere */
+/* Utility classes */
 .is-clickable {
   cursor: pointer;
 }
 
 .is-clickable:active {
-  opacity: 0.9;
+  opacity: var(--state-active-opacity);
 }
 
 .with-border {
-  /* We'll remove the default border since we have a contained design now */
+  /* Removed border since we have a contained design now */
   border-bottom: none;
 }
 </style>

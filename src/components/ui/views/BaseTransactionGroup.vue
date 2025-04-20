@@ -155,7 +155,6 @@ const formattedAmount = computed(() => {
 
 .group-amount {
   padding: var(--spacing-sm);
-  padding-right: var(--spacing-xl);
   color: var(--text-header);
   display: flex;
   align-items: center;
@@ -176,7 +175,24 @@ const formattedAmount = computed(() => {
   flex-direction: column;
   overflow: hidden; /* To maintain rounded corners */
   margin: 0;
-  gap: 8px; /* Add gap between transaction items */
+  padding: var(--spacing-xs);
+  gap: var(--spacing-xs); /* Gap between transaction items */
+}
+
+/* Add subtle dividers using ::v-deep to target child components */
+.group-content :deep(> *:not(:last-child)) {
+  position: relative;
+}
+
+.group-content :deep(> *:not(:last-child))::after {
+  content: "";
+  position: absolute;
+  bottom: calc(var(--spacing-xs) * -1); /* Position it at the bottom with offset for gap */
+  left: var(--spacing-md);
+  right: var(--spacing-md);
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.06); /* Very subtle light color */
+  z-index: 1;
 }
 
 .custom-content {
@@ -204,15 +220,4 @@ const formattedAmount = computed(() => {
 .color-warning {
   color: var(--color-warning);
 }
-
-/* Remove automatic minus, as we now manage it manually */
-/* 
-.color-warning.group-amount::before {
-  content: "";
-  width: 3px;
-  height: 1px;
-  background: var(--color-warning);
-  margin-right: 2px;
-}
-*/
 </style>
