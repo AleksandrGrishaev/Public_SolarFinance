@@ -1,7 +1,7 @@
 // src/stores/transaction/types.ts - с добавлением полей для валютной конвертации
 import type { DistributionRule } from '../book/types';
 
-export type TransactionType = 'income' | 'expense' | 'transfer';
+export type TransactionType = 'income' | 'expense' | 'transfer' | 'debt' | 'correction' | 'exchange';
 
 export interface Transaction {
   id: string;

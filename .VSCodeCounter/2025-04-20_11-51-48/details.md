@@ -1,10 +1,10 @@
 # Details
 
-Date : 2025-04-20 00:35:47
+Date : 2025-04-20 11:51:48
 
 Directory /Users/peaker/dev/solar-finance/src
 
-Total : 156 files,  22974 codes, 1769 comments, 3669 blanks, all 28412 lines
+Total : 156 files,  23035 codes, 1773 comments, 3678 blanks, all 28486 lines
 
 [Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
@@ -61,8 +61,8 @@ Total : 156 files,  22974 codes, 1769 comments, 3669 blanks, all 28412 lines
 | [src/components/ui/selectors/UniversalSelector.vue](/src/components/ui/selectors/UniversalSelector.vue) | Vue | 144 | 3 | 15 | 162 |
 | [src/components/ui/views/BaseBookHeader.vue](/src/components/ui/views/BaseBookHeader.vue) | Vue | 58 | 1 | 8 | 67 |
 | [src/components/ui/views/BasePercentageSlider.vue](/src/components/ui/views/BasePercentageSlider.vue) | Vue | 245 | 4 | 31 | 280 |
-| [src/components/ui/views/BaseTransactionGroup.vue](/src/components/ui/views/BaseTransactionGroup.vue) | Vue | 189 | 4 | 25 | 218 |
-| [src/components/ui/views/BaseTransactionItem.vue](/src/components/ui/views/BaseTransactionItem.vue) | Vue | 429 | 7 | 57 | 493 |
+| [src/components/ui/views/BaseTransactionGroup.vue](/src/components/ui/views/BaseTransactionGroup.vue) | Vue | 187 | 4 | 28 | 219 |
+| [src/components/ui/views/BaseTransactionItem.vue](/src/components/ui/views/BaseTransactionItem.vue) | Vue | 487 | 10 | 62 | 559 |
 | [src/composables/transaction/useFormatBalance.ts](/src/composables/transaction/useFormatBalance.ts) | TypeScript | 126 | 42 | 25 | 193 |
 | [src/composables/ui/useClickOutside.ts](/src/composables/ui/useClickOutside.ts) | TypeScript | 24 | 6 | 6 | 36 |
 | [src/composables/ui/useDropdown.ts](/src/composables/ui/useDropdown.ts) | TypeScript | 38 | 4 | 9 | 51 |
@@ -120,7 +120,7 @@ Total : 156 files,  22974 codes, 1769 comments, 3669 blanks, all 28412 lines
 | [src/styles/\_mixins.scss](/src/styles/_mixins.scss) | SCSS | 20 | 1 | 3 | 24 |
 | [src/styles/components/\_forms.scss](/src/styles/components/_forms.scss) | SCSS | 137 | 16 | 25 | 178 |
 | [src/styles/components/\_inputs.scss](/src/styles/components/_inputs.scss) | SCSS | 30 | 1 | 3 | 34 |
-| [src/styles/main.scss](/src/styles/main.scss) | SCSS | 70 | 13 | 17 | 100 |
+| [src/styles/main.scss](/src/styles/main.scss) | SCSS | 75 | 14 | 18 | 107 |
 | [src/styles/themes/\_colors.scss](/src/styles/themes/_colors.scss) | SCSS | 116 | 14 | 36 | 166 |
 | [src/styles/themes/\_dark.scss](/src/styles/themes/_dark.scss) | SCSS | 6 | 5 | 3 | 14 |
 | [src/styles/themes/\_typography.scss](/src/styles/themes/_typography.scss) | SCSS | 66 | 13 | 17 | 96 |

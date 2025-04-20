@@ -49,8 +49,8 @@
 "/Users/peaker/dev/solar-finance/src/components/ui/selectors/UniversalSelector.vue", "Vue", 0, 144, 0, 0, 3, 15, 162
 "/Users/peaker/dev/solar-finance/src/components/ui/views/BaseBookHeader.vue", "Vue", 0, 58, 0, 0, 1, 8, 67
 "/Users/peaker/dev/solar-finance/src/components/ui/views/BasePercentageSlider.vue", "Vue", 0, 245, 0, 0, 4, 31, 280
-"/Users/peaker/dev/solar-finance/src/components/ui/views/BaseTransactionGroup.vue", "Vue", 0, 189, 0, 0, 4, 25, 218
-"/Users/peaker/dev/solar-finance/src/components/ui/views/BaseTransactionItem.vue", "Vue", 0, 429, 0, 0, 7, 57, 493
+"/Users/peaker/dev/solar-finance/src/components/ui/views/BaseTransactionGroup.vue", "Vue", 0, 187, 0, 0, 4, 28, 219
+"/Users/peaker/dev/solar-finance/src/components/ui/views/BaseTransactionItem.vue", "Vue", 0, 487, 0, 0, 10, 62, 559
 "/Users/peaker/dev/solar-finance/src/composables/transaction/useFormatBalance.ts", "TypeScript", 126, 0, 0, 0, 42, 25, 193
 "/Users/peaker/dev/solar-finance/src/composables/ui/useClickOutside.ts", "TypeScript", 24, 0, 0, 0, 6, 6, 36
 "/Users/peaker/dev/solar-finance/src/composables/ui/useDropdown.ts", "TypeScript", 38, 0, 0, 0, 4, 9, 51
@@ -108,7 +108,7 @@
 "/Users/peaker/dev/solar-finance/src/styles/_mixins.scss", "SCSS", 0, 0, 20, 0, 1, 3, 24
 "/Users/peaker/dev/solar-finance/src/styles/components/_forms.scss", "SCSS", 0, 0, 137, 0, 16, 25, 178
 "/Users/peaker/dev/solar-finance/src/styles/components/_inputs.scss", "SCSS", 0, 0, 30, 0, 1, 3, 34
-"/Users/peaker/dev/solar-finance/src/styles/main.scss", "SCSS", 0, 0, 70, 0, 13, 17, 100
+"/Users/peaker/dev/solar-finance/src/styles/main.scss", "SCSS", 0, 0, 75, 0, 14, 18, 107
 "/Users/peaker/dev/solar-finance/src/styles/themes/_colors.scss", "SCSS", 0, 0, 116, 0, 14, 36, 166
 "/Users/peaker/dev/solar-finance/src/styles/themes/_dark.scss", "SCSS", 0, 0, 6, 0, 5, 3, 14
 "/Users/peaker/dev/solar-finance/src/styles/themes/_typography.scss", "SCSS", 0, 0, 66, 0, 13, 17, 96
@@ -155,4 +155,4 @@
 "/Users/peaker/dev/solar-finance/src/views/transaction/composables/useDistribution.ts", "TypeScript", 53, 0, 0, 0, 17, 11, 81
 "/Users/peaker/dev/solar-finance/src/views/transaction/composables/useKeypad.ts", "TypeScript", 38, 0, 0, 0, 22, 7, 67
 "/Users/peaker/dev/solar-finance/src/views/transaction/composables/useTransaction.ts", "TypeScript", 139, 0, 0, 0, 27, 27, 193
-"Total", "-", 6377, 13369, 497, 2731, 1769, 3669, 28412
+"Total", "-", 6377, 13425, 502, 2731, 1773, 3678, 28486

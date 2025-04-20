@@ -1,4 +1,4 @@
-<!-- src/views/TransactionView.vue -->
+<!-- src/views/transaction/TransactionView.vue -->
 <template>
   <div class="transaction-view">
     <div v-if="isLoading" class="loading-overlay">
@@ -29,29 +29,30 @@
       />
       
       <div class="filter-group">
-  <transaction-type-selector 
-    v-model="selectedType" 
-  />
-  
-  <!-- Используем фильтрованные счета на основе выбранной книги и передаем ID книги -->
-  <account-selector 
-    :accounts="filteredAccounts" 
-    v-model="selectedAccount"
-    :is-transfer="selectedType === 'transfer'"
-    :destination-account-id="destinationAccount"
-    :bookId="selectedBook"
-    @update:destination-account-id="handleDestinationAccountChange"
-  />
-  
-  <!-- Слайдер отображается только если есть правила распределения в книге и это не перевод -->
-  <percentage-slider 
-    :owners="distributionOwners" 
-    v-model="distributionPercentage"
-    :total-amount="parseFloat(amount) || 0"
-    :currency="sourceCurrencySymbol"
-    :class="{ 'invisible': !shouldShowDistribution }"
-  />
-</div>
+        <!-- Используем новый TransactionTypeSelector из ./components/ -->
+        <transaction-type-selector 
+          v-model="selectedType" 
+        />
+        
+        <!-- Используем фильтрованные счета на основе выбранной книги и передаем ID книги -->
+        <account-selector 
+          :accounts="filteredAccounts" 
+          v-model="selectedAccount"
+          :is-transfer="selectedType === 'transfer'"
+          :destination-account-id="destinationAccount"
+          :bookId="selectedBook"
+          @update:destination-account-id="handleDestinationAccountChange"
+        />
+        
+        <!-- Слайдер отображается только если есть правила распределения в книге и это не перевод -->
+        <percentage-slider 
+          :owners="distributionOwners" 
+          v-model="distributionPercentage"
+          :total-amount="parseFloat(amount) || 0"
+          :currency="sourceCurrencySymbol"
+          :class="{ 'invisible': !shouldShowDistribution }"
+        />
+      </div>
       
       <div class="keypad-container">
         <number-keypad 
@@ -63,16 +64,16 @@
       </div>
     </div>
 
-   <!-- Selector popup -->
-   <category-selector
-    v-model="showCategorySelector"
-    :categories="filteredCategories"
-    :bookId="selectedBook"
-    :transactionType="selectedType"
-    @select="handleCategorySelect"
-    @add="handleAddCategory"
-    @edit="handleOpenCategoryList"
-  />
+    <!-- Selector popup -->
+    <category-selector
+      v-model="showCategorySelector"
+      :categories="filteredCategories"
+      :bookId="selectedBook"
+      :transactionType="selectedType"
+      @select="handleCategorySelect"
+      @add="handleAddCategory"
+      @edit="handleOpenCategoryList"
+    />
     
     <!-- List/Edit popup -->
     <category-list-popup
@@ -90,7 +91,8 @@
 <script setup lang="ts">
 import { onMounted, watch, ref, computed } from 'vue';
 import BookSelector from '../../components/transactions/BookSelector.vue';
-import TransactionTypeSelector from '../../components/transactions/TransactionTypeSelector.vue';
+// Импортируем новый TransactionTypeSelector из директории components
+import TransactionTypeSelector from './components/TransactionTypeSelector.vue';
 import AccountSelector from '../../components/transactions/AccountSelector.vue';
 import PercentageSlider from '../../components/transactions/PercentageSlider.vue';
 import NumberKeypad from '../../components/transactions/NumberKeypad.vue';
