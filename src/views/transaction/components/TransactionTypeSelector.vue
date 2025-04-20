@@ -1,88 +1,179 @@
 <!-- src/views/transaction/components/TransactionTypeSelector.vue -->
 <template>
-    <BaseTransactionSelector
-      v-model="selectedType"
-      :items="primaryTypes"
-      :secondItems="secondaryTypes"
-      :multiSelect="false"
-      @update:modelValue="updateValue"
-      @set-changed="handleSetChanged"
-    />
-  </template>
-  
-  <script setup lang="ts">
-  import { computed, ref, watch } from 'vue';
-  import { useSystemStore } from '../../../stores/system';
-  import BaseTransactionSelector from '../../../components/ui/selectors/BaseTransactionSelector.vue';
-  
-  const props = defineProps({
-    types: {
-      type: Array as () => Array<{ id: string, name: string }>,
-      required: false,
-      default: () => []
-    },
-    modelValue: {
-      type: String,
-      required: true
-    }
-  });
-  
-  const emit = defineEmits(['update:modelValue']);
-  
-  // Создаем локальную реактивную переменную для хранения значения селектора
-  const selectedType = ref(props.modelValue);
-  
-  // Отслеживаем, какой набор типов активен
-  const isSecondSetActive = ref(false);
-  
-  // Используем системное хранилище
-  const systemStore = useSystemStore();
-  
-  // Получаем все типы транзакций
-  const allTransactionTypes = computed(() => {
-    // Если передан массив types в props, используем его
-    if (props.types.length > 0) {
-      return props.types;
-    }
+  <div class="transaction-selector">
+    <!-- Контейнер для элементов -->
+    <div class="items-container">
+      <div 
+        v-for="item in displayedTypes" 
+        :key="item.id"
+        class="selector-item"
+        :class="{ 'active': selectedType === item.id }"
+        @click="updateValue(item.id)"
+      >
+        {{ item.name }}
+      </div>
+    </div>
     
-    // Иначе получаем из хранилища
-    return systemStore.allTransactionTypes || [];
-  });
+    <!-- Иконка переключения наборов типов -->
+    <div class="toggle-button" @click="toggleTypeSet">
+      <div class="toggle-icon" :class="{ 'rotated': isSecondSetActive }">
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          width="20" 
+          height="20" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          stroke-width="2" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" 
+          class="icon">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { computed, ref, watch } from 'vue';
+import { 
+  TransactionType, 
+  PRIMARY_TRANSACTION_TYPES, 
+  SECONDARY_TRANSACTION_TYPES,
+  isSecondaryTransactionType 
+} from '../../../constants/transactionTypes';
+
+const props = defineProps({
+  modelValue: {
+    type: String as () => TransactionType,
+    required: true
+  }
+});
+
+const emit = defineEmits(['update:modelValue']);
+
+// Локальное состояние для отслеживания активного набора типов
+const isSecondSetActive = ref(false);
+
+// Отображаемые типы в зависимости от активного набора
+const displayedTypes = computed(() => {
+  return isSecondSetActive.value 
+    ? SECONDARY_TRANSACTION_TYPES 
+    : PRIMARY_TRANSACTION_TYPES;
+});
+
+// Используем modelValue напрямую для упрощения
+const selectedType = computed(() => props.modelValue);
+
+// Переключение между наборами типов транзакций
+const toggleTypeSet = () => {
+  isSecondSetActive.value = !isSecondSetActive.value;
   
-  // Разделяем типы транзакций на два набора: 
-  // Первый набор: income, expense, transfer
-  // Второй набор: debt, correction, exchange
-  const primaryTypes = computed(() => {
-    return allTransactionTypes.value.filter(type => 
-      ['income', 'expense', 'transfer'].includes(type.id)
-    );
-  });
-  
-  const secondaryTypes = computed(() => {
-    return allTransactionTypes.value.filter(type => 
-      ['debt', 'correction', 'exchange'].includes(type.id)
-    );
-  });
-  
-  // Проверяем, принадлежит ли текущий выбранный тип ко второму набору
-  watch(() => props.modelValue, (newValue) => {
-    const isSecondary = secondaryTypes.value.some(type => type.id === newValue);
-    isSecondSetActive.value = isSecondary;
-    selectedType.value = newValue;
-  }, { immediate: true });
-  
-  // Обработчик изменения активного набора типов
-  const handleSetChanged = (isSecondSet) => {
-    isSecondSetActive.value = isSecondSet;
-  };
-  
-  // Метод для обновления значения в родительском компоненте
-  const updateValue = (value) => {
-    emit('update:modelValue', value);
-  };
-  
-  // Обновляем локальное значение при изменении modelValue
-  watch(() => props.modelValue, (newValue) => {
-    selectedType.value = newValue;
-  }, { immediate: true });
-  </script>
+  // Если выбранный элемент не отображается в текущем наборе, выбираем первый доступный
+  const currentTypeIds = displayedTypes.value.map(type => type.id);
+  if (!currentTypeIds.includes(selectedType.value)) {
+    emit('update:modelValue', currentTypeIds[0]);
+  }
+};
+
+// Метод для обновления значения в родительском компоненте
+const updateValue = (value: TransactionType) => {
+  emit('update:modelValue', value);
+};
+
+// При изменении типа транзакции извне, переключаем активный набор если необходимо
+watch(() => props.modelValue, (newValue) => {
+  const shouldBeSecondSet = isSecondaryTransactionType(newValue);
+  if (shouldBeSecondSet !== isSecondSetActive.value) {
+    isSecondSetActive.value = shouldBeSecondSet;
+  }
+}, { immediate: true });
+</script>
+
+<style scoped>
+.transaction-selector {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--bg-light, #949496);
+  border-radius: var(--border-radius-lg, 28px);
+  padding: 0 2px 0 0px;
+  gap: 6px;
+  width: auto;
+  align-self: flex-start;
+}
+
+.items-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 4px;
+  border-radius: var(--border-radius-lg, 28px);
+  gap: var(--spacing-xs, 4px);
+  background-color: var(--bg-contrast, #444444);
+  box-shadow: var(--shadow-tabs, 0px 4px 4px rgba(0, 0, 0, 0.25));
+  overflow-x: auto;
+}
+
+.selector-item {
+  height: 28px;
+  padding: 4px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: var(--border-radius-xl, 34px);
+  font-size: var(--font-small-size, 12px);
+  font-weight: var(--font-small-weight, 400);
+  line-height: var(--font-small-line-height, 16px);
+  white-space: nowrap;
+  color: var(--text-usual);
+  cursor: pointer;
+  transition: all var(--transition-speed, 0.2s) var(--transition-fn, ease);
+}
+
+.selector-item:hover {
+  opacity: var(--state-hover-opacity, 0.8);
+}
+
+.selector-item.active {
+  background-color: var(--bg-item-selected, #000000);
+  color: var(--text-contrast, white);
+}
+
+.toggle-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--bg-contrast, #444444);
+  color: var(--text-usual, #F5F5F5);
+  transition: all var(--transition-speed, 0.2s) var(--transition-fn, ease);
+}
+
+.toggle-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--transition-speed, 0.2s) var(--transition-fn, ease);
+}
+
+.toggle-icon.rotated {
+  transform: rotate(180deg);
+}
+
+.toggle-button:hover {
+  opacity: var(--state-hover-opacity, 0.8);
+}
+
+.toggle-button:active {
+  opacity: var(--state-active-opacity, 0.6);
+}
+
+.icon {
+  color: inherit;
+}
+</style>
