@@ -42,6 +42,7 @@
       :destination-account-id="destinationAccount"
       :bookId="selectedBook"
       :showDistributionToggle="showDistributionToggle"
+      :isDistributionVisible="isSliderVisible"
       @update:destination-account-id="handleDestinationAccountChange"
       @toggle-distribution="toggleDistributionVisibility"
     />

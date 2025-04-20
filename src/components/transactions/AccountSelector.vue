@@ -35,12 +35,13 @@
       <div 
         v-if="showDistributionToggle" 
         class="distribution-toggle"
+        :class="{ 'active': isDistributionVisible }"
         @click="toggleDistribution"
       >
         <component 
           :is="getTablerIcon('IconChartPie')" 
           size="16" 
-          color="#949496" 
+          :color="isDistributionVisible ? (selectedAccount.color || '#5B8FF9') : '#949496'" 
           stroke-width="1.5"
         />
       </div>
@@ -134,6 +135,10 @@ const props = defineProps({
     default: ''
   },
   showDistributionToggle: { // Новый проп для отображения иконки управления слайдером
+    type: Boolean,
+    default: false
+  },
+  isDistributionVisible: { // Новый проп для отслеживания состояния видимости слайдера
     type: Boolean,
     default: false
   }
@@ -297,6 +302,9 @@ const toggleDistribution = () => {
   height: 100%;
   width: auto;
   gap: 8px; /* Пространство между селектором аккаунта и иконкой распределения */
+  background-color: var(--bg-light, #949496);
+  border-radius: var(--border-radius-lg, 28px);
+  padding: 0 2px 0 0px;
 }
 
 .account-section {
@@ -327,6 +335,13 @@ const toggleDistribution = () => {
 
 .distribution-toggle:hover {
   opacity: 0.8;
+}
+
+/* Активное состояние кнопки распределения (когда слайдер видим) */
+.distribution-toggle.active {
+  background: #46484A; /* Оставляем фон серым */
+  opacity: 1;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
 }
 
 /* For transfers (two accounts) */
