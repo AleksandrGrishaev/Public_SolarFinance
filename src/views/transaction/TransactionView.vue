@@ -107,6 +107,8 @@ import { useCurrency } from './composables';
 import { useAccountStore } from '../../stores/account';
 import { useTransactionStore } from '../../stores/transaction';
 import { useUserStore } from '../../stores/user';
+import { useBookStore } from '../../stores/book';
+import { useCurrencyStore } from '../../stores/currency';
 import { messageService } from '../../services/system/MessageService';
 
 // Определяем события для emit
@@ -122,6 +124,8 @@ const isSaving = ref(false);
 const accountStore = useAccountStore();
 const transactionStore = useTransactionStore();
 const userStore = useUserStore();
+const bookStore = useBookStore();
+const currencyStore = useCurrencyStore();
 
 // Инициализируем основной хук, но не деструктурируем методы, которые будем переопределять
 const transactionState = useTransaction(emit);
