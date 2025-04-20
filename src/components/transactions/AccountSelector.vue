@@ -2,28 +2,47 @@
 <template>
   <div class="account-element">
     <!-- For regular transactions (not transfer) -->
-    <div v-if="!isTransfer" class="single-account" @click="showAccountSelector('source')">
-      <div class="account-icon" :style="{ backgroundColor: selectedAccount.color || '#5B8FF9' }">
-        <!-- Если есть иконка, рендерим её -->
+    <div v-if="!isTransfer" class="single-account">
+      <div 
+        class="account-section"
+        @click="showAccountSelector('source')"
+      >
+        <div class="account-icon" :style="{ backgroundColor: selectedAccount.color || '#5B8FF9' }">
+          <!-- Если есть иконка, рендерим её -->
+          <component 
+            v-if="selectedAccount.icon && getTablerIcon(selectedAccount.icon)" 
+            :is="getTablerIcon(selectedAccount.icon)" 
+            size="14" 
+            color="white" 
+            stroke-width="1.5"
+          />
+          <!-- Иначе используем символ валюты -->
+          <template v-else>
+            {{ selectedAccount.symbol || getCurrencySymbol(selectedAccount.currency) }}
+          </template>
+        </div>
+        <div class="account-name">
+          {{ truncateName(selectedAccount.name) }}
+        </div>
+        <div class="choose-button">
+          <svg width="9" height="6" viewBox="0 0 9 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3.9047 6.11346L3.97424 6.25H4.12747H4.87281H5.02604L5.09558 6.11346L8.15148 0.113461L8.3366 -0.25L7.92871 -0.25L6.73616 -0.25L6.57911 -0.25L6.51094 -0.108509L4.50014 4.06517L2.48934 -0.108509L2.42117 -0.25L2.26411 -0.25L1.07157 -0.25L0.66368 -0.25L0.848797 0.113461L3.9047 6.11346Z" fill="#949496" stroke="#949496" stroke-width="0.5"/>
+          </svg>
+        </div>
+      </div>
+      
+      <!-- Иконка для управления слайдером (показана только если showDistributionToggle = true) -->
+      <div 
+        v-if="showDistributionToggle" 
+        class="distribution-toggle"
+        @click="toggleDistribution"
+      >
         <component 
-          v-if="selectedAccount.icon && getTablerIcon(selectedAccount.icon)" 
-          :is="getTablerIcon(selectedAccount.icon)" 
-          size="14" 
-          color="white" 
+          :is="getTablerIcon('IconChartPie')" 
+          size="16" 
+          color="#949496" 
           stroke-width="1.5"
         />
-        <!-- Иначе используем символ валюты -->
-        <template v-else>
-          {{ selectedAccount.symbol || getCurrencySymbol(selectedAccount.currency) }}
-        </template>
-      </div>
-      <div class="account-name">
-        {{ truncateName(selectedAccount.name) }}
-      </div>
-      <div class="choose-button">
-        <svg width="9" height="6" viewBox="0 0 9 6" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M3.9047 6.11346L3.97424 6.25H4.12747H4.87281H5.02604L5.09558 6.11346L8.15148 0.113461L8.3366 -0.25L7.92871 -0.25L6.73616 -0.25L6.57911 -0.25L6.51094 -0.108509L4.50014 4.06517L2.48934 -0.108509L2.42117 -0.25L2.26411 -0.25L1.07157 -0.25L0.66368 -0.25L0.848797 0.113461L3.9047 6.11346Z" fill="#949496" stroke="#949496" stroke-width="0.5"/>
-        </svg>
       </div>
     </div>
     
@@ -113,10 +132,20 @@ const props = defineProps({
   bookId: {  // Добавляем prop для передачи ID книги
     type: String,
     default: ''
+  },
+  showDistributionToggle: { // Новый проп для отображения иконки управления слайдером
+    type: Boolean,
+    default: false
   }
 });
 
-const emit = defineEmits(['update:modelValue', 'update:destinationAccountId', 'add', 'edit']);
+const emit = defineEmits([
+  'update:modelValue', 
+  'update:destinationAccountId', 
+  'add', 
+  'edit',
+  'toggle-distribution' // Новое событие для управления отображением слайдера
+]);
 
 const accountSelectorVisible = ref(false);
 const selectionMode = ref('source'); // 'source' or 'destination'
@@ -244,6 +273,11 @@ const handleEditAccounts = () => {
   emit('edit');
   accountSelectorVisible.value = false;
 };
+
+// Обработчик переключения отображения слайдера распределения
+const toggleDistribution = () => {
+  emit('toggle-distribution');
+};
 </script>
 
 <style scoped>
@@ -258,6 +292,14 @@ const handleEditAccounts = () => {
 
 /* For regular transactions (single account) */
 .single-account {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  width: auto;
+  gap: 8px; /* Пространство между селектором аккаунта и иконкой распределения */
+}
+
+.account-section {
   padding: 6px 14px;
   background: #46484A;
   border-radius: 28px;
@@ -267,8 +309,24 @@ const handleEditAccounts = () => {
   height: 100%;
   min-width: 50px;
   max-width: 200px;
-  width: auto; /* Change from 100% to auto to size based on content */
   cursor: pointer;
+}
+
+/* Стиль для иконки переключения слайдера */
+.distribution-toggle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #46484A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.distribution-toggle:hover {
+  opacity: 0.8;
 }
 
 /* For transfers (two accounts) */

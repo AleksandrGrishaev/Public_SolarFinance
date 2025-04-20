@@ -36,22 +36,24 @@
         
         <!-- Используем фильтрованные счета на основе выбранной книги и передаем ID книги -->
         <account-selector 
-          :accounts="filteredAccounts" 
-          v-model="selectedAccount"
-          :is-transfer="selectedType === 'transfer'"
-          :destination-account-id="destinationAccount"
-          :bookId="selectedBook"
-          @update:destination-account-id="handleDestinationAccountChange"
-        />
+      :accounts="filteredAccounts" 
+      v-model="selectedAccount"
+      :is-transfer="selectedType === 'transfer'"
+      :destination-account-id="destinationAccount"
+      :bookId="selectedBook"
+      :showDistributionToggle="showDistributionToggle"
+      @update:destination-account-id="handleDestinationAccountChange"
+      @toggle-distribution="toggleDistributionVisibility"
+    />
         
         <!-- Слайдер отображается только если есть правила распределения в книге и это не перевод -->
         <percentage-slider 
-          :owners="distributionOwners" 
-          v-model="distributionPercentage"
-          :total-amount="parseFloat(amount) || 0"
-          :currency="sourceCurrencySymbol"
-          :class="{ 'invisible': !shouldShowDistribution }"
-        />
+      :owners="distributionOwners" 
+      v-model="distributionPercentage"
+      :total-amount="parseFloat(amount) || 0"
+      :currency="sourceCurrencySymbol"
+      :class="{ 'invisible': !isSliderVisible }"
+    />
       </div>
       
       <div class="keypad-container">
@@ -110,6 +112,8 @@ import { useUserStore } from '../../stores/user';
 import { useBookStore } from '../../stores/book';
 import { useCurrencyStore } from '../../stores/currency';
 import { messageService } from '../../services/system/MessageService';
+import { useDistributionControl } from './composables/useDistributionControl';
+
 
 // Определяем события для emit
 const emit = defineEmits(['update:showMenu']);
@@ -129,6 +133,9 @@ const currencyStore = useCurrencyStore();
 
 // Инициализируем основной хук, но не деструктурируем методы, которые будем переопределять
 const transactionState = useTransaction(emit);
+
+
+
 // Деструктурируем только нужные переменные и методы
 const {
   // State
@@ -172,6 +179,13 @@ const {
   convertedAmount,
   initCurrencyStore
 } = useCurrency(selectedAccount, destinationAccount, selectedType, amount);
+
+// Работа со слайдером
+const {
+  isSliderVisible,
+  showDistributionToggle,
+  toggleDistributionVisibility
+} = useDistributionControl(shouldShowDistribution, selectedType);
 
 // Обработчик изменения аккаунта назначения
 const handleDestinationAccountChange = (accountId: string) => {
