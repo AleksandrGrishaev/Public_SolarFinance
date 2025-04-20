@@ -94,15 +94,14 @@
 
 <script setup lang="ts">
 import { onMounted, watch, ref, computed } from 'vue';
-import BookSelector from '../../components/transactions/BookSelector.vue';
-// Импортируем новый TransactionTypeSelector из директории components
+import BookSelector from './components/BookSelector.vue';
 import TransactionTypeSelector from './components/TransactionTypeSelector.vue';
-import AccountSelector from '../../components/transactions/AccountSelector.vue';
-import PercentageSlider from '../../components/transactions/PercentageSlider.vue';
-import NumberKeypad from '../../components/transactions/NumberKeypad.vue';
+import AccountSelector from './components/AccountSelector.vue';
+import PercentageSlider from './components/PercentageSlider.vue';
+import NumberKeypad from './components/NumberKeypad.vue';
 import CategorySelector from '../../components/categories/CategorySelector.vue';
 import CategoryListPopup from '../../components/categories/CategoryListPopup.vue';
-import AmountSection from '../../components/transactions/AmountSection.vue';
+import AmountSection from './components/AmountSection.vue';
 
 // Импортируем хуки и сервисы
 import { useTransaction } from './composables/useTransaction.ts';

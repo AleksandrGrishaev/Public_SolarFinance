@@ -25,8 +25,8 @@
 
 <script setup lang="ts">
 import { computed, onMounted, watch } from 'vue';
-import { useBookStore } from '../../stores/book';
-import { useUserStore } from '../../stores/user';
+import { useBookStore } from '../../../stores/book';
+import { useUserStore } from '../../../stores/user';
 
 const props = defineProps({
   books: {

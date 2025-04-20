@@ -1,10 +1,10 @@
 # Details
 
-Date : 2025-04-20 11:51:48
+Date : 2025-04-20 23:26:28
 
 Directory /Users/peaker/dev/solar-finance/src
 
-Total : 156 files,  23035 codes, 1773 comments, 3678 blanks, all 28486 lines
+Total : 161 files,  24377 codes, 1822 comments, 3947 blanks, all 30146 lines
 
 [Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
@@ -15,6 +15,7 @@ Total : 156 files,  23035 codes, 1773 comments, 3678 blanks, all 28486 lines
 | [src/about/Description.md](/src/about/Description.md) | Markdown | 58 | 0 | 28 | 86 |
 | [src/about/WorkFlow/BaseStores.md](/src/about/WorkFlow/BaseStores.md) | Markdown | 169 | 0 | 52 | 221 |
 | [src/about/WorkFlow/BookView.md](/src/about/WorkFlow/BookView.md) | Markdown | 77 | 0 | 47 | 124 |
+| [src/about/WorkFlow/DistributionRules.md](/src/about/WorkFlow/DistributionRules.md) | Markdown | 606 | 0 | 140 | 746 |
 | [src/about/WorkFlow/MainPlan.md](/src/about/WorkFlow/MainPlan.md) | Markdown | 468 | 0 | 151 | 619 |
 | [src/about/WorkFlow/Mock.md](/src/about/WorkFlow/Mock.md) | Markdown | 1,306 | 0 | 68 | 1,374 |
 | [src/about/main.md](/src/about/main.md) | Markdown | 653 | 0 | 121 | 774 |
@@ -31,12 +32,10 @@ Total : 156 files,  23035 codes, 1773 comments, 3678 blanks, all 28486 lines
 | [src/components/categories/view/CategoryTransactionsList.vue](/src/components/categories/view/CategoryTransactionsList.vue) | Vue | 150 | 3 | 18 | 171 |
 | [src/components/navigation/NavMenu.vue](/src/components/navigation/NavMenu.vue) | Vue | 118 | 1 | 7 | 126 |
 | [src/components/system/MessageProvider.vue](/src/components/system/MessageProvider.vue) | Vue | 11 | 0 | 3 | 14 |
-| [src/components/transactions/AccountSelector.vue](/src/components/transactions/AccountSelector.vue) | Vue | 294 | 10 | 37 | 341 |
 | [src/components/transactions/AmountSection.vue](/src/components/transactions/AmountSection.vue) | Vue | 190 | 5 | 24 | 219 |
 | [src/components/transactions/BookSelector.vue](/src/components/transactions/BookSelector.vue) | Vue | 135 | 1 | 19 | 155 |
 | [src/components/transactions/NumberKeypad.vue](/src/components/transactions/NumberKeypad.vue) | Vue | 147 | 1 | 17 | 165 |
 | [src/components/transactions/PercentageSlider.vue](/src/components/transactions/PercentageSlider.vue) | Vue | 57 | 3 | 8 | 68 |
-| [src/components/transactions/TransactionTypeSelector.vue](/src/components/transactions/TransactionTypeSelector.vue) | Vue | 82 | 1 | 11 | 94 |
 | [src/components/transactions/ViewTransaction/TransactionDateGroup.vue](/src/components/transactions/ViewTransaction/TransactionDateGroup.vue) | Vue | 46 | 1 | 7 | 54 |
 | [src/components/transactions/ViewTransaction/TransactionItem.vue](/src/components/transactions/ViewTransaction/TransactionItem.vue) | Vue | 88 | 1 | 6 | 95 |
 | [src/components/ui/BasePopup.vue](/src/components/ui/BasePopup.vue) | Vue | 206 | 7 | 25 | 238 |
@@ -55,6 +54,8 @@ Total : 156 files,  23035 codes, 1773 comments, 3678 blanks, all 28486 lines
 | [src/components/ui/inputs/ToggleButtonGroup.vue](/src/components/ui/inputs/ToggleButtonGroup.vue) | Vue | 68 | 1 | 8 | 77 |
 | [src/components/ui/inputs/ToggleSwitch.vue](/src/components/ui/inputs/ToggleSwitch.vue) | Vue | 80 | 1 | 8 | 89 |
 | [src/components/ui/lists/ListItemWithToggle.vue](/src/components/ui/lists/ListItemWithToggle.vue) | Vue | 149 | 6 | 20 | 175 |
+| [src/components/ui/selectors/BaseAccountSelector.vue](/src/components/ui/selectors/BaseAccountSelector.vue) | Vue | 244 | 11 | 21 | 276 |
+| [src/components/ui/selectors/BaseTransactionSelector.vue](/src/components/ui/selectors/BaseTransactionSelector.vue) | Vue | 388 | 5 | 72 | 465 |
 | [src/components/ui/selectors/BookSelector.vue](/src/components/ui/selectors/BookSelector.vue) | Vue | 211 | 4 | 30 | 245 |
 | [src/components/ui/selectors/BooksFilter.vue](/src/components/ui/selectors/BooksFilter.vue) | Vue | 241 | 3 | 40 | 284 |
 | [src/components/ui/selectors/CurrencySelector.vue](/src/components/ui/selectors/CurrencySelector.vue) | Vue | 69 | 1 | 11 | 81 |
@@ -70,6 +71,7 @@ Total : 156 files,  23035 codes, 1773 comments, 3678 blanks, all 28486 lines
 | [src/composables/ui/useGridLayoutTypes.ts](/src/composables/ui/useGridLayoutTypes.ts) | TypeScript | 34 | 1 | 6 | 41 |
 | [src/composables/ui/useTruncateText.ts](/src/composables/ui/useTruncateText.ts) | TypeScript | 65 | 49 | 16 | 130 |
 | [src/composables/useDateFilter.ts](/src/composables/useDateFilter.ts) | TypeScript | 382 | 69 | 83 | 534 |
+| [src/constants/transactionTypes.ts](/src/constants/transactionTypes.ts) | TypeScript | 26 | 6 | 6 | 38 |
 | [src/data/categories.ts](/src/data/categories.ts) | TypeScript | 110 | 11 | 26 | 147 |
 | [src/layouts/ConsoleLayout.vue](/src/layouts/ConsoleLayout.vue) | Vue | 70 | 3 | 9 | 82 |
 | [src/layouts/EmptyLayout.vue](/src/layouts/EmptyLayout.vue) | Vue | 15 | 0 | 2 | 17 |
@@ -159,12 +161,15 @@ Total : 156 files,  23035 codes, 1773 comments, 3678 blanks, all 28486 lines
 | [src/views/book/popup/NewBookPopup.vue](/src/views/book/popup/NewBookPopup.vue) | Vue | 30 | 1 | 5 | 36 |
 | [src/views/currency/popup/CurrencyPopup.vue](/src/views/currency/popup/CurrencyPopup.vue) | Vue | 162 | 3 | 25 | 190 |
 | [src/views/icon/popup/IconSelectorPopup.vue](/src/views/icon/popup/IconSelectorPopup.vue) | Vue | 361 | 6 | 52 | 419 |
-| [src/views/transaction/TransactionView.vue](/src/views/transaction/TransactionView.vue) | Vue | 549 | 7 | 83 | 639 |
+| [src/views/transaction/TransactionView.vue](/src/views/transaction/TransactionView.vue) | Vue | 568 | 8 | 90 | 666 |
+| [src/views/transaction/components/AccountSelector.vue](/src/views/transaction/components/AccountSelector.vue) | Vue | 195 | 2 | 29 | 226 |
+| [src/views/transaction/components/TransactionTypeSelector.vue](/src/views/transaction/components/TransactionTypeSelector.vue) | Vue | 173 | 3 | 26 | 202 |
 | [src/views/transaction/composables/index.ts](/src/views/transaction/composables/index.ts) | TypeScript | 6 | 2 | 1 | 9 |
 | [src/views/transaction/composables/useAccount.ts](/src/views/transaction/composables/useAccount.ts) | TypeScript | 132 | 37 | 27 | 196 |
 | [src/views/transaction/composables/useCategory.ts](/src/views/transaction/composables/useCategory.ts) | TypeScript | 74 | 22 | 17 | 113 |
 | [src/views/transaction/composables/useCurrency.ts](/src/views/transaction/composables/useCurrency.ts) | TypeScript | 148 | 48 | 34 | 230 |
 | [src/views/transaction/composables/useDistribution.ts](/src/views/transaction/composables/useDistribution.ts) | TypeScript | 53 | 17 | 11 | 81 |
+| [src/views/transaction/composables/useDistributionControl.ts](/src/views/transaction/composables/useDistributionControl.ts) | TypeScript | 67 | 32 | 16 | 115 |
 | [src/views/transaction/composables/useKeypad.ts](/src/views/transaction/composables/useKeypad.ts) | TypeScript | 38 | 22 | 7 | 67 |
 | [src/views/transaction/composables/useTransaction.ts](/src/views/transaction/composables/useTransaction.ts) | TypeScript | 139 | 27 | 27 | 193 |
 

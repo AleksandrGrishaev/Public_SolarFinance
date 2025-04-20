@@ -1,51 +1,52 @@
 # Summary
 
-Date : 2025-04-20 11:51:48
+Date : 2025-04-20 23:26:28
 
 Directory /Users/peaker/dev/solar-finance/src
 
-Total : 156 files,  23035 codes, 1773 comments, 3678 blanks, all 28486 lines
+Total : 161 files,  24377 codes, 1822 comments, 3947 blanks, all 30146 lines
 
 Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
 ## Languages
 | language | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| Vue | 75 | 13,425 | 288 | 1,934 | 15,647 |
-| TypeScript | 67 | 6,377 | 1,404 | 1,158 | 8,939 |
-| Markdown | 6 | 2,731 | 0 | 467 | 3,198 |
+| Vue | 77 | 14,068 | 299 | 2,041 | 16,408 |
+| TypeScript | 69 | 6,470 | 1,442 | 1,180 | 9,092 |
+| Markdown | 7 | 3,337 | 0 | 607 | 3,944 |
 | SCSS | 8 | 502 | 81 | 119 | 702 |
 
 ## Directories
 | path | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| . | 156 | 23,035 | 1,773 | 3,678 | 28,486 |
+| . | 161 | 24,377 | 1,822 | 3,947 | 30,146 |
 | . (Files) | 2 | 65 | 9 | 10 | 84 |
-| about | 6 | 2,731 | 0 | 467 | 3,198 |
+| about | 7 | 3,337 | 0 | 607 | 3,944 |
 | about (Files) | 2 | 711 | 0 | 149 | 860 |
-| about/WorkFlow | 4 | 2,020 | 0 | 318 | 2,338 |
-| components | 45 | 7,353 | 159 | 1,028 | 8,540 |
+| about/WorkFlow | 5 | 2,626 | 0 | 458 | 3,084 |
+| components | 45 | 7,609 | 164 | 1,073 | 8,846 |
 | components/categories | 11 | 2,540 | 62 | 388 | 2,990 |
 | components/categories (Files) | 9 | 2,305 | 57 | 357 | 2,719 |
 | components/categories/view | 2 | 235 | 5 | 31 | 271 |
 | components/navigation | 1 | 118 | 1 | 7 | 126 |
 | components/system | 1 | 11 | 0 | 3 | 14 |
-| components/transactions | 8 | 1,039 | 23 | 129 | 1,191 |
-| components/transactions (Files) | 6 | 905 | 21 | 116 | 1,042 |
+| components/transactions | 6 | 663 | 12 | 81 | 756 |
+| components/transactions (Files) | 4 | 529 | 10 | 68 | 607 |
 | components/transactions/ViewTransaction | 2 | 134 | 2 | 13 | 149 |
-| components/ui | 24 | 3,645 | 73 | 501 | 4,219 |
+| components/ui | 26 | 4,277 | 89 | 594 | 4,960 |
 | components/ui (Files) | 2 | 260 | 8 | 32 | 300 |
 | components/ui/buttons | 1 | 53 | 1 | 6 | 60 |
 | components/ui/filters | 1 | 503 | 14 | 73 | 590 |
 | components/ui/icons | 4 | 397 | 6 | 53 | 456 |
 | components/ui/inputs | 7 | 641 | 8 | 92 | 741 |
 | components/ui/lists | 1 | 149 | 6 | 20 | 175 |
-| components/ui/selectors | 4 | 665 | 11 | 96 | 772 |
+| components/ui/selectors | 6 | 1,297 | 27 | 189 | 1,513 |
 | components/ui/views | 4 | 977 | 19 | 129 | 1,125 |
 | composables | 7 | 775 | 194 | 170 | 1,139 |
 | composables (Files) | 1 | 382 | 69 | 83 | 534 |
 | composables/transaction | 1 | 126 | 42 | 25 | 193 |
 | composables/ui | 5 | 267 | 83 | 62 | 412 |
+| constants | 1 | 26 | 6 | 6 | 38 |
 | data | 1 | 110 | 11 | 26 | 147 |
 | layouts | 3 | 148 | 4 | 21 | 173 |
 | router | 1 | 139 | 16 | 10 | 165 |
@@ -68,7 +69,7 @@ Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-
 | styles/components | 2 | 167 | 17 | 28 | 212 |
 | styles/themes | 4 | 240 | 49 | 70 | 359 |
 | types | 1 | 5 | 0 | 0 | 5 |
-| views | 41 | 7,436 | 513 | 1,231 | 9,180 |
+| views | 44 | 7,890 | 551 | 1,309 | 9,750 |
 | views (Files) | 6 | 1,555 | 26 | 176 | 1,757 |
 | views/account | 9 | 2,279 | 122 | 380 | 2,781 |
 | views/account/popup | 9 | 2,279 | 122 | 380 | 2,781 |
@@ -85,8 +86,9 @@ Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-
 | views/currency/popup | 1 | 162 | 3 | 25 | 190 |
 | views/icon | 1 | 361 | 6 | 52 | 419 |
 | views/icon/popup | 1 | 361 | 6 | 52 | 419 |
-| views/transaction | 8 | 1,139 | 182 | 207 | 1,528 |
-| views/transaction (Files) | 1 | 549 | 7 | 83 | 639 |
-| views/transaction/composables | 7 | 590 | 175 | 124 | 889 |
+| views/transaction | 11 | 1,593 | 220 | 285 | 2,098 |
+| views/transaction (Files) | 1 | 568 | 8 | 90 | 666 |
+| views/transaction/components | 2 | 368 | 5 | 55 | 428 |
+| views/transaction/composables | 8 | 657 | 207 | 140 | 1,004 |
 
 Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-details.md)

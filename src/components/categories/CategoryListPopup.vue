@@ -126,7 +126,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import BasePopup from '../ui/BasePopup.vue';
-import BookSelector from '../transactions/BookSelector.vue';
+import BookSelector from "../../views/transaction/components/BookSelector.vue";
 import TransactionTypeSelector from '../../views/transaction/components/TransactionTypeSelector.vue';
 import CategoryIcon from './CategoryIcon.vue';
 import CategoryItem from './CategoryItem.vue';
