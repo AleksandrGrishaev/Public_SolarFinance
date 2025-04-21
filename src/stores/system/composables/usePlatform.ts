@@ -1,5 +1,5 @@
 // src/stores/system/composables/usePlatform.ts
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useSystemStore } from '../systemStore';
 
 /**
@@ -14,8 +14,29 @@ export function usePlatform() {
     if (!systemStore.isMobile && !systemStore.isNativePlatform) {
       systemStore.detectPlatform();
       systemStore.calculateSafeArea();
+      systemStore.updateViewport();
     }
+    
+    // Setup resize listeners if not already setup
+    systemStore.setupViewportListeners();
   });
+  
+  // Clean up event listeners when component is unmounted
+  onBeforeUnmount(() => {
+    systemStore.cleanupListeners();
+  });
+  
+  // Watch for viewport changes
+  watch(
+    () => systemStore.viewport,
+    (newViewport) => {
+      // Выводим в консоль только когда меняется ориентация
+      if (newViewport.orientation !== 'portrait' && newViewport.orientation !== 'landscape') {
+        console.log('[usePlatform] Viewport changed:', newViewport);
+      }
+    },
+    { deep: true }
+  );
 
   return {
     // Platform information
@@ -27,6 +48,9 @@ export function usePlatform() {
     
     // Safe area insets
     safeAreaInsets: computed(() => systemStore.safeAreaInsets),
+    
+    // Viewport information
+    viewport: computed(() => systemStore.viewport),
     
     // Keyboard information
     keyboard: computed(() => systemStore.keyboard),
@@ -41,6 +65,9 @@ export function usePlatform() {
           ? `${systemStore.keyboard.height}px` 
           : `${systemStore.safeAreaInsets.bottom}px`
       };
-    })
+    }),
+    
+    // Print system information to console
+    printSystemInfo: () => systemStore.printSystemInfo()
   };
 }

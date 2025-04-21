@@ -49,6 +49,9 @@ export class AppInitService {
       systemStore.initialize();
       console.log('[AppInitService] System store initialized, platform:', systemStore.platform);
       
+      // Не нужно дублировать вывод информации о системе, 
+      // так как она уже выводится в systemStore.initialize()
+      
       // Инициализация хранилища валют
       const currencyStore = useCurrencyStore();
       await currencyStore.init();
