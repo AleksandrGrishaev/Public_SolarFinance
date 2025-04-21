@@ -5,7 +5,8 @@
         <n-notification-provider>
           <n-message-provider>
             <message-provider>
-              <div class="app-container" :class="{ 'dark-theme': themeStore.isDark }">
+              <!-- Оставляем div без класса темы - теперь это управляется через document.documentElement -->
+              <div class="app-container">
                 <router-view v-slot="{ Component }">
                   <transition name="fade" mode="out-in">
                     <component :is="Component" />
@@ -31,6 +32,7 @@ import {
 } from 'naive-ui';
 import { useThemeStore } from './stores/theme';
 import MessageProvider from './components/system/MessageProvider.vue';
+
 // Получение хранилища темы
 const themeStore = useThemeStore();
 </script>

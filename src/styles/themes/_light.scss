@@ -1,0 +1,52 @@
+// src/styles/themes/_light.scss
+
+// Полная конфигурация светлой темы
+// Создана на основе _dark.scss с обратными цветами
+
+.light-theme {
+    // Text colors
+    --text-header: #333333;     // TextHeader - темный
+    --text-usual: #333333;      // TextUsual - основной темный текст
+    --text-subheader: #666666;  // TextSubHeader - серый
+    --text-grey: #777777;       // TextGrey - серый
+    --text-inactive: #999999;   // TextInActive - светло-серый
+    --text-contrast: #FFFFFF;   // TextContrast - белый (для контраста на темном фоне)
+  
+    // Main colors
+    --color-primary: #FFB800;   // ColorPrimary - более насыщенный желтый
+    --color-warning: #D32F2F;   // ColorWarning - яркий красный
+    --color-success: #2E7D32;   // ColorSuccess - темно-зеленый
+  
+    // Background colors
+    --bg-contrast: #E0E0E0;     // BgContrast - светло-серый
+    --bg-light: #F0F0F0;        // BgLight - очень светлый серый
+    --bg-main: #FFFFFF;         // BgMain - белый основной фон
+    --bg-superlight: #F8F9FA;   // BgContainer - почти белый фон
+    
+    // Фоновые цвета компонентов
+    --bg-screen: #FFFFFF;       // Белый фон экрана
+    --bg-popup: #FFFFFF;        // Фон для попапов
+    --bg-field-light: #F0F0F0;  // Светлый фон для полей
+    --bg-field-dark: #E0E0E0;   // Чуть темнее фон для полей
+    --bg-dropdown: #FFFFFF;     // Фон для выпадающих меню
+    --bg-item-selected: #FFB800;   // Фон для выбранных элементов - желтый (primary)
+    --bg-item-unselected: #F0F0F0; // Фон для невыбранных элементов - светлый
+  
+    // Other colors
+    --status-online: #2E7D32;   // StatusOnline - зеленый
+    --status-offline: #D32F2F;  // StatusOffline - красный
+    
+    // Базовые переменные приложения
+    --app-background: var(--bg-screen);
+    --text-primary: var(--text-usual);
+    --text-secondary: var(--text-grey);
+    --border-color: #E0E0E0;    // Светлая рамка
+    
+    // Дополнительные настройки для светлой темы
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --input-placeholder-color: rgba(0, 0, 0, 0.35);
+    
+    // Специфичные настройки компонентов для светлой темы
+    --scrollbar-track: #F8F9FA;
+    --scrollbar-thumb: #D0D0D0;
+  }

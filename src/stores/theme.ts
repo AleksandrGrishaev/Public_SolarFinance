@@ -1,3 +1,4 @@
+// src/stores/theme.ts 
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useUserStore } from '../stores/user'
@@ -45,10 +46,14 @@ export const useThemeStore = defineStore('theme', () => {
   
   // Вспомогательная функция для применения темы
   const applyTheme = () => {
+    // Удаляем все классы тем
+    document.documentElement.classList.remove('dark-theme', 'light-theme')
+    
+    // Применяем нужный класс
     if (isDark.value) {
       document.documentElement.classList.add('dark-theme')
     } else {
-      document.documentElement.classList.remove('dark-theme')
+      document.documentElement.classList.add('light-theme')
     }
   }
   
@@ -86,6 +91,7 @@ export const useThemeStore = defineStore('theme', () => {
     toggleTheme,
     setDarkTheme,
     setLightTheme,
-    initTheme
+    initTheme,
+    applyTheme  // Добавили applyTheme в возвращаемый объект, чтобы сделать его публичным
   }
 })

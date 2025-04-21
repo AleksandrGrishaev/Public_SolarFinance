@@ -1,14 +1,52 @@
 // src/styles/themes/_dark.scss
 
-// Конфигурация темной темы
+// Полная конфигурация темной темы
+// Переменные, перенесенные из _colors.scss
 
 .dark-theme {
-    // Базовые переменные приложения
-    --app-background: var(--bg-main);
-    --text-primary: var(--text-usual);
-    --text-secondary: var(--text-grey);
-    --border-color: #444444;
-    
-    // Если нужны специфичные для темной темы настройки,
-    // их можно добавить здесь
-  }
+  // Text colors
+  --text-header: #FFFFFF;     // TextHeader - белый
+  --text-usual: #F5F5F5;      // TextUsual - почти белый
+  --text-subheader: #444444;  // TextSubHeader - светло-серый
+  --text-grey: #949496;       // TextGrey - серый
+  --text-inactive: #DBDADD;   // TextInActive - темно-серый
+  --text-contrast: #FFFFFF;   // TextContrast - белый (для контрастного текста)
+
+  // Main colors
+  --color-primary: #FFD452;   // ColorPrimary - желтый
+  --color-warning: #A44942;   // ColorWarning - красный
+  --color-success: #53B794;   // ColorSuccess - зеленый
+
+  // Background colors
+  --bg-contrast: #404040;     // BgContrast - темно-серый
+  --bg-light: #949496;        // BgLight - серый
+  --bg-main: #333333;         // BgMain - основной темно-серый фон
+  --bg-superlight: #F7F9F8;   // BgContainer - светло-серый фон
+  
+  // Фоновые цвета компонентов
+  --bg-screen: #000000;       // Черный фон экрана
+  --bg-popup: #404040;        // Фон для попапов
+  --bg-field-light: #949496;  // Светлый фон для полей
+  --bg-field-dark: #46484A;   // Темный фон для полей
+  --bg-dropdown: #444444;     // Фон для выпадающих меню
+  --bg-item-selected: #000000;   // Фон для выбранных элементов
+  --bg-item-unselected: #949496; // Фон для невыбранных элементов
+
+  // Other colors
+  --status-online: #53B794;   // StatusOnline - зеленый
+  --status-offline: #FF5252;  // StatusOffline - красный
+  
+  // Базовые переменные приложения
+  --app-background: var(--bg-screen);
+  --text-primary: var(--text-usual);
+  --text-secondary: var(--text-grey);
+  --border-color: #444444;
+  
+  // Дополнительные настройки для темной темы
+  --shadow-color: rgba(0, 0, 0, 0.35);
+  --input-placeholder-color: rgba(255, 255, 255, 0.4);
+  
+  // Специфичные настройки компонентов для темной темы
+  --scrollbar-track: #2D2D2D;
+  --scrollbar-thumb: #494949;
+}
