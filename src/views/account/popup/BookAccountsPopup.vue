@@ -85,7 +85,7 @@ import BasePopup from '../../../components/ui/BasePopup.vue';
 import ListItemWithToggle from '../../../components/ui/lists/ListItemWithToggle.vue';
 import BookSelector from '../../../components/ui/selectors/BookSelector.vue';
 import CreateActionButton from '../../../components/ui/buttons/CreateActionButton.vue';
-import AccountIcon from '../../../components/ui/icons/AccountIcon.vue';
+import AccountIcon from './components/AccountIcon.vue';
 import { IconPlus } from '@tabler/icons-vue';
 import { useFormatBalance } from '../../../composables/transaction/useFormatBalance';
 import AccountAddPopup from './AccountAddPopup.vue';
