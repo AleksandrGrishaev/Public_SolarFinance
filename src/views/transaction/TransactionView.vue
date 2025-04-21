@@ -93,7 +93,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, watch, ref, computed } from 'vue';
+import { onMounted, watch, ref, computed, onBeforeMount } from 'vue';
 import BookSelector from './components/BookSelector.vue';
 import TransactionTypeSelector from './components/TransactionTypeSelector.vue';
 import AccountSelector from './components/AccountSelector.vue';
@@ -114,10 +114,15 @@ import { useBookStore } from '../../stores/book';
 import { useCurrencyStore } from '../../stores/currency';
 import { messageService } from '../../services/system/MessageService';
 import { useDistributionControl } from './composables/useDistributionControl';
+import { useRouter } from 'vue-router';
+
 
 
 // Определяем события для emit
-const emit = defineEmits(['update:showMenu']);
+const emit = defineEmits(['update:showMenu', 'update:header']);
+
+// Добавить router
+const router = useRouter();
 
 // Состояние для управления вводом суммы
 const isSourceAmountActive = ref(true);
@@ -187,6 +192,26 @@ const {
   showDistributionToggle,
   toggleDistributionVisibility
 } = useDistributionControl(shouldShowDistribution, selectedType);
+
+
+// Добавить функцию обновления заголовка
+const updateHeaderConfig = () => {
+  emit('update:header', {
+    show: true,
+    title: '', // Пустой title
+    showBack: true,
+    hasNotifications: true,
+    showMessageIcon: true,
+  });
+};
+
+// Добавить в onBeforeMount
+onBeforeMount(() => {
+  updateHeaderConfig();
+  
+  // Настраиваем интерфейс для страницы транзакций
+  emit('update:showMenu', true);
+});
 
 // Обработчик изменения аккаунта назначения
 const handleDestinationAccountChange = (accountId: string) => {

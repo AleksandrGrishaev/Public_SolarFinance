@@ -21,8 +21,13 @@ const routes: Array<RouteRecordRaw> = [
     redirect: '/transaction',
     meta: {
       requiresAuth: true,
-      title: 'Home'
-    }
+      title: '',
+      header: {
+        show: true,
+        showBack: true,
+        showMessageIcon: false,
+        hasNotifications: false,
+    }}
   },
   {
     path: '/login',
@@ -76,7 +81,13 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/transaction/TransactionView.vue'),
         meta: {
           requiresAuth: true,
-          title: 'Add Transaction'
+          title: '',
+          header: {
+            show: true,
+            showBack: true,
+            showMessageIcon: false,
+            hasNotifications: true
+          }
         }
       }
     ]

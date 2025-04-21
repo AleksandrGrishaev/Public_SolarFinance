@@ -1,6 +1,10 @@
 <!-- src/components/navigation/AppTopHeader.vue -->
 <template>
-    <header class="app-top-header">
+    <header 
+      class="app-top-header" 
+      :class="{ 'with-safe-area': applySafeArea }"
+      :style="headerStyle"
+    >
       <div class="app-top-header__left">
         <BaseIcon 
           v-if="showBackButton"
@@ -10,18 +14,20 @@
           class="app-top-header__back-button"
           @click="handleBackClick"
         />
+        <slot name="left"></slot>
       </div>
-      <div class="app-top-header__title" v-if="title">
-        <h1 class="en-subheading text-usual">{{ title }}</h1>
-      </div>
+      <div class="app-top-header__title" v-if="title || $slots.title">
+  <h1 v-if="title" class="en-subheading text-usual">{{ title }}</h1>
+  <slot name="title"></slot>
+</div>
       <div class="app-top-header__right">
-        <div class="app-top-header__icon-container">
+        <slot name="pre-icons"></slot>
+        <div class="app-top-header__icon-container" v-if="showMessageIcon">
           <BaseIcon 
             :icon="IconMessage" 
-            size="lg" 
+            size="xl" 
             rounded="full"
-            class="app-top-header__icon app-top-header__icon--bg"
-            :customStyle="{ background: 'var(--bg-field-dark)' }"
+            class="app-top-header__icon"
             clickable
             @click="handleMessageClick"
           />
@@ -31,23 +37,26 @@
           ></div>
         </div>
         <BaseIcon 
+          v-if="showProfileIcon"
           :icon="IconUser" 
-          size="lg" 
+          size="xl" 
           rounded="full"
-          class="app-top-header__icon app-top-header__icon--bg"
-          :customStyle="{ background: 'var(--bg-field-dark)' }"
+          class="app-top-header__icon"
           clickable
           @click="handleProfileClick"
         />
+        <slot name="right"></slot>
       </div>
     </header>
   </template>
   
   <script setup lang="ts">
+  import { computed } from 'vue';
   import { IconArrowLeft, IconMessage, IconUser } from '@tabler/icons-vue';
   import BaseIcon from '@/components/ui/icons/BaseIcon.vue';
+  import { usePlatform } from '@/composables/usePlatform';
   
-  defineProps({
+  const props = defineProps({
     /**
      * Show back button
      */
@@ -68,10 +77,43 @@
     hasNotifications: {
       type: Boolean,
       default: false
+    },
+    /**
+     * Show message icon
+     */
+    showMessageIcon: {
+      type: Boolean,
+      default: true
+    },
+    /**
+     * Show profile icon
+     */
+    showProfileIcon: {
+      type: Boolean,
+      default: true
+    },
+    /**
+     * Apply platform-specific safe area (for mobile devices)
+     */
+    applySafeArea: {
+      type: Boolean,
+      default: true
     }
   });
   
   const emit = defineEmits(['back', 'message', 'profile']);
+  
+  // Platform detection
+  const { safeAreaInsets, platform } = usePlatform();
+  
+  // Compute dynamic style for header based on platform
+  const headerStyle = computed(() => {
+    if (!props.applySafeArea) return {};
+    
+    return {
+      paddingTop: `${safeAreaInsets.value.top}px`
+    };
+  });
   
   /**
    * Handle back button click
@@ -104,6 +146,11 @@
     justify-content: space-between;
     height: 34px;
     width: 100%;
+    background-color: transparent;
+  }
+  
+  .app-top-header.with-safe-area {
+    box-sizing: content-box;
   }
   
   .app-top-header__left {
@@ -130,10 +177,6 @@
   
   .app-top-header__icon-container {
     position: relative;
-  }
-  
-  .app-top-header__icon--bg {
-    border: 1px solid var(--bg-field-dark);
   }
   
   .app-top-header__notification-badge {
