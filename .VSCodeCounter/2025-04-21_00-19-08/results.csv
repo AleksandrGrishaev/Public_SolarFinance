@@ -17,15 +17,11 @@
 "/Users/peaker/dev/solar-finance/src/components/categories/CategorySelector.vue", "Vue", 0, 329, 0, 0, 7, 52, 388
 "/Users/peaker/dev/solar-finance/src/components/categories/CategoryViewPopup.vue", "Vue", 0, 426, 0, 0, 12, 77, 515
 "/Users/peaker/dev/solar-finance/src/components/categories/view/CategoryDateFilters.vue", "Vue", 0, 85, 0, 0, 2, 13, 100
+"/Users/peaker/dev/solar-finance/src/components/categories/view/CategoryTransactionGroup.vue", "Vue", 0, 38, 0, 0, 1, 5, 44
+"/Users/peaker/dev/solar-finance/src/components/categories/view/CategoryTransactionItem.vue", "Vue", 0, 90, 0, 0, 1, 10, 101
 "/Users/peaker/dev/solar-finance/src/components/categories/view/CategoryTransactionsList.vue", "Vue", 0, 150, 0, 0, 3, 18, 171
 "/Users/peaker/dev/solar-finance/src/components/navigation/NavMenu.vue", "Vue", 0, 118, 0, 0, 1, 7, 126
 "/Users/peaker/dev/solar-finance/src/components/system/MessageProvider.vue", "Vue", 0, 11, 0, 0, 0, 3, 14
-"/Users/peaker/dev/solar-finance/src/components/transactions/AmountSection.vue", "Vue", 0, 190, 0, 0, 5, 24, 219
-"/Users/peaker/dev/solar-finance/src/components/transactions/BookSelector.vue", "Vue", 0, 135, 0, 0, 1, 19, 155
-"/Users/peaker/dev/solar-finance/src/components/transactions/NumberKeypad.vue", "Vue", 0, 147, 0, 0, 1, 17, 165
-"/Users/peaker/dev/solar-finance/src/components/transactions/PercentageSlider.vue", "Vue", 0, 57, 0, 0, 3, 8, 68
-"/Users/peaker/dev/solar-finance/src/components/transactions/ViewTransaction/TransactionDateGroup.vue", "Vue", 0, 46, 0, 0, 1, 7, 54
-"/Users/peaker/dev/solar-finance/src/components/transactions/ViewTransaction/TransactionItem.vue", "Vue", 0, 88, 0, 0, 1, 6, 95
 "/Users/peaker/dev/solar-finance/src/components/ui/BasePopup.vue", "Vue", 0, 206, 0, 0, 7, 25, 238
 "/Users/peaker/dev/solar-finance/src/components/ui/CreateCategoryButton.vue", "Vue", 0, 54, 0, 0, 1, 7, 62
 "/Users/peaker/dev/solar-finance/src/components/ui/buttons/CreateActionButton.vue", "Vue", 0, 53, 0, 0, 1, 6, 60
@@ -149,8 +145,12 @@
 "/Users/peaker/dev/solar-finance/src/views/book/popup/NewBookPopup.vue", "Vue", 0, 30, 0, 0, 1, 5, 36
 "/Users/peaker/dev/solar-finance/src/views/currency/popup/CurrencyPopup.vue", "Vue", 0, 162, 0, 0, 3, 25, 190
 "/Users/peaker/dev/solar-finance/src/views/icon/popup/IconSelectorPopup.vue", "Vue", 0, 361, 0, 0, 6, 52, 419
-"/Users/peaker/dev/solar-finance/src/views/transaction/TransactionView.vue", "Vue", 0, 568, 0, 0, 8, 90, 666
+"/Users/peaker/dev/solar-finance/src/views/transaction/TransactionView.vue", "Vue", 0, 567, 0, 0, 8, 90, 665
 "/Users/peaker/dev/solar-finance/src/views/transaction/components/AccountSelector.vue", "Vue", 0, 195, 0, 0, 2, 29, 226
+"/Users/peaker/dev/solar-finance/src/views/transaction/components/AmountSection.vue", "Vue", 0, 190, 0, 0, 5, 24, 219
+"/Users/peaker/dev/solar-finance/src/views/transaction/components/BookSelector.vue", "Vue", 0, 135, 0, 0, 1, 19, 155
+"/Users/peaker/dev/solar-finance/src/views/transaction/components/NumberKeypad.vue", "Vue", 0, 147, 0, 0, 1, 17, 165
+"/Users/peaker/dev/solar-finance/src/views/transaction/components/PercentageSlider.vue", "Vue", 0, 57, 0, 0, 3, 8, 68
 "/Users/peaker/dev/solar-finance/src/views/transaction/components/TransactionTypeSelector.vue", "Vue", 0, 173, 0, 0, 3, 26, 202
 "/Users/peaker/dev/solar-finance/src/views/transaction/composables/index.ts", "TypeScript", 6, 0, 0, 0, 2, 1, 9
 "/Users/peaker/dev/solar-finance/src/views/transaction/composables/useAccount.ts", "TypeScript", 132, 0, 0, 0, 37, 27, 196
@@ -160,4 +160,4 @@
 "/Users/peaker/dev/solar-finance/src/views/transaction/composables/useDistributionControl.ts", "TypeScript", 67, 0, 0, 0, 32, 16, 115
 "/Users/peaker/dev/solar-finance/src/views/transaction/composables/useKeypad.ts", "TypeScript", 38, 0, 0, 0, 22, 7, 67
 "/Users/peaker/dev/solar-finance/src/views/transaction/composables/useTransaction.ts", "TypeScript", 139, 0, 0, 0, 27, 27, 193
-"Total", "-", 6470, 14068, 502, 3337, 1822, 3947, 30146
+"Total", "-", 6470, 14061, 502, 3337, 1822, 3949, 30141

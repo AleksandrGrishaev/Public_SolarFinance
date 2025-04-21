@@ -34,7 +34,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import { getParentCategoriesForType } from '../../../data/categories';
+import { useCategoryStore } from '../../../stores/category/categoryStore';
 
 const props = defineProps({
   modelValue: {
@@ -46,16 +46,18 @@ const props = defineProps({
     default: 'expense'
   }
 });
-
 const emit = defineEmits(['update:modelValue']);
-
 const isOpen = ref(false);
 
-// Получаем доступные родительские категории для текущего типа транзакции
+// Get category store
+const categoryStore = useCategoryStore();
+
+// Use the store's getParentCategoriesForType getter
 const availableParents = computed(() => {
-  return getParentCategoriesForType(props.categoryType);
+  return categoryStore.getParentCategoriesForType(props.categoryType);
 });
 
+// Rest of your code remains unchanged
 // Отслеживаем изменение типа транзакции
 watch(() => props.categoryType, () => {
   // Если тип сменился, и выбранная родительская категория не подходит,
@@ -76,7 +78,6 @@ const selectParent = (category) => {
   isOpen.value = false;
 };
 </script>
-
 <style scoped>
 .parent-selector-container {
   position: relative;
