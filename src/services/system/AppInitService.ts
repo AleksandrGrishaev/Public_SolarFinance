@@ -1,7 +1,8 @@
-// src/services/AppInitService.ts
+// src/services/system/AppInitService.ts
 import { useCurrencyStore } from '@/stores/currency';
 import { useUserStore } from '@/stores/user';
 import { useThemeStore } from '@/stores/theme';
+import { useSystemStore } from '@/stores/system';
 
 /**
  * Класс для инициализации приложения
@@ -43,6 +44,11 @@ export class AppInitService {
     console.log('[AppInitService] Initializing application...');
     
     try {
+      // Инициализация системного хранилища (платформа, безопасные зоны)
+      const systemStore = useSystemStore();
+      systemStore.initialize();
+      console.log('[AppInitService] System store initialized, platform:', systemStore.platform);
+      
       // Инициализация хранилища валют
       const currencyStore = useCurrencyStore();
       await currencyStore.init();

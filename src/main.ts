@@ -7,8 +7,6 @@ import { appInitService } from './services/system/AppInitService'
 import { messageService } from './services/system/MessageService'
 import './styles/main.scss';
 
-
-
 // Типы для глобального message provider
 declare global {
   interface Window {
@@ -30,6 +28,7 @@ app.use(router)
 app.config.errorHandler = (err, instance, info) => {
   console.error('Global error:', err)
   console.error('Error info:', info)
+  
   // Оповещаем пользователя об ошибке через messageService, если он доступен
   if (messageService.hasProvider) {
     messageService.error('Произошла ошибка в приложении. Пожалуйста, обновите страницу.')
@@ -42,6 +41,7 @@ app.mount('#app')
 // Запускаем инициализацию приложения после монтирования
 appInitService.initializeApp().catch(error => {
   console.error('Failed to initialize application:', error)
+  
   if (messageService.hasProvider) {
     messageService.error('Ошибка инициализации приложения')
   }
