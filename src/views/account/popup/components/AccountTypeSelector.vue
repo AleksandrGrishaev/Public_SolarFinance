@@ -33,7 +33,7 @@
 <script setup lang="ts">
 import { computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import { IconCreditCard, IconWallet, IconCash, IconPigMoney } from '@tabler/icons-vue';
-import DropdownArrow from '../../../../components/ui/icons/DropdownArrow.vue';
+import DropdownArrow from '../../../../components/ui/icons/BaseDropdownArrow.vue';
 import { useDropdown } from '../../../../composables/ui/useDropdown';
 
 const typeOptions = [

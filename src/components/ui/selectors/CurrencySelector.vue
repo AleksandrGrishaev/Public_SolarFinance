@@ -13,7 +13,7 @@
   
   <script setup lang="ts">
   import { computed } from 'vue';
-  import DropdownArrow from '../icons/DropdownArrow.vue';
+  import DropdownArrow from '../icons/BaseDropdownArrow.vue';
   
   const props = defineProps({
     currencyCode: {

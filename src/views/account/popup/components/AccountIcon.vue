@@ -27,7 +27,7 @@
   <script setup lang="ts">
   import { computed } from 'vue';
   import * as TablerIcons from '@tabler/icons-vue';
-  import { useFormatBalance } from '../../../composables/transaction/useFormatBalance';
+  import { useFormatBalance } from '../../../../composables/transaction/useFormatBalance.ts';
   
   const props = defineProps({
     account: {
