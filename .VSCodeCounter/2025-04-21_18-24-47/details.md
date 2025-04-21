@@ -1,10 +1,10 @@
 # Details
 
-Date : 2025-04-21 17:35:13
+Date : 2025-04-21 18:24:47
 
 Directory /Users/peaker/dev/solar-finance/src
 
-Total : 166 files,  24898 codes, 1948 comments, 4033 blanks, all 30879 lines
+Total : 166 files,  25024 codes, 1948 comments, 4040 blanks, all 31012 lines
 
 [Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
@@ -33,7 +33,7 @@ Total : 166 files,  24898 codes, 1948 comments, 4033 blanks, all 30879 lines
 | [src/components/categories/view/CategoryTransactionGroup.vue](/src/components/categories/view/CategoryTransactionGroup.vue) | Vue | 38 | 1 | 5 | 44 |
 | [src/components/categories/view/CategoryTransactionItem.vue](/src/components/categories/view/CategoryTransactionItem.vue) | Vue | 90 | 1 | 10 | 101 |
 | [src/components/categories/view/CategoryTransactionsList.vue](/src/components/categories/view/CategoryTransactionsList.vue) | Vue | 150 | 3 | 18 | 171 |
-| [src/components/navigation/AppTopHeader.vue](/src/components/navigation/AppTopHeader.vue) | Vue | 176 | 1 | 17 | 194 |
+| [src/components/navigation/AppTopHeader.vue](/src/components/navigation/AppTopHeader.vue) | Vue | 237 | 1 | 17 | 255 |
 | [src/components/navigation/NavMenu.vue](/src/components/navigation/NavMenu.vue) | Vue | 118 | 1 | 7 | 126 |
 | [src/components/system/MessageProvider.vue](/src/components/system/MessageProvider.vue) | Vue | 11 | 0 | 3 | 14 |
 | [src/components/ui/BasePopup.vue](/src/components/ui/BasePopup.vue) | Vue | 206 | 7 | 25 | 238 |
@@ -42,7 +42,7 @@ Total : 166 files,  24898 codes, 1948 comments, 4033 blanks, all 30879 lines
 | [src/components/ui/filters/DateFilter.vue](/src/components/ui/filters/DateFilter.vue) | Vue | 503 | 14 | 73 | 590 |
 | [src/components/ui/icons/BaseAddIcon.vue](/src/components/ui/icons/BaseAddIcon.vue) | Vue | 90 | 1 | 13 | 104 |
 | [src/components/ui/icons/BaseDropdownArrow.vue](/src/components/ui/icons/BaseDropdownArrow.vue) | Vue | 37 | 1 | 1 | 39 |
-| [src/components/ui/icons/BaseIcon.vue](/src/components/ui/icons/BaseIcon.vue) | Vue | 167 | 1 | 25 | 193 |
+| [src/components/ui/icons/BaseIcon.vue](/src/components/ui/icons/BaseIcon.vue) | Vue | 221 | 1 | 32 | 254 |
 | [src/components/ui/inputs/ColorPicker.vue](/src/components/ui/inputs/ColorPicker.vue) | Vue | 68 | 2 | 13 | 83 |
 | [src/components/ui/inputs/IconPicker.vue](/src/components/ui/inputs/IconPicker.vue) | Vue | 66 | 1 | 9 | 76 |
 | [src/components/ui/inputs/ParentCategorySelector.vue](/src/components/ui/inputs/ParentCategorySelector.vue) | Vue | 131 | 1 | 16 | 148 |
@@ -71,7 +71,7 @@ Total : 166 files,  24898 codes, 1948 comments, 4033 blanks, all 30879 lines
 | [src/constants/transactionTypes.ts](/src/constants/transactionTypes.ts) | TypeScript | 26 | 6 | 6 | 38 |
 | [src/layouts/ConsoleLayout.vue](/src/layouts/ConsoleLayout.vue) | Vue | 70 | 3 | 9 | 82 |
 | [src/layouts/EmptyLayout.vue](/src/layouts/EmptyLayout.vue) | Vue | 15 | 0 | 2 | 17 |
-| [src/layouts/IosLayout.vue](/src/layouts/IosLayout.vue) | Vue | 136 | 1 | 20 | 157 |
+| [src/layouts/IosLayout.vue](/src/layouts/IosLayout.vue) | Vue | 145 | 1 | 20 | 166 |
 | [src/main.ts](/src/main.ts) | TypeScript | 30 | 9 | 9 | 48 |
 | [src/router/index.ts](/src/router/index.ts) | TypeScript | 150 | 16 | 10 | 176 |
 | [src/services/BaseCrudService.ts](/src/services/BaseCrudService.ts) | TypeScript | 54 | 22 | 11 | 87 |
@@ -162,7 +162,7 @@ Total : 166 files,  24898 codes, 1948 comments, 4033 blanks, all 30879 lines
 | [src/views/book/popup/NewBookPopup.vue](/src/views/book/popup/NewBookPopup.vue) | Vue | 30 | 1 | 5 | 36 |
 | [src/views/currency/popup/CurrencyPopup.vue](/src/views/currency/popup/CurrencyPopup.vue) | Vue | 162 | 3 | 25 | 190 |
 | [src/views/icon/popup/IconSelectorPopup.vue](/src/views/icon/popup/IconSelectorPopup.vue) | Vue | 361 | 6 | 52 | 419 |
-| [src/views/transaction/TransactionView.vue](/src/views/transaction/TransactionView.vue) | Vue | 586 | 8 | 96 | 690 |
+| [src/views/transaction/TransactionView.vue](/src/views/transaction/TransactionView.vue) | Vue | 588 | 8 | 96 | 692 |
 | [src/views/transaction/components/AccountSelector.vue](/src/views/transaction/components/AccountSelector.vue) | Vue | 195 | 2 | 29 | 226 |
 | [src/views/transaction/components/AmountSection.vue](/src/views/transaction/components/AmountSection.vue) | Vue | 190 | 5 | 24 | 219 |
 | [src/views/transaction/components/BookSelector.vue](/src/views/transaction/components/BookSelector.vue) | Vue | 135 | 1 | 19 | 155 |

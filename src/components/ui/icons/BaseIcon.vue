@@ -7,7 +7,8 @@
       customClass, 
       clickable ? 'clickable' : '',
       rounded ? `rounded-${rounded}` : '',
-      bordered ? 'bordered' : ''
+      bordered ? 'bordered' : '',
+      padding !== null ? 'has-padding' : ''
     ]"
     :style="mergedStyle"
     @click="handleClick"
@@ -96,12 +97,109 @@ const props = defineProps({
   customStyle: {
     type: Object,
     default: () => ({})
+  },
+  // Auto sizing (автоматически рассчитывать размер контейнера)
+  autoSize: {
+    type: Boolean,
+    default: false
   }
 });
 
 const emit = defineEmits(['click']);
 
-// Merge custom styles with background color
+// Получаем размер иконки в пикселях
+const baseIconSize = computed(() => {
+  if (props.iconSize) return props.iconSize;
+  
+  // Default size mapping for icon (smaller than container)
+  const iconSizeMap = {
+    'xs': 12,
+    'sm': 16,
+    'md': 18,
+    'lg': 24,
+    'xl': 30
+  };
+  
+  if (typeof props.size === 'string') {
+    return iconSizeMap[props.size] || 18;
+  }
+  
+  // If size is a number, return it directly
+  return typeof props.size === 'number' ? props.size : 18;
+});
+
+// Вычисляем размер иконки с учетом padding и других факторов
+const computedIconSize = computed(() => {
+  // Если autoSize = false, используем стандартный расчет
+  if (!props.autoSize) {
+    const iconSizeMap = {
+      'xs': 12,
+      'sm': 16,
+      'md': 18,
+      'lg': 24,
+      'xl': 30
+    };
+    
+    if (typeof props.size === 'string') {
+      return iconSizeMap[props.size] || 18;
+    }
+    
+    return typeof props.size === 'number' ? Math.round(props.size * 0.65) : 18;
+  }
+  
+  // Если autoSize = true, просто возвращаем baseIconSize
+  return baseIconSize.value;
+});
+
+// Получаем padding в пикселях
+const paddingValue = computed(() => {
+  if (props.padding === null) return 0;
+  
+  if (typeof props.padding === 'number') {
+    return props.padding;
+  }
+  
+  // Если padding задан как строка, пытаемся извлечь числовое значение
+  const match = props.padding.match(/^(\d+)(?:px)?$/);
+  return match ? parseInt(match[1], 10) : 6;
+});
+
+// Расчет ширины и высоты контейнера
+const containerSize = computed(() => {
+  if (!props.autoSize) return null;
+  
+  // Базовый размер иконки + padding с обеих сторон
+  return baseIconSize.value + (paddingValue.value * 2);
+});
+
+// Расчет border-radius
+const borderRadiusValue = computed(() => {
+  if (!props.rounded) return null;
+  
+  if (props.rounded === 'full') {
+    // Если autoSize = true, возвращаем 50% для круглой иконки
+    if (props.autoSize) {
+      return '50%';
+    }
+    
+    // Иначе используем предопределенное значение для круглых иконок
+    return '50%';
+  }
+  
+  // Для других типов скругления используем CSS-переменные или фиксированные значения
+  const radiusMap = {
+    'sm': 'var(--border-radius-sm, 8px)',
+    'md': 'var(--border-radius-md, 14px)',
+    'lg': 'var(--border-radius-lg, 28px)',
+    'xl': 'var(--border-radius-xl, 34px)',
+    'xxl': '40px',
+    'xxxl': 'var(--border-radius-xxxl, 48px)'
+  };
+  
+  return radiusMap[props.rounded] || null;
+});
+
+// Объединяем пользовательские стили и вычисленные стили
 const mergedStyle = computed(() => {
   const styles = { ...props.customStyle };
   
@@ -124,28 +222,18 @@ const mergedStyle = computed(() => {
       `${props.padding}px` : props.padding;
   }
   
-  return styles;
-});
-
-// Calculate the actual icon size based on the container size
-const computedIconSize = computed(() => {
-  if (props.iconSize) return props.iconSize;
-  
-  // Default size mapping for icon (smaller than container)
-  const iconSizeMap = {
-    'xs': 12,
-    'sm': 16,
-    'md': 18,
-    'lg': 24,
-    'xl': 30
-  };
-  
-  if (typeof props.size === 'string') {
-    return iconSizeMap[props.size] || 18;
+  // Если включен autoSize, явно задаем ширину и высоту
+  if (props.autoSize && containerSize.value) {
+    styles.width = `${containerSize.value}px`;
+    styles.height = `${containerSize.value}px`;
   }
   
-  // If size is a number, use 65% of the container size
-  return typeof props.size === 'number' ? Math.round(props.size * 0.65) : 18;
+  // Устанавливаем border-radius
+  if (borderRadiusValue.value) {
+    styles.borderRadius = borderRadiusValue.value;
+  }
+  
+  return styles;
 });
 
 // Handle click event
@@ -178,7 +266,12 @@ const handleClick = (event) => {
   border-style: solid;
 }
 
-/* Predefined sizes */
+.has-padding {
+  /* Гарантируем, что padding применяется */
+  padding: var(--padding, 6px);
+}
+
+/* Predefined sizes - используются только если autoSize = false */
 .size-xs {
   width: 16px;
   height: 16px;
@@ -209,7 +302,7 @@ const handleClick = (event) => {
   display: inline-flex;
 }
 
-/* Rounded variants */
+/* Rounded variants - используются только если не указан явный border-radius в styles */
 .rounded-sm {
   border-radius: var(--border-radius-sm, 8px);
 }

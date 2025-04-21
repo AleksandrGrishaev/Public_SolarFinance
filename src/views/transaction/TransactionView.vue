@@ -199,7 +199,7 @@ const updateHeaderConfig = () => {
   emit('update:header', {
     show: true,
     title: '', // Пустой title
-    showBack: true,
+    showBack: false,
     hasNotifications: true,
     showMessageIcon: true,
     showProfileIcon: true,
@@ -657,7 +657,7 @@ watch([selectedAccount, destinationAccount, convertedAmount], () => {
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-top: 74px; /* Отступ сверху экрана */
+  margin-top: 12 px; /* Отступ сверху экрана */
 }
 
 .filter-group {

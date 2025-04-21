@@ -14,6 +14,7 @@
       :bordered="true"
       :borderColor="'var(--bg-dropdown)'"
       :padding="10"
+      :iconSize="18"
       @back="handleBack"
       @message="handleMessage"
       @profile="handleProfile"
@@ -80,13 +81,19 @@ const updateHeaderSettings = (settings: {
   iconColor?: string,
   bordered?: boolean,
   borderColor?: string,
-  padding?: number | string
+  padding?: number | string,
+  iconSize?: number
 }) => {
+  console.log('[IosLayout] Updating header settings:', settings);
+  
   if (settings.show !== undefined) showHeader.value = settings.show;
   if (settings.title !== undefined) headerTitle.value = settings.title;
   if (settings.showBack !== undefined) showBackButton.value = settings.showBack;
   if (settings.hasNotifications !== undefined) hasNotifications.value = settings.hasNotifications;
-  if (settings.showMessageIcon !== undefined) showMessageIcon.value = settings.showMessageIcon;
+  if (settings.showMessageIcon !== undefined) {
+    console.log('[IosLayout] Updating showMessageIcon to:', settings.showMessageIcon);
+    showMessageIcon.value = settings.showMessageIcon;
+  }
   if (settings.showProfileIcon !== undefined) showProfileIcon.value = settings.showProfileIcon;
 };
 
@@ -112,19 +119,35 @@ const showNavMenu = computed(() => {
 
 // Set initial header settings based on route
 onMounted(() => {
+  console.log('[IosLayout] Mounted, initializing from route meta:', route.meta);
+  
   // Example of setting header based on route
   headerTitle.value = route.meta.title as string || '';
   showBackButton.value = route.meta.showBack !== false;
   
-  // Добавьте инициализацию для иконок из meta
+  // Используем значения из meta, или значения по умолчанию
   if (route.meta.header) {
     if (route.meta.header.hasNotifications !== undefined) 
       hasNotifications.value = route.meta.header.hasNotifications;
-    if (route.meta.header.showMessageIcon !== undefined) 
+    
+    if (route.meta.header.showMessageIcon !== undefined) {
       showMessageIcon.value = route.meta.header.showMessageIcon;
+      console.log('[IosLayout] Setting showMessageIcon from route meta:', showMessageIcon.value);
+    }
+    
     if (route.meta.header.showProfileIcon !== undefined) 
       showProfileIcon.value = route.meta.header.showProfileIcon;
   }
+  
+  // Явно вывести состояние header после инициализации
+  console.log('[IosLayout] Header state after initialization:', {
+    showHeader: showHeader.value,
+    title: headerTitle.value,
+    showBackButton: showBackButton.value,
+    hasNotifications: hasNotifications.value,
+    showMessageIcon: showMessageIcon.value,
+    showProfileIcon: showProfileIcon.value
+  });
 });
 </script>
 

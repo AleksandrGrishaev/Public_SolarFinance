@@ -1,17 +1,17 @@
 # Summary
 
-Date : 2025-04-21 17:35:13
+Date : 2025-04-21 18:24:47
 
 Directory /Users/peaker/dev/solar-finance/src
 
-Total : 166 files,  24898 codes, 1948 comments, 4033 blanks, all 30879 lines
+Total : 166 files,  25024 codes, 1948 comments, 4040 blanks, all 31012 lines
 
 Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
 ## Languages
 | language | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| Vue | 78 | 14,336 | 300 | 2,074 | 16,710 |
+| Vue | 78 | 14,462 | 300 | 2,081 | 16,843 |
 | TypeScript | 72 | 6,672 | 1,567 | 1,230 | 9,469 |
 | Markdown | 8 | 3,388 | 0 | 610 | 3,998 |
 | SCSS | 8 | 502 | 81 | 119 | 702 |
@@ -19,22 +19,22 @@ Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-
 ## Directories
 | path | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| . | 166 | 24,898 | 1,948 | 4,033 | 30,879 |
+| . | 166 | 25,024 | 1,948 | 4,040 | 31,012 |
 | . (Files) | 2 | 65 | 9 | 10 | 84 |
 | about | 8 | 3,388 | 0 | 610 | 3,998 |
 | about (Files) | 3 | 762 | 0 | 152 | 914 |
 | about/WorkFlow | 5 | 2,626 | 0 | 458 | 3,084 |
-| components | 41 | 7,150 | 152 | 1,008 | 8,310 |
+| components | 41 | 7,265 | 152 | 1,015 | 8,432 |
 | components/categories | 13 | 2,668 | 64 | 403 | 3,135 |
 | components/categories (Files) | 9 | 2,305 | 57 | 357 | 2,719 |
 | components/categories/view | 4 | 363 | 7 | 46 | 416 |
-| components/navigation | 2 | 294 | 2 | 24 | 320 |
+| components/navigation | 2 | 355 | 2 | 24 | 381 |
 | components/system | 1 | 11 | 0 | 3 | 14 |
-| components/ui | 25 | 4,177 | 86 | 578 | 4,841 |
+| components/ui | 25 | 4,231 | 86 | 585 | 4,902 |
 | components/ui (Files) | 2 | 260 | 8 | 32 | 300 |
 | components/ui/buttons | 1 | 53 | 1 | 6 | 60 |
 | components/ui/filters | 1 | 503 | 14 | 73 | 590 |
-| components/ui/icons | 3 | 294 | 3 | 39 | 336 |
+| components/ui/icons | 3 | 348 | 3 | 46 | 397 |
 | components/ui/inputs | 7 | 644 | 8 | 90 | 742 |
 | components/ui/lists | 1 | 149 | 6 | 20 | 175 |
 | components/ui/selectors | 6 | 1,297 | 27 | 189 | 1,513 |
@@ -44,7 +44,7 @@ Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-
 | composables/transaction | 1 | 126 | 42 | 25 | 193 |
 | composables/ui | 5 | 267 | 83 | 62 | 412 |
 | constants | 1 | 26 | 6 | 6 | 38 |
-| layouts | 3 | 221 | 4 | 31 | 256 |
+| layouts | 3 | 230 | 4 | 31 | 265 |
 | router | 1 | 150 | 16 | 10 | 176 |
 | services | 5 | 250 | 114 | 72 | 436 |
 | services (Files) | 1 | 54 | 22 | 11 | 87 |
@@ -68,7 +68,7 @@ Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-
 | styles/themes | 4 | 240 | 49 | 70 | 359 |
 | types | 1 | 5 | 0 | 0 | 5 |
 | utils | 1 | 16 | 9 | 4 | 29 |
-| views | 49 | 8,544 | 564 | 1,397 | 10,505 |
+| views | 49 | 8,546 | 564 | 1,397 | 10,507 |
 | views (Files) | 6 | 1,555 | 26 | 176 | 1,757 |
 | views/account | 10 | 2,386 | 125 | 394 | 2,905 |
 | views/account/popup | 10 | 2,386 | 125 | 394 | 2,905 |
@@ -85,8 +85,8 @@ Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-
 | views/currency/popup | 1 | 162 | 3 | 25 | 190 |
 | views/icon | 1 | 361 | 6 | 52 | 419 |
 | views/icon/popup | 1 | 361 | 6 | 52 | 419 |
-| views/transaction | 15 | 2,140 | 230 | 359 | 2,729 |
-| views/transaction (Files) | 1 | 586 | 8 | 96 | 690 |
+| views/transaction | 15 | 2,142 | 230 | 359 | 2,731 |
+| views/transaction (Files) | 1 | 588 | 8 | 96 | 692 |
 | views/transaction/components | 6 | 897 | 15 | 123 | 1,035 |
 | views/transaction/composables | 8 | 657 | 207 | 140 | 1,004 |
 

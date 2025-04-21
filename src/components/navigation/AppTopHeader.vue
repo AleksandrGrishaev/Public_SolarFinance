@@ -9,7 +9,7 @@
       <BaseIcon 
         v-if="showBackButton"
         :icon="IconArrowLeft" 
-        size="md" 
+        size="xl" 
         clickable
         class="app-top-header__back-button"
         @click="handleBackClick"
@@ -25,8 +25,8 @@
       <div class="app-top-header__icon-container" v-if="showMessageIcon">
         <BaseIcon 
           :icon="IconMessage" 
-          size="lg" 
-          rounded="xl"
+          :size="18" 
+          rounded="full"
           class="app-top-header__icon"
           clickable
           :background="background"
@@ -34,6 +34,7 @@
           :bordered="bordered"
           :borderColor="borderColor"
           :padding="padding"
+          :autoSize="true"
           @click="handleMessageClick"
         />
         <div 
@@ -44,8 +45,8 @@
       <BaseIcon 
         v-if="showProfileIcon"
         :icon="IconUser" 
-        size="lg"
-        rounded="xl"
+        :size="18"
+        rounded="full"
         class="app-top-header__icon"
         clickable
         :background="background"
@@ -53,6 +54,7 @@
         :bordered="bordered"
         :borderColor="borderColor"
         :padding="padding"
+        :autoSize="true"
         @click="handleProfileClick"
       />
       <slot name="right"></slot>
@@ -61,7 +63,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { IconArrowLeft, IconMessage, IconUser } from '@tabler/icons-vue';
 import BaseIcon from '@/components/ui/icons/BaseIcon.vue';
 import { usePlatform } from '@/stores/system/composables/usePlatform';
@@ -143,7 +145,14 @@ const props = defineProps({
    */
   padding: {
     type: [String, Number],
-    default: 6
+    default: 10
+  },
+  /**
+   * Icon size
+   */
+  iconSize: {
+    type: Number,
+    default: 18
   }
 });
 
@@ -185,6 +194,16 @@ const handleMessageClick = () => {
 const handleProfileClick = () => {
   emit('profile');
 };
+
+// Добавляем для отладки
+onMounted(() => {
+  console.log('[AppTopHeader] Mounted with props:', {
+    showMessageIcon: props.showMessageIcon,
+    background: props.background,
+    padding: props.padding,
+    bordered: props.bordered
+  });
+});
 </script>
 
 <style scoped>
@@ -246,10 +265,11 @@ const handleProfileClick = () => {
 .app-top-header__notification-badge {
   background-color: var(--color-warning);
   border-radius: 50%;
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 0px;
+  right: 0px;
+  z-index: 3;
 }
 </style>
