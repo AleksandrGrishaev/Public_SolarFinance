@@ -1,14 +1,14 @@
-Date : 2025-04-21 00:19:08
+Date : 2025-04-21 17:35:13
 Directory : /Users/peaker/dev/solar-finance/src
-Total : 161 files,  24370 codes, 1822 comments, 3949 blanks, all 30141 lines
+Total : 166 files,  24898 codes, 1948 comments, 4033 blanks, all 30879 lines
 
 Languages
 +------------+------------+------------+------------+------------+------------+
 | language   | files      | code       | comment    | blank      | total      |
 +------------+------------+------------+------------+------------+------------+
-| Vue        |         77 |     14,061 |        299 |      2,043 |     16,403 |
-| TypeScript |         69 |      6,470 |      1,442 |      1,180 |      9,092 |
-| Markdown   |          7 |      3,337 |          0 |        607 |      3,944 |
+| Vue        |         78 |     14,336 |        300 |      2,074 |     16,710 |
+| TypeScript |         72 |      6,672 |      1,567 |      1,230 |      9,469 |
+| Markdown   |          8 |      3,388 |          0 |        610 |      3,998 |
 | SCSS       |          8 |        502 |         81 |        119 |        702 |
 +------------+------------+------------+------------+------------+------------+
 
@@ -16,23 +16,23 @@ Directories
 +----------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
 | path                                                                                         | files      | code       | comment    | blank      | total      |
 +----------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
-| .                                                                                            |        161 |     24,370 |      1,822 |      3,949 |     30,141 |
+| .                                                                                            |        166 |     24,898 |      1,948 |      4,033 |     30,879 |
 | . (Files)                                                                                    |          2 |         65 |          9 |         10 |         84 |
-| about                                                                                        |          7 |      3,337 |          0 |        607 |      3,944 |
-| about (Files)                                                                                |          2 |        711 |          0 |        149 |        860 |
+| about                                                                                        |          8 |      3,388 |          0 |        610 |      3,998 |
+| about (Files)                                                                                |          3 |        762 |          0 |        152 |        914 |
 | about/WorkFlow                                                                               |          5 |      2,626 |          0 |        458 |      3,084 |
-| components                                                                                   |         41 |      7,074 |        154 |      1,007 |      8,235 |
+| components                                                                                   |         41 |      7,150 |        152 |      1,008 |      8,310 |
 | components/categories                                                                        |         13 |      2,668 |         64 |        403 |      3,135 |
 | components/categories (Files)                                                                |          9 |      2,305 |         57 |        357 |      2,719 |
 | components/categories/view                                                                   |          4 |        363 |          7 |         46 |        416 |
-| components/navigation                                                                        |          1 |        118 |          1 |          7 |        126 |
+| components/navigation                                                                        |          2 |        294 |          2 |         24 |        320 |
 | components/system                                                                            |          1 |         11 |          0 |          3 |         14 |
-| components/ui                                                                                |         26 |      4,277 |         89 |        594 |      4,960 |
+| components/ui                                                                                |         25 |      4,177 |         86 |        578 |      4,841 |
 | components/ui (Files)                                                                        |          2 |        260 |          8 |         32 |        300 |
 | components/ui/buttons                                                                        |          1 |         53 |          1 |          6 |         60 |
 | components/ui/filters                                                                        |          1 |        503 |         14 |         73 |        590 |
-| components/ui/icons                                                                          |          4 |        397 |          6 |         53 |        456 |
-| components/ui/inputs                                                                         |          7 |        641 |          8 |         92 |        741 |
+| components/ui/icons                                                                          |          3 |        294 |          3 |         39 |        336 |
+| components/ui/inputs                                                                         |          7 |        644 |          8 |         90 |        742 |
 | components/ui/lists                                                                          |          1 |        149 |          6 |         20 |        175 |
 | components/ui/selectors                                                                      |          6 |      1,297 |         27 |        189 |      1,513 |
 | components/ui/views                                                                          |          4 |        977 |         19 |        129 |      1,125 |
@@ -41,21 +41,22 @@ Directories
 | composables/transaction                                                                      |          1 |        126 |         42 |         25 |        193 |
 | composables/ui                                                                               |          5 |        267 |         83 |         62 |        412 |
 | constants                                                                                    |          1 |         26 |          6 |          6 |         38 |
-| data                                                                                         |          1 |        110 |         11 |         26 |        147 |
-| layouts                                                                                      |          3 |        148 |          4 |         21 |        173 |
-| router                                                                                       |          1 |        139 |         16 |         10 |        165 |
-| services                                                                                     |          5 |        246 |        111 |         70 |        427 |
+| layouts                                                                                      |          3 |        221 |          4 |         31 |        256 |
+| router                                                                                       |          1 |        150 |         16 |         10 |        176 |
+| services                                                                                     |          5 |        250 |        114 |         72 |        436 |
 | services (Files)                                                                             |          1 |         54 |         22 |         11 |         87 |
 | services/api                                                                                 |          2 |         82 |         31 |         36 |        149 |
-| services/system                                                                              |          2 |        110 |         58 |         23 |        191 |
-| stores                                                                                       |         36 |      3,525 |        675 |        526 |      4,726 |
+| services/system                                                                              |          2 |        114 |         61 |         25 |        200 |
+| stores                                                                                       |         39 |      3,806 |        799 |        596 |      5,201 |
 | stores (Files)                                                                               |          1 |         71 |         10 |         10 |         91 |
 | stores/account                                                                               |          5 |        643 |        164 |        119 |        926 |
 | stores/book                                                                                  |          5 |        272 |         64 |         42 |        378 |
 | stores/category                                                                              |          5 |        671 |        104 |        120 |        895 |
 | stores/common                                                                                |          1 |          9 |          1 |          1 |         11 |
 | stores/currency                                                                              |          5 |        360 |         60 |         69 |        489 |
-| stores/system                                                                                |          4 |        118 |         54 |         21 |        193 |
+| stores/system                                                                                |          7 |        399 |        178 |         91 |        668 |
+| stores/system (Files)                                                                        |          4 |        261 |        113 |         54 |        428 |
+| stores/system/composables                                                                    |          3 |        138 |         65 |         37 |        240 |
 | stores/transaction                                                                           |          5 |      1,012 |         96 |         76 |      1,184 |
 | stores/user                                                                                  |          5 |        369 |        122 |         68 |        559 |
 | styles                                                                                       |          8 |        502 |         81 |        119 |        702 |
@@ -63,12 +64,13 @@ Directories
 | styles/components                                                                            |          2 |        167 |         17 |         28 |        212 |
 | styles/themes                                                                                |          4 |        240 |         49 |         70 |        359 |
 | types                                                                                        |          1 |          5 |          0 |          0 |          5 |
-| views                                                                                        |         48 |      8,418 |        561 |      1,377 |     10,356 |
+| utils                                                                                        |          1 |         16 |          9 |          4 |         29 |
+| views                                                                                        |         49 |      8,544 |        564 |      1,397 |     10,505 |
 | views (Files)                                                                                |          6 |      1,555 |         26 |        176 |      1,757 |
-| views/account                                                                                |          9 |      2,279 |        122 |        380 |      2,781 |
-| views/account/popup                                                                          |          9 |      2,279 |        122 |        380 |      2,781 |
+| views/account                                                                                |         10 |      2,386 |        125 |        394 |      2,905 |
+| views/account/popup                                                                          |         10 |      2,386 |        125 |        394 |      2,905 |
 | views/account/popup (Files)                                                                  |          4 |      1,732 |         43 |        285 |      2,060 |
-| views/account/popup/components                                                               |          2 |        337 |          2 |         55 |        394 |
+| views/account/popup/components                                                               |          3 |        444 |          5 |         69 |        518 |
 | views/account/popup/composables                                                              |          3 |        210 |         77 |         40 |        327 |
 | views/book                                                                                   |         16 |      1,940 |        174 |        391 |      2,505 |
 | views/book/page                                                                              |         14 |      1,875 |        172 |        381 |      2,428 |
@@ -80,8 +82,8 @@ Directories
 | views/currency/popup                                                                         |          1 |        162 |          3 |         25 |        190 |
 | views/icon                                                                                   |          1 |        361 |          6 |         52 |        419 |
 | views/icon/popup                                                                             |          1 |        361 |          6 |         52 |        419 |
-| views/transaction                                                                            |         15 |      2,121 |        230 |        353 |      2,704 |
-| views/transaction (Files)                                                                    |          1 |        567 |          8 |         90 |        665 |
+| views/transaction                                                                            |         15 |      2,140 |        230 |        359 |      2,729 |
+| views/transaction (Files)                                                                    |          1 |        586 |          8 |         96 |        690 |
 | views/transaction/components                                                                 |          6 |        897 |         15 |        123 |      1,035 |
 | views/transaction/composables                                                                |          8 |        657 |        207 |        140 |      1,004 |
 +----------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
@@ -91,6 +93,7 @@ Files
 | filename                                                                                     | language   | code       | comment    | blank      | total      |
 +----------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
 | /Users/peaker/dev/solar-finance/src/App.vue                                                  | Vue        |         35 |          0 |          1 |         36 |
+| /Users/peaker/dev/solar-finance/src/about/BaseIconStructur.md                                | Markdown   |         51 |          0 |          3 |         54 |
 | /Users/peaker/dev/solar-finance/src/about/Description.md                                     | Markdown   |         58 |          0 |         28 |         86 |
 | /Users/peaker/dev/solar-finance/src/about/WorkFlow/BaseStores.md                             | Markdown   |        169 |          0 |         52 |        221 |
 | /Users/peaker/dev/solar-finance/src/about/WorkFlow/BookView.md                               | Markdown   |         77 |          0 |         47 |        124 |
@@ -111,19 +114,19 @@ Files
 | /Users/peaker/dev/solar-finance/src/components/categories/view/CategoryTransactionGroup.vue  | Vue        |         38 |          1 |          5 |         44 |
 | /Users/peaker/dev/solar-finance/src/components/categories/view/CategoryTransactionItem.vue   | Vue        |         90 |          1 |         10 |        101 |
 | /Users/peaker/dev/solar-finance/src/components/categories/view/CategoryTransactionsList.vue  | Vue        |        150 |          3 |         18 |        171 |
+| /Users/peaker/dev/solar-finance/src/components/navigation/AppTopHeader.vue                   | Vue        |        176 |          1 |         17 |        194 |
 | /Users/peaker/dev/solar-finance/src/components/navigation/NavMenu.vue                        | Vue        |        118 |          1 |          7 |        126 |
 | /Users/peaker/dev/solar-finance/src/components/system/MessageProvider.vue                    | Vue        |         11 |          0 |          3 |         14 |
 | /Users/peaker/dev/solar-finance/src/components/ui/BasePopup.vue                              | Vue        |        206 |          7 |         25 |        238 |
 | /Users/peaker/dev/solar-finance/src/components/ui/CreateCategoryButton.vue                   | Vue        |         54 |          1 |          7 |         62 |
 | /Users/peaker/dev/solar-finance/src/components/ui/buttons/CreateActionButton.vue             | Vue        |         53 |          1 |          6 |         60 |
 | /Users/peaker/dev/solar-finance/src/components/ui/filters/DateFilter.vue                     | Vue        |        503 |         14 |         73 |        590 |
-| /Users/peaker/dev/solar-finance/src/components/ui/icons/AccountIcon.vue                      | Vue        |        107 |          3 |         14 |        124 |
 | /Users/peaker/dev/solar-finance/src/components/ui/icons/BaseAddIcon.vue                      | Vue        |         90 |          1 |         13 |        104 |
+| /Users/peaker/dev/solar-finance/src/components/ui/icons/BaseDropdownArrow.vue                | Vue        |         37 |          1 |          1 |         39 |
 | /Users/peaker/dev/solar-finance/src/components/ui/icons/BaseIcon.vue                         | Vue        |        167 |          1 |         25 |        193 |
-| /Users/peaker/dev/solar-finance/src/components/ui/icons/DropdownArrow.vue                    | Vue        |         33 |          1 |          1 |         35 |
 | /Users/peaker/dev/solar-finance/src/components/ui/inputs/ColorPicker.vue                     | Vue        |         68 |          2 |         13 |         83 |
 | /Users/peaker/dev/solar-finance/src/components/ui/inputs/IconPicker.vue                      | Vue        |         66 |          1 |          9 |         76 |
-| /Users/peaker/dev/solar-finance/src/components/ui/inputs/ParentCategorySelector.vue          | Vue        |        128 |          1 |         18 |        147 |
+| /Users/peaker/dev/solar-finance/src/components/ui/inputs/ParentCategorySelector.vue          | Vue        |        131 |          1 |         16 |        148 |
 | /Users/peaker/dev/solar-finance/src/components/ui/inputs/SharePicker.vue                     | Vue        |        171 |          1 |         28 |        200 |
 | /Users/peaker/dev/solar-finance/src/components/ui/inputs/TextInput.vue                       | Vue        |         60 |          1 |          8 |         69 |
 | /Users/peaker/dev/solar-finance/src/components/ui/inputs/ToggleButtonGroup.vue               | Vue        |         68 |          1 |          8 |         77 |
@@ -147,16 +150,15 @@ Files
 | /Users/peaker/dev/solar-finance/src/composables/ui/useTruncateText.ts                        | TypeScript |         65 |         49 |         16 |        130 |
 | /Users/peaker/dev/solar-finance/src/composables/useDateFilter.ts                             | TypeScript |        382 |         69 |         83 |        534 |
 | /Users/peaker/dev/solar-finance/src/constants/transactionTypes.ts                            | TypeScript |         26 |          6 |          6 |         38 |
-| /Users/peaker/dev/solar-finance/src/data/categories.ts                                       | TypeScript |        110 |         11 |         26 |        147 |
 | /Users/peaker/dev/solar-finance/src/layouts/ConsoleLayout.vue                                | Vue        |         70 |          3 |          9 |         82 |
 | /Users/peaker/dev/solar-finance/src/layouts/EmptyLayout.vue                                  | Vue        |         15 |          0 |          2 |         17 |
-| /Users/peaker/dev/solar-finance/src/layouts/IosLayout.vue                                    | Vue        |         63 |          1 |         10 |         74 |
+| /Users/peaker/dev/solar-finance/src/layouts/IosLayout.vue                                    | Vue        |        136 |          1 |         20 |        157 |
 | /Users/peaker/dev/solar-finance/src/main.ts                                                  | TypeScript |         30 |          9 |          9 |         48 |
-| /Users/peaker/dev/solar-finance/src/router/index.ts                                          | TypeScript |        139 |         16 |         10 |        165 |
+| /Users/peaker/dev/solar-finance/src/router/index.ts                                          | TypeScript |        150 |         16 |         10 |        176 |
 | /Users/peaker/dev/solar-finance/src/services/BaseCrudService.ts                              | TypeScript |         54 |         22 |         11 |         87 |
 | /Users/peaker/dev/solar-finance/src/services/api/ApiService.ts                               | TypeScript |          6 |          1 |          4 |         11 |
 | /Users/peaker/dev/solar-finance/src/services/api/LocalStorageApiService.ts                   | TypeScript |         76 |         30 |         32 |        138 |
-| /Users/peaker/dev/solar-finance/src/services/system/AppInitService.ts                        | TypeScript |         56 |         25 |         12 |         93 |
+| /Users/peaker/dev/solar-finance/src/services/system/AppInitService.ts                        | TypeScript |         60 |         28 |         14 |        102 |
 | /Users/peaker/dev/solar-finance/src/services/system/MessageService.ts                        | TypeScript |         54 |         33 |         11 |         98 |
 | /Users/peaker/dev/solar-finance/src/stores/account/accountService.ts                         | TypeScript |         90 |         27 |         13 |        130 |
 | /Users/peaker/dev/solar-finance/src/stores/account/accountStore.ts                           | TypeScript |        412 |        126 |        101 |        639 |
@@ -179,10 +181,13 @@ Files
 | /Users/peaker/dev/solar-finance/src/stores/currency/defaultCurrencies.ts                     | TypeScript |         50 |          2 |          2 |         54 |
 | /Users/peaker/dev/solar-finance/src/stores/currency/index.ts                                 | TypeScript |          3 |          3 |          1 |          7 |
 | /Users/peaker/dev/solar-finance/src/stores/currency/types.ts                                 | TypeScript |         25 |          1 |          3 |         29 |
+| /Users/peaker/dev/solar-finance/src/stores/system/composables/useApp.ts                      | TypeScript |         37 |         21 |          9 |         67 |
+| /Users/peaker/dev/solar-finance/src/stores/system/composables/usePlatform.ts                 | TypeScript |         45 |         17 |         11 |         73 |
+| /Users/peaker/dev/solar-finance/src/stores/system/composables/useViewport.ts                 | TypeScript |         56 |         27 |         17 |        100 |
 | /Users/peaker/dev/solar-finance/src/stores/system/constants.ts                               | TypeScript |         35 |         13 |          4 |         52 |
-| /Users/peaker/dev/solar-finance/src/stores/system/index.ts                                   | TypeScript |          3 |          2 |          1 |          6 |
-| /Users/peaker/dev/solar-finance/src/stores/system/systemStore.ts                             | TypeScript |         56 |         34 |         12 |        102 |
-| /Users/peaker/dev/solar-finance/src/stores/system/types.ts                                   | TypeScript |         24 |          5 |          4 |         33 |
+| /Users/peaker/dev/solar-finance/src/stores/system/index.ts                                   | TypeScript |          4 |          3 |          2 |          9 |
+| /Users/peaker/dev/solar-finance/src/stores/system/systemStore.ts                             | TypeScript |        211 |         96 |         45 |        352 |
+| /Users/peaker/dev/solar-finance/src/stores/system/types.ts                                   | TypeScript |         11 |          1 |          3 |         15 |
 | /Users/peaker/dev/solar-finance/src/stores/theme.ts                                          | TypeScript |         71 |         10 |         10 |         91 |
 | /Users/peaker/dev/solar-finance/src/stores/transaction/defaultTransactions.ts                | TypeScript |        741 |         22 |         17 |        780 |
 | /Users/peaker/dev/solar-finance/src/stores/transaction/index.ts                              | TypeScript |          4 |          2 |          1 |          7 |
@@ -203,6 +208,7 @@ Files
 | /Users/peaker/dev/solar-finance/src/styles/themes/_typography.scss                           | SCSS       |         66 |         13 |         17 |         96 |
 | /Users/peaker/dev/solar-finance/src/styles/themes/_variables.scss                            | SCSS       |         52 |         17 |         14 |         83 |
 | /Users/peaker/dev/solar-finance/src/types/base.ts                                            | TypeScript |          5 |          0 |          0 |          5 |
+| /Users/peaker/dev/solar-finance/src/utils/debounce.ts                                        | TypeScript |         16 |          9 |          4 |         29 |
 | /Users/peaker/dev/solar-finance/src/views/AccountsView.vue                                   | Vue        |        184 |          4 |         24 |        212 |
 | /Users/peaker/dev/solar-finance/src/views/DashboardView.vue                                  | Vue        |        221 |          4 |         19 |        244 |
 | /Users/peaker/dev/solar-finance/src/views/DebugStoreView.vue                                 | Vue        |        643 |          4 |         59 |        706 |
@@ -213,6 +219,7 @@ Files
 | /Users/peaker/dev/solar-finance/src/views/account/popup/AccountEditPopup.vue                 | Vue        |        410 |         11 |         58 |        479 |
 | /Users/peaker/dev/solar-finance/src/views/account/popup/AccountSelectorPopup.vue             | Vue        |        485 |         13 |         82 |        580 |
 | /Users/peaker/dev/solar-finance/src/views/account/popup/BookAccountsPopup.vue                | Vue        |        471 |          6 |         93 |        570 |
+| /Users/peaker/dev/solar-finance/src/views/account/popup/components/AccountIcon.vue           | Vue        |        107 |          3 |         14 |        124 |
 | /Users/peaker/dev/solar-finance/src/views/account/popup/components/AccountSharingPicker.vue  | Vue        |        186 |          1 |         30 |        217 |
 | /Users/peaker/dev/solar-finance/src/views/account/popup/components/AccountTypeSelector.vue   | Vue        |        151 |          1 |         25 |        177 |
 | /Users/peaker/dev/solar-finance/src/views/account/popup/composables/useAccountManagement.ts  | TypeScript |         76 |         18 |         20 |        114 |
@@ -236,7 +243,7 @@ Files
 | /Users/peaker/dev/solar-finance/src/views/book/popup/NewBookPopup.vue                        | Vue        |         30 |          1 |          5 |         36 |
 | /Users/peaker/dev/solar-finance/src/views/currency/popup/CurrencyPopup.vue                   | Vue        |        162 |          3 |         25 |        190 |
 | /Users/peaker/dev/solar-finance/src/views/icon/popup/IconSelectorPopup.vue                   | Vue        |        361 |          6 |         52 |        419 |
-| /Users/peaker/dev/solar-finance/src/views/transaction/TransactionView.vue                    | Vue        |        567 |          8 |         90 |        665 |
+| /Users/peaker/dev/solar-finance/src/views/transaction/TransactionView.vue                    | Vue        |        586 |          8 |         96 |        690 |
 | /Users/peaker/dev/solar-finance/src/views/transaction/components/AccountSelector.vue         | Vue        |        195 |          2 |         29 |        226 |
 | /Users/peaker/dev/solar-finance/src/views/transaction/components/AmountSection.vue           | Vue        |        190 |          5 |         24 |        219 |
 | /Users/peaker/dev/solar-finance/src/views/transaction/components/BookSelector.vue            | Vue        |        135 |          1 |         19 |        155 |
@@ -251,5 +258,5 @@ Files
 | /Users/peaker/dev/solar-finance/src/views/transaction/composables/useDistributionControl.ts  | TypeScript |         67 |         32 |         16 |        115 |
 | /Users/peaker/dev/solar-finance/src/views/transaction/composables/useKeypad.ts               | TypeScript |         38 |         22 |          7 |         67 |
 | /Users/peaker/dev/solar-finance/src/views/transaction/composables/useTransaction.ts          | TypeScript |        139 |         27 |         27 |        193 |
-| Total                                                                                        |            |     24,370 |      1,822 |      3,949 |     30,141 |
+| Total                                                                                        |            |     24,898 |      1,948 |      4,033 |     30,879 |
 +----------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+

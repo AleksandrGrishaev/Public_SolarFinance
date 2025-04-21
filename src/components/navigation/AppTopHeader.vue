@@ -25,10 +25,15 @@
       <div class="app-top-header__icon-container" v-if="showMessageIcon">
         <BaseIcon 
           :icon="IconMessage" 
-          size="xl" 
-          rounded="full"
+          size="lg" 
+          rounded="xl"
           class="app-top-header__icon"
           clickable
+          :background="background"
+          :color="iconColor"
+          :bordered="bordered"
+          :borderColor="borderColor"
+          :padding="padding"
           @click="handleMessageClick"
         />
         <div 
@@ -39,10 +44,15 @@
       <BaseIcon 
         v-if="showProfileIcon"
         :icon="IconUser" 
-        size="xl" 
-        rounded="full"
+        size="lg"
+        rounded="xl"
         class="app-top-header__icon"
         clickable
+        :background="background"
+        :color="iconColor"
+        :bordered="bordered"
+        :borderColor="borderColor"
+        :padding="padding"
         @click="handleProfileClick"
       />
       <slot name="right"></slot>
@@ -99,6 +109,41 @@ const props = defineProps({
   applySafeArea: {
     type: Boolean,
     default: true
+  },
+  /**
+   * Background color for icons
+   */
+  background: {
+    type: String,
+    default: null
+  },
+  /**
+   * Icon color
+   */
+  iconColor: {
+    type: String,
+    default: 'white'
+  },
+  /**
+   * Apply border to icons
+   */
+  bordered: {
+    type: Boolean,
+    default: false
+  },
+  /**
+   * Border color for icons
+   */
+  borderColor: {
+    type: String,
+    default: null
+  },
+  /**
+   * Padding for icons
+   */
+  padding: {
+    type: [String, Number],
+    default: 6
   }
 });
 
@@ -113,7 +158,9 @@ const headerStyle = computed(() => {
   if (!props.applySafeArea) return {};
   
   return {
-    paddingTop: `${safeAreaInsets.value.top}px`
+    paddingTop: `${safeAreaInsets.value.top}px`,
+    // Учитываем дополнительное внутреннее пространство при вычислении общей высоты
+    height: safeAreaInsets.value.top > 0 ? `calc(34px + ${safeAreaInsets.value.top}px)` : '34px'
   };
 });
 
@@ -150,15 +197,22 @@ const handleProfileClick = () => {
   height: 34px;
   width: 100%;
   background-color: transparent;
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .app-top-header.with-safe-area {
-  box-sizing: content-box;
+  box-sizing: border-box;
+  height: auto;
+  min-height: 34px;
 }
 
 .app-top-header__left {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
+  z-index: 2;
 }
 
 .app-top-header__back-button {
@@ -169,6 +223,11 @@ const handleProfileClick = () => {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 50%;
+  z-index: 1;
 }
 
 .app-top-header__right {
@@ -176,6 +235,8 @@ const handleProfileClick = () => {
   flex-direction: row;
   gap: var(--spacing-sm);
   align-items: center;
+  flex-shrink: 0;
+  z-index: 2;
 }
 
 .app-top-header__icon-container {

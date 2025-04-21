@@ -202,6 +202,8 @@ const updateHeaderConfig = () => {
     showBack: true,
     hasNotifications: true,
     showMessageIcon: true,
+    showProfileIcon: true,
+    background: 'var(--bg-dropdown)'
   });
 };
 
@@ -605,7 +607,7 @@ watch([selectedAccount, destinationAccount, convertedAmount], () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #121212; /* Черный фон */
+  background-color: #000000; /* Черный фон */
   box-sizing: border-box;
   /* Предотвращаем скролл */
   overflow: hidden;

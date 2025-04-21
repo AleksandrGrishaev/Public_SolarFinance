@@ -2,17 +2,22 @@
 <template>
   <div class="ios-layout" :class="{ 'dark-theme': isDarkTheme }">
     <AppTopHeader 
-  v-if="showHeader" 
-  :showBackButton="showBackButton"
-  :title="headerTitle"
-  :hasNotifications="hasNotifications"
-  :showMessageIcon="showMessageIcon"
-  :showProfileIcon="showProfileIcon"
-  :applySafeArea="true"
-  @back="handleBack"
-  @message="handleMessage"
-  @profile="handleProfile"
-/>
+      v-if="showHeader" 
+      :showBackButton="showBackButton"
+      :title="headerTitle"
+      :hasNotifications="hasNotifications"
+      :showMessageIcon="showMessageIcon"
+      :showProfileIcon="showProfileIcon"
+      :applySafeArea="true"
+      :background="'var(--bg-dropdown)'"
+      :iconColor="'var(--text-usual)'"
+      :bordered="true"
+      :borderColor="'var(--bg-dropdown)'"
+      :padding="10"
+      @back="handleBack"
+      @message="handleMessage"
+      @profile="handleProfile"
+    />
     
     <div class="ios-content">
       <router-view 
@@ -64,21 +69,25 @@ const updateShowMenu = (value: boolean) => {
 };
 
 // Update header settings from child components
-// Update header settings from child components
 const updateHeaderSettings = (settings: {
   show?: boolean,
   title?: string,
   showBack?: boolean,
   hasNotifications?: boolean,
-  showMessageIcon?: boolean,  // Добавьте этот параметр
-  showProfileIcon?: boolean   // Добавьте этот параметр
+  showMessageIcon?: boolean,
+  showProfileIcon?: boolean,
+  background?: string,
+  iconColor?: string,
+  bordered?: boolean,
+  borderColor?: string,
+  padding?: number | string
 }) => {
   if (settings.show !== undefined) showHeader.value = settings.show;
   if (settings.title !== undefined) headerTitle.value = settings.title;
   if (settings.showBack !== undefined) showBackButton.value = settings.showBack;
   if (settings.hasNotifications !== undefined) hasNotifications.value = settings.hasNotifications;
-  if (settings.showMessageIcon !== undefined) showMessageIcon.value = settings.showMessageIcon;  // Обработайте параметр
-  if (settings.showProfileIcon !== undefined) showProfileIcon.value = settings.showProfileIcon;  // Обработайте параметр
+  if (settings.showMessageIcon !== undefined) showMessageIcon.value = settings.showMessageIcon;
+  if (settings.showProfileIcon !== undefined) showProfileIcon.value = settings.showProfileIcon;
 };
 
 // Event handlers for header actions

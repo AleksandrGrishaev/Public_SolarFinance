@@ -85,7 +85,7 @@ const routes: Array<RouteRecordRaw> = [
           header: {
             show: true,
             showBack: true,
-            showMessageIcon: false,
+            showMessageIcon: true,
             hasNotifications: true
           }
         }
