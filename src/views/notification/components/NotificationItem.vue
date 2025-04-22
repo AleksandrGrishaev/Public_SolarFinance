@@ -66,6 +66,7 @@ import BaseTitle from '@/components/atoms/typography/BaseTitle.vue';
 import BaseDescription from '@/components/atoms/typography/BaseDescription.vue';
 import { NotificationSubtype } from '@/stores/notification/types';
 import { useSwipe } from '@/composables/useSwipe';
+import { useAlerts } from '@/stores/alert/alertService';
 
 export default defineComponent({
   name: 'NotificationItem',
@@ -109,6 +110,7 @@ export default defineComponent({
   },
   emits: ['action', 'read', 'delete'],
   setup(props, { emit }) {
+    const alerts = useAlerts();
     const hasAction = computed(() => !!props.action);
     const actionText = computed(() => props.action?.text || 'View');
     
@@ -131,11 +133,21 @@ export default defineComponent({
     const handleMarkAsRead = () => {
       if (!props.read) {
         emit('read', props.id);
+        
+        // Show confirmation alert
+        alerts.info(`Notification marked as read`, {
+          duration: 2000
+        });
       }
     };
     
     const handleDelete = () => {
       emit('delete', props.id);
+      
+      // Show confirmation alert
+      alerts.info(`Notification removed`, {
+        duration: 2000
+      });
     };
     
     // Use our swipe composable
@@ -191,6 +203,17 @@ export default defineComponent({
           id: props.id,
           action: props.action
         });
+        
+        // Show relevant alert based on action type
+        if (props.action.text === 'Dismiss') {
+          alerts.info(`Notification dismissed`, {
+            duration: 2000
+          });
+        } else {
+          alerts.success(`${props.action.text} action completed`, {
+            duration: 2000
+          });
+        }
       }
     };
     

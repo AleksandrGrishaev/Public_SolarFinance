@@ -36,6 +36,7 @@
             :action="notification.action"
             @action="onAction"
             @read="onRead"
+            @delete="onDelete"
           />
         </template>
       </BaseList>
@@ -93,7 +94,7 @@ export default defineComponent({
       default: 'd MMMM'
     }
   },
-  emits: ['decline', 'accept', 'read', 'debtView', 'debtDecline', 'debtAccept'],
+  emits: ['decline', 'accept', 'read', 'debtView', 'debtDecline', 'debtAccept', 'delete'],
   setup(props, { emit }) {
     const groupedNotifications = computed(() => {
       const groups: Record<string, NotificationItem[]> = {};
@@ -145,6 +146,10 @@ export default defineComponent({
       emit('read', id);
     };
     
+    const onDelete = (id: string) => {
+      emit('delete', id);
+    };
+    
     const onDebtView = (data: { id: string, transactionId: string }) => {
       emit('debtView', data);
     };
@@ -162,6 +167,7 @@ export default defineComponent({
       hasNotifications,
       onAction,
       onRead,
+      onDelete,
       onDebtView,
       onDebtDecline,
       onDebtAccept

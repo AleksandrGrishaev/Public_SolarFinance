@@ -26,6 +26,7 @@
           @debtView="onDebtView"
           @debtDecline="onDebtDecline"
           @debtAccept="onDebtAccept"
+          @delete="onDeleteNotification"
         />
       </div>
     </div>
@@ -41,6 +42,7 @@ import BaseFloatingPopup from '@/components/organisms/popups/BaseFloatingPopup.v
 import NotificationList from './NotificationList.vue';
 import { useNotifications } from '@/stores/notification/composables/useNotifications';
 import { NotificationSubtype } from '@/stores/notification/types';
+import { useAlerts } from '@/stores/alert/alertService';
 
 export default defineComponent({
   name: 'NotificationPopup',
@@ -52,6 +54,7 @@ export default defineComponent({
   setup() {
     const router = useRouter();
     const isVisible = ref(false);
+    const alerts = useAlerts();
     
     // Use the notification store
     const {
@@ -101,9 +104,18 @@ export default defineComponent({
       close();
     };
     
+    const onDeleteNotification = (id: string) => {
+      deleteNotification(id);
+    };
+    
     const onDeclineNotification = (id: string) => {
       console.log('Dismissed notification:', id);
       deleteNotification(id);
+      
+      // Show a simple alert that notification was dismissed
+      alerts.info('Notification dismissed', {
+        duration: 2000
+      });
     };
     
     const onAcceptNotification = (id: string) => {
@@ -126,6 +138,15 @@ export default defineComponent({
         // Close the popup if navigating
         close();
       }
+      
+      // After handling, remove the notification
+      deleteNotification(id);
+      
+      // Show a success alert
+      alerts.success('Action completed', {
+        title: notification?.action?.text || 'Success',
+        duration: 3000
+      });
     };
     
     const onReadNotification = (id: string) => {
@@ -143,6 +164,8 @@ export default defineComponent({
       
       // Close popup
       close();
+      
+      // Optionally, don't delete the notification yet as the user is just viewing it
     };
     
     const onDebtDecline = (data: { id: string, transactionId: string }) => {
@@ -154,8 +177,12 @@ export default defineComponent({
       // Delete the notification
       deleteNotification(data.id);
       
-      // Show a success message
-      showInfo('Debt declined', 'You have successfully declined the debt');
+      // Show a warning alert
+      alerts.warning('Debt declined', {
+        title: 'Debt Request',
+        message: 'You have declined the debt request',
+        duration: 3000
+      });
     };
     
     const onDebtAccept = (data: { id: string, transactionId: string }) => {
@@ -167,8 +194,12 @@ export default defineComponent({
       // Delete the notification
       deleteNotification(data.id);
       
-      // Show a success message
-      showInfo('Debt accepted', 'You have successfully accepted the debt');
+      // Show a success alert
+      alerts.success('Debt accepted', {
+        title: 'Debt Request',
+        message: 'You have successfully accepted the debt',
+        duration: 3000
+      });
     };
     
     return {
@@ -184,7 +215,8 @@ export default defineComponent({
       onReadNotification,
       onDebtView,
       onDebtDecline,
-      onDebtAccept
+      onDebtAccept,
+      onDeleteNotification
     };
   }
 });
