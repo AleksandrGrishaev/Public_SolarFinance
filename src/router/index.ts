@@ -122,7 +122,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: '',
         name: 'debug',
-        component: () => import('@/views/DebugStoreView.vue'),
+        component: () => import('@/views/debug/DebugStoreView.vue'),
         meta: {
           requiresAuth: true,
           title: 'Debug Stores'

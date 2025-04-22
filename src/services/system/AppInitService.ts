@@ -3,6 +3,7 @@ import { useCurrencyStore } from '@/stores/currency';
 import { useUserStore } from '@/stores/user';
 import { useSystemStore } from '@/stores/system';
 import { useThemeStore } from '@/stores/theme/themeStore';
+import { useNotificationService } from '@/stores/notification/notificationService';
 
 /**
  * Класс для инициализации приложения
@@ -62,6 +63,12 @@ export class AppInitService {
       const themeStore = useThemeStore();
       themeStore.init();
       console.log('[AppInitService] Theme store initialized, current theme:', themeStore.currentTheme);
+      
+      // Инициализация сервиса уведомлений
+      const notificationService = useNotificationService();
+      notificationService.init();
+      console.log('[AppInitService] Notification service initialized, unread count:', 
+        notificationService.getUnreadCount());
       
       this._isInitialized = true;
       console.log('[AppInitService] Application initialization complete');
