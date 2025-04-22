@@ -1,18 +1,58 @@
 <!-- src/views/notification/components/NotificationItem.vue -->
 <template>
-  <div class="transaction" :class="{ 'transaction--read': read }" @click="handleAction">
-    <div class="icon-big">
-      <BaseIconComponent 
-        :icon="getIconComponent()" 
-        size="38" 
-        :background="getIconBackground()" 
-        color="white"
-        borderRadius="19px"
-      />
+  <div class="notification-wrapper">
+    <div
+      class="notification-swipe-actions notification-swipe-actions--left"
+      :class="{ 'notification-swipe-actions--visible': swipeDirection === 'left' }"
+    >
+      <div class="swipe-action swipe-action--read" @click.stop="handleMarkAsRead">
+        <IconCheck size="20" />
+        <span>Read</span>
+      </div>
     </div>
-    <div class="name-info">
-      <BaseTitle :text="title" />
-      <BaseDescription :text="message" />
+    
+    <div
+      class="notification-swipe-actions notification-swipe-actions--right"
+      :class="{ 'notification-swipe-actions--visible': swipeDirection === 'right' }"
+    >
+      <div class="swipe-action swipe-action--delete" @click.stop="handleDelete">
+        <IconTrash size="20" />
+        <span>Delete</span>
+      </div>
+    </div>
+    
+    <div 
+      ref="swipeEl"
+      class="transaction" 
+      :class="{ 
+        'transaction--read': read, 
+        'swiping': isSwiping,
+        'swipe-left': swipeDirection === 'left',
+        'swipe-right': swipeDirection === 'right'
+      }" 
+      :style="swipeStyle"
+      @click="handleAction"
+      @touchstart="onTouchStart"
+      @touchmove="onTouchMove"
+      @touchend="onTouchEnd"
+    >
+      <div class="icon-big">
+        <BaseIconComponent 
+          :icon="getIconComponent()" 
+          size="38" 
+          :background="getIconBackground()" 
+          color="white"
+          borderRadius="19px"
+        />
+      </div>
+      <div class="name-info">
+        <BaseTitle :text="title" />
+        <BaseDescription :text="message" />
+        <div class="time-info">{{ formattedTime }}</div>
+      </div>
+      <div v-if="action && action.text" class="action-indicator">
+        <IconChevronRight size="16" />
+      </div>
     </div>
   </div>
 </template>
@@ -20,18 +60,22 @@
 <script lang="ts">
 import { defineComponent, computed } from 'vue';
 import { format, formatDistanceToNow, isToday, isYesterday } from 'date-fns';
-import { IconInfoCircle, IconBell, IconCash, IconDiscount } from '@tabler/icons-vue';
+import { IconInfoCircle, IconBell, IconCash, IconDiscount, IconCheck, IconTrash, IconChevronRight } from '@tabler/icons-vue';
 import BaseIconComponent from '@/components/atoms/icons/BaseIconComponent.vue';
 import BaseTitle from '@/components/atoms/typography/BaseTitle.vue';
 import BaseDescription from '@/components/atoms/typography/BaseDescription.vue';
 import { NotificationSubtype } from '@/stores/notification/types';
+import { useSwipe } from '@/composables/useSwipe';
 
 export default defineComponent({
   name: 'NotificationItem',
   components: {
     BaseIconComponent,
     BaseTitle,
-    BaseDescription
+    BaseDescription,
+    IconCheck,
+    IconTrash,
+    IconChevronRight
   },
   props: {
     id: {
@@ -63,7 +107,7 @@ export default defineComponent({
       default: null
     }
   },
-  emits: ['action', 'read'],
+  emits: ['action', 'read', 'delete'],
   setup(props, { emit }) {
     const hasAction = computed(() => !!props.action);
     const actionText = computed(() => props.action?.text || 'View');
@@ -82,6 +126,31 @@ export default defineComponent({
       } else {
         return format(dateObj, 'd MMM');
       }
+    });
+    
+    const handleMarkAsRead = () => {
+      if (!props.read) {
+        emit('read', props.id);
+      }
+    };
+    
+    const handleDelete = () => {
+      emit('delete', props.id);
+    };
+    
+    // Use our swipe composable
+    const { 
+      isSwiping, 
+      swipeDirection, 
+      swipeStyle, 
+      onTouchStart, 
+      onTouchMove, 
+      onTouchEnd 
+    } = useSwipe({
+      threshold: 70,
+      maxSwipe: 120,
+      onLeftSwipe: handleMarkAsRead,
+      onRightSwipe: handleDelete
     });
     
     // Get appropriate icon component based on notification type
@@ -131,20 +200,35 @@ export default defineComponent({
       formattedTime,
       getIconComponent,
       getIconBackground,
-      handleAction
+      handleAction,
+      isSwiping,
+      swipeDirection,
+      swipeStyle,
+      onTouchStart,
+      onTouchMove,
+      onTouchEnd,
+      handleMarkAsRead,
+      handleDelete
     };
   }
 });
 </script>
 
 <style scoped>
+.notification-wrapper {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: var(--spacing-xs);
+  border-radius: 32px;
+}
+
 .transaction,
 .transaction * {
   box-sizing: border-box;
 }
 
 .transaction {
-  padding: 6px 20px 6px 12px;
+  padding: 8px 16px 8px 12px;
   display: flex;
   flex-direction: row;
   gap: 10px;
@@ -156,8 +240,9 @@ export default defineComponent({
   overflow: hidden;
   background: var(--text-textsubheader, #444444);
   border-radius: 32px;
-  margin-bottom: var(--spacing-xs);
   cursor: pointer;
+  z-index: 1;
+  will-change: transform;
 }
 
 .transaction:hover {
@@ -169,7 +254,7 @@ export default defineComponent({
 }
 
 .name-info {
-  padding: 10px;
+  padding: 8px 8px 8px 0;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -178,5 +263,83 @@ export default defineComponent({
   flex: 1;
   position: relative;
   overflow: hidden;
+}
+
+.time-info {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 2px;
+}
+
+/* Action indicator arrow */
+.action-indicator {
+  color: var(--maincolor-colorsucces, #53b794);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Swipe states */
+.transaction.swiping {
+  transition: none;
+}
+
+.transaction:not(.swiping) {
+  transition: transform 0.3s ease;
+}
+
+.transaction.swipe-left {
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+.transaction.swipe-right {
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+/* Swipe action buttons */
+.notification-swipe-actions {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.notification-swipe-actions--left {
+  left: 0;
+  padding-left: 16px;
+}
+
+.notification-swipe-actions--right {
+  right: 0;
+  padding-right: 16px;
+}
+
+.notification-swipe-actions--visible {
+  opacity: 1;
+}
+
+.swipe-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: white;
+  font-size: 10px;
+}
+
+.swipe-action--read {
+  color: var(--maincolor-colorsucces, #53b794);
+}
+
+.swipe-action--delete {
+  color: var(--maincolor-colorwarrning, #a44942);
 }
 </style>
