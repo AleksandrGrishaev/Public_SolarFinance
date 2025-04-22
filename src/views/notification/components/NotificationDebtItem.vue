@@ -2,28 +2,27 @@
 <template>
   <div class="notification" :class="{ 'notification--read': read }">
     <div class="icon-big">
-      <component :is="IconCash" size="24" class="icon-box" />
+      <BaseIconComponent 
+        :icon="IconCash" 
+        size="38" 
+        background="var(--maincolor-colorsucces, #53b794)" 
+        color="white"
+        borderRadius="50%"
+      />
     </div>
     <div class="note-debt">
       <div class="text">
-        <div class="title">New debt from {{ createdBy }}</div>
-        <div class="about">
-          Notes: {{ transactionName }}. {{ message }}
-        </div>
+        <BaseTitle :text="`New debt from ${createdBy}`" />
+        <BaseDescription :text="`Notes: ${transactionName}. ${message}`" />
       </div>
-      <div class="express-action">
-        <div class="button-line">
-          <div class="decline" @click="decline">
-            <div class="declire">Decline</div>
-          </div>
-          <div class="view" @click="view">
-            <div class="declire2">View</div>
-          </div>
-          <div class="accept" @click="accept">
-            <div class="acccept">Accept</div>
-          </div>
-        </div>
-      </div>
+      <ExpressAction 
+        declineText="Decline"
+        viewText="View"
+        acceptText="Accept"
+        @decline="decline"
+        @view="view"
+        @accept="accept"
+      />
     </div>
   </div>
 </template>
@@ -32,10 +31,19 @@
 import { defineComponent, computed } from 'vue';
 import { format, formatDistanceToNow, isToday, isYesterday } from 'date-fns';
 import { IconCash } from '@tabler/icons-vue';
+import BaseIconComponent from '@/components/atoms/icons/BaseIconComponent.vue';
+import BaseTitle from '@/components/atoms/typography/BaseTitle.vue';
+import BaseDescription from '@/components/atoms/typography/BaseDescription.vue';
+import ExpressAction from '@/components/molecules/actions/ExpressAction.vue';
 
 export default defineComponent({
   name: 'NotificationDebtItem',
-  components: {},
+  components: {
+    BaseIconComponent,
+    BaseTitle,
+    BaseDescription,
+    ExpressAction
+  },
   props: {
     id: {
       type: String,
@@ -186,34 +194,6 @@ export default defineComponent({
   opacity: 0.7;
 }
 
-.icon-big {
-  display: flex;
-  flex-direction: row;
-  gap: 0px;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  position: relative;
-  overflow: hidden;
-}
-
-.icon-box {
-  border-radius: 19px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 38px;
-  height: 38px;
-  position: relative;
-  overflow: visible;
-  aspect-ratio: 1;
-  background-color: var(--maincolor-colorsucces, #53b794);
-  color: white;
-}
-
 .note-debt {
   padding: 4px 8px 4px 0px;
   display: flex;
@@ -238,137 +218,5 @@ export default defineComponent({
   overflow: hidden;
 }
 
-.title {
-  color: #ffffff;
-  text-align: left;
-  font-family: var(--enbody-font-family, "Inter-Regular", sans-serif);
-  font-size: var(--enbody-font-size, 16px);
-  line-height: var(--enbody-line-height, 20px);
-  letter-spacing: var(--enbody-letter-spacing, -0.02em);
-  font-weight: var(--enbody-font-weight, 400);
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-}
-
-.about {
-  color: #ffffff;
-  text-align: left;
-  font-family: var(--ensmall-font-family, "Inter-Regular", sans-serif);
-  font-size: var(--ensmall-font-size, 12px);
-  line-height: var(--ensmall-line-height, 16px);
-  font-weight: var(--ensmall-font-weight, 400);
-  position: relative;
-  align-self: stretch;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-}
-
-.express-action {
-  padding: 0px 8px 0px 0px;
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-  align-items: center;
-  justify-content: flex-start;
-  align-self: stretch;
-  flex-shrink: 0;
-  height: 20px;
-  position: relative;
-}
-
-.button-line {
-  display: flex;
-  flex-direction: row;
-  gap: 12px;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  position: relative;
-}
-
-.decline {
-  border-radius: 34px;
-  border-style: dashed;
-  border-color: var(--maincolor-colorwarrning, #a44942);
-  border-width: 1px;
-  padding: 4px 8px 4px 8px;
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  position: relative;
-  cursor: pointer;
-}
-
-.declire {
-  color: var(--maincolor-colorwarrning, #a44942);
-  text-align: left;
-  font-family: var(--ensupersmall-font-family, "Inter-Regular", sans-serif);
-  font-size: var(--ensupersmall-font-size, 10px);
-  line-height: var(--ensupersmall-line-height, 12px);
-  font-weight: var(--ensupersmall-font-weight, 400);
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-}
-
-.view {
-  background: var(--maincolor-colorneutral, #dbdadd);
-  border-radius: 34px;
-  padding: 4px 8px 4px 8px;
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  position: relative;
-  cursor: pointer;
-}
-
-.declire2 {
-  color: var(--text-textgrey, #949496);
-  text-align: left;
-  font-family: var(--ensupersmall-font-family, "Inter-Regular", sans-serif);
-  font-size: var(--ensupersmall-font-size, 10px);
-  line-height: var(--ensupersmall-line-height, 12px);
-  font-weight: var(--ensupersmall-font-weight, 400);
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-}
-
-.accept {
-  background: var(--maincolor-colorsucces, #53b794);
-  border-radius: 34px;
-  padding: 4px 8px 4px 8px;
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  position: relative;
-  cursor: pointer;
-}
-
-.acccept {
-  color: var(--text-textcontrast, #ffffff);
-  text-align: left;
-  font-family: var(--ensupersmall-font-family, "Inter-Regular", sans-serif);
-  font-size: var(--ensupersmall-font-size, 10px);
-  line-height: var(--ensupersmall-line-height, 12px);
-  font-weight: var(--ensupersmall-font-weight, 400);
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-}
+/* Styles for the action buttons are now in the ExpressAction component */
 </style>

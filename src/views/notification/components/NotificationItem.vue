@@ -1,14 +1,18 @@
 <!-- src/views/notification/components/NotificationItem.vue -->
 <template>
-  <div class="transaction" :class="{ 'transaction--read': read }">
+  <div class="transaction" :class="{ 'transaction--read': read }" @click="handleAction">
     <div class="icon-big">
-      <component :is="getIconComponent()" size="24" class="icon-box" />
+      <BaseIconComponent 
+        :icon="getIconComponent()" 
+        size="38" 
+        :background="getIconBackground()" 
+        color="white"
+        borderRadius="19px"
+      />
     </div>
     <div class="name-info">
-      <div class="title">{{ title }}</div>
-      <div class="about">
-        {{ message }}
-      </div>
+      <BaseTitle :text="title" />
+      <BaseDescription :text="message" />
     </div>
   </div>
 </template>
@@ -17,11 +21,18 @@
 import { defineComponent, computed } from 'vue';
 import { format, formatDistanceToNow, isToday, isYesterday } from 'date-fns';
 import { IconInfoCircle, IconBell, IconCash, IconDiscount } from '@tabler/icons-vue';
+import BaseIconComponent from '@/components/atoms/icons/BaseIconComponent.vue';
+import BaseTitle from '@/components/atoms/typography/BaseTitle.vue';
+import BaseDescription from '@/components/atoms/typography/BaseDescription.vue';
 import { NotificationSubtype } from '@/stores/notification/types';
 
 export default defineComponent({
   name: 'NotificationItem',
-  components: {},
+  components: {
+    BaseIconComponent,
+    BaseTitle,
+    BaseDescription
+  },
   props: {
     id: {
       type: String,
@@ -87,6 +98,20 @@ export default defineComponent({
       }
     };
     
+    // Get appropriate icon background color based on notification type
+    const getIconBackground = () => {
+      switch (props.iconType) {
+        case NotificationSubtype.INFO:
+          return 'var(--maincolor-colorsucces)';
+        case NotificationSubtype.PROMO:
+          return 'var(--maincolor-colorpromo, purple)';
+        case NotificationSubtype.DEBT:
+          return 'var(--maincolor-colorwarrning)';
+        default:
+          return 'var(--maincolor-colorsucces)';
+      }
+    };
+    
     const handleAction = () => {
       if (!props.read) {
         emit('read', props.id);
@@ -105,6 +130,7 @@ export default defineComponent({
       actionText,
       formattedTime,
       getIconComponent,
+      getIconBackground,
       handleAction
     };
   }
@@ -131,38 +157,15 @@ export default defineComponent({
   background: var(--text-textsubheader, #444444);
   border-radius: 32px;
   margin-bottom: var(--spacing-xs);
+  cursor: pointer;
+}
+
+.transaction:hover {
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .transaction--read {
   opacity: 0.7;
-}
-
-.icon-big {
-  display: flex;
-  flex-direction: row;
-  gap: 0px;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  position: relative;
-  overflow: hidden;
-}
-
-.icon-box {
-  border-radius: 19px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 38px;
-  height: 38px;
-  position: relative;
-  overflow: visible;
-  aspect-ratio: 1;
-  background-color: var(--maincolor-colorsucces, #53b794);
-  color: white;
 }
 
 .name-info {
@@ -175,33 +178,5 @@ export default defineComponent({
   flex: 1;
   position: relative;
   overflow: hidden;
-}
-
-.title {
-  color: #ffffff;
-  text-align: left;
-  font-family: var(--enbody-font-family, "Inter-Regular", sans-serif);
-  font-size: var(--enbody-font-size, 16px);
-  line-height: var(--enbody-line-height, 20px);
-  letter-spacing: var(--enbody-letter-spacing, -0.02em);
-  font-weight: var(--enbody-font-weight, 400);
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-}
-
-.about {
-  color: #ffffff;
-  text-align: left;
-  font-family: var(--ensmall-font-family, "Inter-Regular", sans-serif);
-  font-size: var(--ensmall-font-size, 12px);
-  line-height: var(--ensmall-line-height, 16px);
-  font-weight: var(--ensmall-font-weight, 400);
-  position: relative;
-  align-self: stretch;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
 }
 </style>

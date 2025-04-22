@@ -79,7 +79,7 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   width: 100%;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
 }
 
 .base-list__date {
@@ -94,6 +94,6 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
-  padding: 0 var(--spacing-md);
+  padding: 0 var(--spacing-xs);
 }
 </style>
