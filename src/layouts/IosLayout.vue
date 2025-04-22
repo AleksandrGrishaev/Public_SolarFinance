@@ -1,6 +1,6 @@
 <!-- src/layouts/IosLayout.vue -->
 <template>
-  <div class="ios-layout" :class="{ 'dark-theme': isDarkTheme }">
+  <div class="ios-layout">
     <AppTopHeader 
       v-if="showHeader" 
       :showBackButton="showBackButton"
@@ -45,9 +45,6 @@ const props = defineProps({
     default: true
   }
 });
-
-// Theme state
-const isDarkTheme = ref(true);
 
 // Menu visibility state
 const localShowNavMenu = ref(props.showNavMenu);
@@ -169,11 +166,6 @@ onMounted(() => {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-}
-
-.dark-theme {
-  background-color: var(--bg-screen);
-  color: var(--text-usual);
 }
 
 .menu-container {

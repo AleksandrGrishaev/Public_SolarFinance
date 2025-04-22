@@ -3,7 +3,7 @@
 // Полная конфигурация светлой темы
 // Создана на основе _dark.scss с обратными цветами
 
-.light-theme {
+html.light-theme {
     // Text colors
     --text-header: #333333;     // TextHeader - темный
     --text-usual: #333333;      // TextUsual - основной темный текст
@@ -12,11 +12,10 @@
     --text-inactive: #999999;   // TextInActive - светло-серый
     --text-contrast: #FFFFFF;   // TextContrast - белый (для контраста на темном фоне)
   
-
-//Icon colors
---bg-icon:#FFFFFF; 
---icon-border: var(--border-color)
---icon-borderActive: var(--color-primary)
+    // Icon colors
+    --bg-icon: #FFFFFF; 
+    --icon-border: var(--border-color);
+    --icon-borderActive: var(--color-primary);
 
     // Main colors
     --color-primary: #FFB800;   // ColorPrimary - более насыщенный желтый
@@ -55,4 +54,4 @@
     // Специфичные настройки компонентов для светлой темы
     --scrollbar-track: #F8F9FA;
     --scrollbar-thumb: #D0D0D0;
-  }
+}

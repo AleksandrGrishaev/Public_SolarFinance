@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html class="dark-theme">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тестирование тем</title>
+    <style>
+        /* Базовые цвета для всех тем */
+        :root {
+            --color-primary: #FFD452;   /* Желтый */
+            --color-warning: #A44942;   /* Красный */
+            --color-success: #53B794;   /* Зеленый */
+            
+            --text-header: #FFFFFF;     /* Белый */
+            --text-usual: #F5F5F5;      /* Почти белый */
+            --bg-main: #333333;         /* Основной темно-серый фон */
+            --bg-screen: #000000;       /* Черный фон экрана */
+        }
+
+        /* Темная тема */
+        .dark-theme {
+            --text-header: #FFFFFF;     /* TextHeader - белый */
+            --text-usual: #F5F5F5;      /* TextUsual - почти белый */
+            --color-primary: #FFD452;   /* ColorPrimary - желтый */
+            --color-warning: #A44942;   /* ColorWarning - красный */
+            --color-success: #53B794;   /* ColorSuccess - зеленый */
+            --bg-main: #333333;         /* BgMain - основной темно-серый фон */
+            --bg-screen: #000000;       /* Черный фон экрана */
+            --app-background: var(--bg-screen);
+            --text-primary: var(--text-usual);
+        }
+        
+        /* Светлая тема */
+        .light-theme {
+            --text-header: #333333;     /* TextHeader - темный */
+            --text-usual: #333333;      /* TextUsual - основной темный текст */
+            --color-primary: #FFB800;   /* ColorPrimary - более насыщенный желтый */
+            --color-warning: #D32F2F;   /* ColorWarning - яркий красный */
+            --color-success: #2E7D32;   /* ColorSuccess - темно-зеленый */
+            --bg-main: #FFFFFF;         /* BgMain - белый основной фон */
+            --bg-screen: #FFFFFF;       /* Белый фон экрана */
+            --app-background: var(--bg-screen);
+            --text-primary: var(--text-usual);
+        }
+        
+        /* Глобальные стили */
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg-screen);
+            color: var(--text-primary);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: var(--text-header);
+            margin-bottom: 20px;
+        }
+        
+        .theme-controls {
+            margin-bottom: 30px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: var(--color-primary);
+            color: #333;
+            font-weight: bold;
+        }
+        
+        .card {
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            background-color: var(--bg-main);
+            color: var(--text-usual);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .color-sample {
+            height: 60px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-weight: bold;
+        }
+        
+        .primary-color {
+            background-color: var(--color-primary);
+        }
+        
+        .warning-color {
+            background-color: var(--color-warning);
+        }
+        
+        .success-color {
+            background-color: var(--color-success);
+        }
+        
+        .text-sample {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+        
+        .debug-info {
+            font-family: monospace;
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #2d2d2d;
+            color: #e0e0e0;
+            border-radius: 5px;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Тестирование CSS-переменных и тем</h1>
+        
+        <div class="theme-controls">
+            <button onclick="setTheme('dark')">Темная тема</button>
+            <button onclick="setTheme('light')">Светлая тема</button>
+        </div>
+        
+        <div class="card">
+            <h2>Цветовые образцы</h2>
+            <div class="color-sample primary-color">Primary Color: var(--color-primary)</div>
+            <div class="color-sample warning-color">Warning Color: var(--color-warning)</div>
+            <div class="color-sample success-color">Success Color: var(--color-success)</div>
+        </div>
+        
+        <div class="card">
+            <h2>Образцы текста</h2>
+            <div class="text-sample">
+                <h3>Заголовок (text-header)</h3>
+                <p>Обычный текст (text-usual)</p>
+            </div>
+        </div>
+        
+        <div class="debug-info">
+            <h3>Отладочная информация:</h3>
+            <div id="theme-info"></div>
+            <div id="css-vars"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Функция для переключения темы
+        function setTheme(theme) {
+            document.documentElement.classList.remove('dark-theme', 'light-theme');
+            document.documentElement.classList.add(theme + '-theme');
+            updateDebugInfo();
+        }
+        
+        // Функция для вывода отладочной информации
+        function updateDebugInfo() {
+            const themeInfoElement = document.getElementById('theme-info');
+            const cssVarsElement = document.getElementById('css-vars');
+            
+            // Информация о текущей теме
+            const currentTheme = document.documentElement.classList.contains('dark-theme') ? 'dark-theme' : 'light-theme';
+            themeInfoElement.innerHTML = `
+                <p>Текущая тема: <strong>${currentTheme}</strong></p>
+                <p>Классы на documentElement: <strong>${document.documentElement.className}</strong></p>
+            `;
+            
+            // Получаем значения CSS-переменных
+            const style = getComputedStyle(document.documentElement);
+            const cssVars = [
+                '--text-header',
+                '--text-usual',
+                '--color-primary',
+                '--color-warning',
+                '--color-success',
+                '--bg-main',
+                '--bg-screen',
+                '--app-background',
+                '--text-primary'
+            ];
+            
+            let cssVarsHtml = '<ul>';
+            cssVars.forEach(variable => {
+                const value = style.getPropertyValue(variable).trim();
+                cssVarsHtml += `<li>${variable}: <strong>${value}</strong></li>`;
+            });
+            cssVarsHtml += '</ul>';
+            
+            cssVarsElement.innerHTML = cssVarsHtml;
+        }
+        
+        // Запускаем обновление отладочной информации при загрузке
+        document.addEventListener('DOMContentLoaded', updateDebugInfo);
+    </script>
+</body>
+</html>

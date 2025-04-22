@@ -1,12 +1,11 @@
 <template>
-  <n-config-provider :theme="themeStore.isDark ? darkTheme : null">
+  <n-config-provider :theme="darkTheme">
     <n-loading-bar-provider>
       <n-dialog-provider>
         <n-notification-provider>
           <n-message-provider>
             <message-provider>
-              <!-- Добавляем ключ для принудительной перерисовки при изменении темы -->
-              <div class="app-container" :key="themeVersion">
+              <div class="app-container">
                 <router-view v-slot="{ Component }">
                   <transition name="fade" mode="out-in">
                     <component :is="Component" />
@@ -30,13 +29,47 @@ import {
   NNotificationProvider,
   NMessageProvider
 } from 'naive-ui';
-import { useThemeStore } from './stores/theme';
 import MessageProvider from './components/system/MessageProvider.vue';
-import { useSimpleTheme } from './composables/useSimpleTheme.ts';
+import { onMounted } from 'vue';
+import { useTheme } from '@/composables/useTheme';
 
-// Получение хранилища темы
-const themeStore = useThemeStore();
+// Инициализируем тему
+const { initTheme } = useTheme();
 
-// Получаем ссылку на версию темы для обновления DOM
-const { themeVersion } = useSimpleTheme();
+onMounted(() => {
+  // Инициализируем тему при загрузке приложения
+  initTheme();
+  console.log('[App] Тема инициализирована');
+});
 </script>
+
+<style>
+/* Переопределение стилей для компонентов Naive UI */
+.n-card {
+  background-color: var(--bg-main) !important;
+  color: var(--text-usual) !important;
+}
+
+.n-card-header__title {
+  color: var(--text-header) !important;
+}
+
+.n-button:not(.n-button--primary):not(.n-button--info):not(.n-button--success):not(.n-button--warning):not(.n-button--error) {
+  background-color: var(--bg-contrast) !important;
+  color: var(--text-usual) !important;
+}
+
+.n-tag:not(.n-tag--primary):not(.n-tag--info):not(.n-tag--success):not(.n-tag--warning):not(.n-tag--error) {
+  background-color: var(--bg-contrast) !important;
+  color: var(--text-usual) !important;
+}
+
+/* Анимации для плавного переключения тем */
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.app-container {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+</style>

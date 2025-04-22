@@ -3,7 +3,7 @@
 // Полная конфигурация темной темы
 // Переменные, перенесенные из _colors.scss
 
-.dark-theme {
+html.dark-theme {
   // Text colors
   --text-header: #FFFFFF;     // TextHeader - белый
   --text-usual: #F5F5F5;      // TextUsual - почти белый
@@ -12,10 +12,10 @@
   --text-inactive: #DBDADD;   // TextInActive - темно-серый
   --text-contrast: #FFFFFF;   // TextContrast - белый (для контрастного текста)
 
-//Icon colors
---bg-icon:#444444; 
---icon-border: var(--border-color)
---icon-borderActive: var(--color-primary)
+  // Icon colors
+  --bg-icon: #444444; 
+  --icon-border: var(--border-color);
+  --icon-borderActive: var(--color-primary);
 
   // Main colors
   --color-primary: #FFD452;   // ColorPrimary - желтый
