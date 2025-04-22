@@ -2,7 +2,6 @@
 import { useCurrencyStore } from '@/stores/currency';
 import { useUserStore } from '@/stores/user';
 import { useSystemStore } from '@/stores/system';
-import { useSimpleTheme } from '@/composables/useSimpleTheme';
 
 /**
  * Класс для инициализации приложения
@@ -61,40 +60,15 @@ export class AppInitService {
       await userStore.init();
       console.log('[AppInitService] User store initialized, authenticated:', userStore.isAuthenticated);
       
-      // Инициализация темы с использованием useSimpleTheme
-      this.initializeTheme(userStore);
+      // Инициализация темы теперь делегирована компоненту App.vue
+      // и выполняется через useTheme
+      console.log('[AppInitService] Theme will be initialized in App.vue');
       
       this._isInitialized = true;
       console.log('[AppInitService] Application initialization complete');
     } catch (error) {
       console.error('[AppInitService] Error during initialization:', error);
       throw error;
-    }
-  }
-  
-  /**
-   * Инициализация темы на основе настроек пользователя или системных настроек
-   */
-  private initializeTheme(userStore: ReturnType<typeof useUserStore>): void {
-    // Используем useSimpleTheme для инициализации темы
-    const { initTheme, toggleTheme } = useSimpleTheme();
-    
-    // Применяем тему из настроек пользователя, если он авторизован
-    if (userStore.isAuthenticated && userStore.userSettings?.theme) {
-      const userTheme = userStore.userSettings.theme;
-      if (userTheme === 'dark' || userTheme === 'light') {
-        // Устанавливаем тему напрямую
-        toggleTheme(userTheme === 'dark');
-        console.log('[AppInitService] Applied theme from user settings:', userTheme);
-      } else {
-        // Если установлено 'system', используем системные настройки
-        initTheme();
-        console.log('[AppInitService] Applied system theme preference');
-      }
-    } else {
-      // Если пользователь не авторизован, инициализируем тему по системным настройкам
-      initTheme();
-      console.log('[AppInitService] Theme initialized using system preferences');
     }
   }
 }
