@@ -1,51 +1,28 @@
 <!-- src/views/notification/components/NotificationDebtItem.vue -->
 <template>
-  <div class="debt-notification" :class="{ 'debt-notification--read': read }">
-    <div class="debt-notification__icon">
-      <component :is="IconCash" size="24" class="debt-notification__icon-img" />
+  <div class="notification" :class="{ 'notification--read': read }">
+    <div class="icon-big">
+      <component :is="IconCash" size="24" class="icon-box" />
     </div>
-    <div class="debt-notification__content">
-      <div class="debt-notification__header">
-        <h3 class="debt-notification__title en-body">{{ title }}</h3>
-        <span class="debt-notification__time en-small text-secondary">{{ formattedTime }}</span>
-      </div>
-      <p class="debt-notification__message en-small">{{ message }}</p>
-      
-      <div class="debt-notification__details">
-        <div class="debt-notification__row">
-          <span class="debt-notification__label">Transaction:</span>
-          <span class="debt-notification__value">{{ transactionName }}</span>
-        </div>
-        <div class="debt-notification__row">
-          <span class="debt-notification__label">Total Amount:</span>
-          <span class="debt-notification__value">{{ formattedAmount }}</span>
-        </div>
-        <div class="debt-notification__row">
-          <span class="debt-notification__label">Your Debt:</span>
-          <span class="debt-notification__value debt-notification__debt-amount">{{ formattedDebtAmount }}</span>
-        </div>
-        <div class="debt-notification__row">
-          <span class="debt-notification__label">Created by:</span>
-          <span class="debt-notification__value">{{ createdBy }}</span>
+    <div class="note-debt">
+      <div class="text">
+        <div class="title">New debt from {{ createdBy }}</div>
+        <div class="about">
+          Notes: {{ transactionName }}. {{ message }}
         </div>
       </div>
-      
-      <div class="debt-notification__actions">
-        <BaseButton 
-          variant="outline" 
-          text="Decline" 
-          @click="decline" 
-        />
-        <BaseButton 
-          variant="outline" 
-          text="View" 
-          @click="view" 
-        />
-        <BaseButton 
-          variant="primary" 
-          text="Accept" 
-          @click="accept" 
-        />
+      <div class="express-action">
+        <div class="button-line">
+          <div class="decline" @click="decline">
+            <div class="declire">Decline</div>
+          </div>
+          <div class="view" @click="view">
+            <div class="declire2">View</div>
+          </div>
+          <div class="accept" @click="accept">
+            <div class="acccept">Accept</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -55,13 +32,10 @@
 import { defineComponent, computed } from 'vue';
 import { format, formatDistanceToNow, isToday, isYesterday } from 'date-fns';
 import { IconCash } from '@tabler/icons-vue';
-import BaseButton from '@/components/atoms/buttons/BaseButton.vue';
 
 export default defineComponent({
   name: 'NotificationDebtItem',
-  components: {
-    BaseButton
-  },
+  components: {},
   props: {
     id: {
       type: String,
@@ -190,94 +164,211 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.debt-notification {
+.notification,
+.notification * {
+  box-sizing: border-box;
+}
+
+.notification {
+  background: var(--text-textsubheader, #444444);
+  border-radius: 32px;
+  padding: 8px 12px 8px 12px;
   display: flex;
-  padding: var(--spacing-md);
-  background-color: transparent;
-  border-radius: var(--border-radius-md);
-  margin-bottom: var(--spacing-xs);
-  transition: background-color 0.2s ease;
-  backdrop-filter: blur(4px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  flex-direction: row;
+  gap: 16px;
+  align-items: center;
+  justify-content: flex-start;
+  flex-shrink: 0;
+  position: relative;
 }
 
-.debt-notification:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-}
-
-.debt-notification--read {
+.notification--read {
   opacity: 0.7;
 }
 
-.debt-notification__icon {
-  margin-right: var(--spacing-md);
+.icon-big {
   display: flex;
-  align-items: flex-start;
-  color: var(--color-warning);
-}
-
-.debt-notification__icon-img {
-  border-radius: var(--border-radius-sm);
-}
-
-.debt-notification__content {
-  flex: 1;
-}
-
-.debt-notification__header {
-  display: flex;
-  justify-content: space-between;
+  flex-direction: row;
+  gap: 0px;
   align-items: center;
-  margin-bottom: var(--spacing-xs);
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
 }
 
-.debt-notification__title {
-  font-weight: 500;
-  margin: 0;
-}
-
-.debt-notification__time {
-  white-space: nowrap;
-}
-
-.debt-notification__message {
-  margin: 0 0 var(--spacing-sm) 0;
-  color: var(--text-secondary);
-}
-
-.debt-notification__details {
-  background-color: rgba(255, 255, 255, 0.05);
-  border-radius: var(--border-radius-sm);
-  padding: var(--spacing-sm);
-  margin-bottom: var(--spacing-md);
-}
-
-.debt-notification__row {
+.icon-box {
+  border-radius: 19px;
   display: flex;
-  justify-content: space-between;
-  margin-bottom: var(--spacing-xs);
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  position: relative;
+  overflow: visible;
+  aspect-ratio: 1;
+  background-color: var(--maincolor-colorsucces, #53b794);
+  color: white;
 }
 
-.debt-notification__row:last-child {
-  margin-bottom: 0;
-}
-
-.debt-notification__label {
-  color: var(--text-secondary);
-  font-size: 0.9em;
-}
-
-.debt-notification__value {
-  font-weight: 500;
-}
-
-.debt-notification__debt-amount {
-  color: var(--color-warning);
-}
-
-.debt-notification__actions {
+.note-debt {
+  padding: 4px 8px 4px 0px;
   display: flex;
-  justify-content: flex-end;
-  gap: var(--spacing-sm);
+  flex-direction: column;
+  gap: 7px;
+  align-items: flex-start;
+  justify-content: center;
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  align-self: stretch;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.title {
+  color: #ffffff;
+  text-align: left;
+  font-family: var(--enbody-font-family, "Inter-Regular", sans-serif);
+  font-size: var(--enbody-font-size, 16px);
+  line-height: var(--enbody-line-height, 20px);
+  letter-spacing: var(--enbody-letter-spacing, -0.02em);
+  font-weight: var(--enbody-font-weight, 400);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.about {
+  color: #ffffff;
+  text-align: left;
+  font-family: var(--ensmall-font-family, "Inter-Regular", sans-serif);
+  font-size: var(--ensmall-font-size, 12px);
+  line-height: var(--ensmall-line-height, 16px);
+  font-weight: var(--ensmall-font-weight, 400);
+  position: relative;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.express-action {
+  padding: 0px 8px 0px 0px;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-start;
+  align-self: stretch;
+  flex-shrink: 0;
+  height: 20px;
+  position: relative;
+}
+
+.button-line {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.decline {
+  border-radius: 34px;
+  border-style: dashed;
+  border-color: var(--maincolor-colorwarrning, #a44942);
+  border-width: 1px;
+  padding: 4px 8px 4px 8px;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  cursor: pointer;
+}
+
+.declire {
+  color: var(--maincolor-colorwarrning, #a44942);
+  text-align: left;
+  font-family: var(--ensupersmall-font-family, "Inter-Regular", sans-serif);
+  font-size: var(--ensupersmall-font-size, 10px);
+  line-height: var(--ensupersmall-line-height, 12px);
+  font-weight: var(--ensupersmall-font-weight, 400);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.view {
+  background: var(--maincolor-colorneutral, #dbdadd);
+  border-radius: 34px;
+  padding: 4px 8px 4px 8px;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  cursor: pointer;
+}
+
+.declire2 {
+  color: var(--text-textgrey, #949496);
+  text-align: left;
+  font-family: var(--ensupersmall-font-family, "Inter-Regular", sans-serif);
+  font-size: var(--ensupersmall-font-size, 10px);
+  line-height: var(--ensupersmall-line-height, 12px);
+  font-weight: var(--ensupersmall-font-weight, 400);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.accept {
+  background: var(--maincolor-colorsucces, #53b794);
+  border-radius: 34px;
+  padding: 4px 8px 4px 8px;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  cursor: pointer;
+}
+
+.acccept {
+  color: var(--text-textcontrast, #ffffff);
+  text-align: left;
+  font-family: var(--ensupersmall-font-family, "Inter-Regular", sans-serif);
+  font-size: var(--ensupersmall-font-size, 10px);
+  line-height: var(--ensupersmall-line-height, 12px);
+  font-weight: var(--ensupersmall-font-weight, 400);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
 }
 </style>

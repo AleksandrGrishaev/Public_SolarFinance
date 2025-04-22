@@ -1,21 +1,13 @@
 <!-- src/views/notification/components/NotificationItem.vue -->
 <template>
-  <div class="notification-item" :class="{ 'notification-item--read': read }">
-    <div class="notification-item__icon">
-      <component :is="getIconComponent()" size="24" class="notification-item__icon-img" />
+  <div class="transaction" :class="{ 'transaction--read': read }">
+    <div class="icon-big">
+      <component :is="getIconComponent()" size="24" class="icon-box" />
     </div>
-    <div class="notification-item__content">
-      <div class="notification-item__header">
-        <h3 class="notification-item__title en-body">{{ title }}</h3>
-        <span class="notification-item__time en-small text-secondary">{{ formattedTime }}</span>
-      </div>
-      <p class="notification-item__message en-small">{{ message }}</p>
-      <div v-if="hasAction" class="notification-item__actions">
-        <BaseButton 
-          variant="outline" 
-          :text="actionText" 
-          @click="handleAction" 
-        />
+    <div class="name-info">
+      <div class="title">{{ title }}</div>
+      <div class="about">
+        {{ message }}
       </div>
     </div>
   </div>
@@ -25,14 +17,11 @@
 import { defineComponent, computed } from 'vue';
 import { format, formatDistanceToNow, isToday, isYesterday } from 'date-fns';
 import { IconInfoCircle, IconBell, IconCash, IconDiscount } from '@tabler/icons-vue';
-import BaseButton from '@/components/atoms/buttons/BaseButton.vue';
 import { NotificationSubtype } from '@/stores/notification/types';
 
 export default defineComponent({
   name: 'NotificationItem',
-  components: {
-    BaseButton
-  },
+  components: {},
   props: {
     id: {
       type: String,
@@ -123,62 +112,96 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.notification-item {
+.transaction,
+.transaction * {
+  box-sizing: border-box;
+}
+
+.transaction {
+  padding: 6px 20px 6px 12px;
   display: flex;
-  padding: var(--spacing-sm);
-  background-color: transparent;
-  border-radius: var(--border-radius-md);
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-start;
+  align-self: stretch;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  background: var(--text-textsubheader, #444444);
+  border-radius: 32px;
   margin-bottom: var(--spacing-xs);
-  backdrop-filter: blur(4px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: background-color 0.2s ease;
 }
 
-.notification-item:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-}
-
-.notification-item--read {
+.transaction--read {
   opacity: 0.7;
 }
 
-.notification-item__icon {
-  margin-right: var(--spacing-sm);
+.icon-big {
   display: flex;
-  align-items: flex-start;
-}
-
-.notification-item__icon-img {
-  border-radius: var(--border-radius-sm);
-}
-
-.notification-item__content {
-  flex: 1;
-}
-
-.notification-item__header {
-  display: flex;
-  justify-content: space-between;
+  flex-direction: row;
+  gap: 0px;
   align-items: center;
-  margin-bottom: var(--spacing-xs);
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
 }
 
-.notification-item__title {
-  font-weight: 500;
-  margin: 0;
-}
-
-.notification-item__time {
-  white-space: nowrap;
-}
-
-.notification-item__message {
-  margin: 0 0 var(--spacing-sm) 0;
-  color: var(--text-secondary);
-}
-
-.notification-item__actions {
+.icon-box {
+  border-radius: 19px;
   display: flex;
-  justify-content: flex-end;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  position: relative;
+  overflow: visible;
+  aspect-ratio: 1;
+  background-color: var(--maincolor-colorsucces, #53b794);
+  color: white;
+}
+
+.name-info {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.title {
+  color: #ffffff;
+  text-align: left;
+  font-family: var(--enbody-font-family, "Inter-Regular", sans-serif);
+  font-size: var(--enbody-font-size, 16px);
+  line-height: var(--enbody-line-height, 20px);
+  letter-spacing: var(--enbody-letter-spacing, -0.02em);
+  font-weight: var(--enbody-font-weight, 400);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.about {
+  color: #ffffff;
+  text-align: left;
+  font-family: var(--ensmall-font-family, "Inter-Regular", sans-serif);
+  font-size: var(--ensmall-font-size, 12px);
+  line-height: var(--ensmall-line-height, 16px);
+  font-weight: var(--ensmall-font-weight, 400);
+  position: relative;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
 }
 </style>
