@@ -86,8 +86,6 @@ export default defineComponent({
   padding: var(--spacing-xs) var(--spacing-lg);
   color: rgba(255, 255, 255, 0.7);
   font-size: 14px;
-  margin-bottom: var(--spacing-xs);
-  margin-top: var(--spacing-md);
 }
 
 .base-list__content {

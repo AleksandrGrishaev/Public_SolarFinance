@@ -117,7 +117,6 @@ export default defineComponent({
   background-color: transparent;
   border-radius: var(--border-radius-lg);
   max-width: 90%;
-  max-height: 80vh;
   display: flex;
   flex-direction: column;
   overflow: hidden; /* Needed for the blurred fade effect */
@@ -126,7 +125,7 @@ export default defineComponent({
 .base-floating-popup__content.top {
   align-self: center;
   width: 100%; /* Take full width */
-  max-height: 75vh; /* Limit height to 75% of viewport */
+  max-height: 90vh; /* Limit height to 75% of viewport */
 }
 
 .base-floating-popup__content.right {
