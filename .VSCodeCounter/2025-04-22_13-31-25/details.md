@@ -1,10 +1,10 @@
 # Details
 
-Date : 2025-04-22 10:27:45
+Date : 2025-04-22 13:31:25
 
 Directory /Users/peaker/dev/solar-finance/src
 
-Total : 173 files,  25624 codes, 2033 comments, 4161 blanks, all 31818 lines
+Total : 208 files,  28446 codes, 2236 comments, 4502 blanks, all 35184 lines
 
 [Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
@@ -20,6 +20,14 @@ Total : 173 files,  25624 codes, 2033 comments, 4161 blanks, all 31818 lines
 | [src/about/WorkFlow/MainPlan.md](/src/about/WorkFlow/MainPlan.md) | Markdown | 468 | 0 | 151 | 619 |
 | [src/about/WorkFlow/Mock.md](/src/about/WorkFlow/Mock.md) | Markdown | 1,306 | 0 | 68 | 1,374 |
 | [src/about/main.md](/src/about/main.md) | Markdown | 653 | 0 | 121 | 774 |
+| [src/components/atoms/buttons/BaseButton.vue](/src/components/atoms/buttons/BaseButton.vue) | Vue | 61 | 0 | 6 | 67 |
+| [src/components/atoms/buttons/index.js](/src/components/atoms/buttons/index.js) | JavaScript | 1 | 1 | 0 | 2 |
+| [src/components/atoms/icons/BaseIcon.vue](/src/components/atoms/icons/BaseIcon.vue) | Vue | 49 | 0 | 4 | 53 |
+| [src/components/atoms/icons/index.js](/src/components/atoms/icons/index.js) | JavaScript | 1 | 1 | 0 | 2 |
+| [src/components/atoms/index.js](/src/components/atoms/index.js) | JavaScript | 3 | 1 | 0 | 4 |
+| [src/components/atoms/typography/BaseDescription.vue](/src/components/atoms/typography/BaseDescription.vue) | Vue | 29 | 0 | 3 | 32 |
+| [src/components/atoms/typography/BaseTitle.vue](/src/components/atoms/typography/BaseTitle.vue) | Vue | 28 | 0 | 5 | 33 |
+| [src/components/atoms/typography/index.js](/src/components/atoms/typography/index.js) | JavaScript | 2 | 1 | 0 | 3 |
 | [src/components/categories/CategoryAddPopup.vue](/src/components/categories/CategoryAddPopup.vue) | Vue | 359 | 9 | 45 | 413 |
 | [src/components/categories/CategoryEditPopup.vue](/src/components/categories/CategoryEditPopup.vue) | Vue | 444 | 10 | 60 | 514 |
 | [src/components/categories/CategoryFilterToggle.vue](/src/components/categories/CategoryFilterToggle.vue) | Vue | 59 | 1 | 10 | 70 |
@@ -33,8 +41,19 @@ Total : 173 files,  25624 codes, 2033 comments, 4161 blanks, all 31818 lines
 | [src/components/categories/view/CategoryTransactionGroup.vue](/src/components/categories/view/CategoryTransactionGroup.vue) | Vue | 38 | 1 | 5 | 44 |
 | [src/components/categories/view/CategoryTransactionItem.vue](/src/components/categories/view/CategoryTransactionItem.vue) | Vue | 90 | 1 | 10 | 101 |
 | [src/components/categories/view/CategoryTransactionsList.vue](/src/components/categories/view/CategoryTransactionsList.vue) | Vue | 150 | 3 | 18 | 171 |
-| [src/components/navigation/AppTopHeader.vue](/src/components/navigation/AppTopHeader.vue) | Vue | 271 | 1 | 20 | 292 |
+| [src/components/index.js](/src/components/index.js) | JavaScript | 3 | 1 | 0 | 4 |
+| [src/components/molecules/actions/ExpressAction.vue](/src/components/molecules/actions/ExpressAction.vue) | Vue | 73 | 0 | 5 | 78 |
+| [src/components/molecules/actions/index.js](/src/components/molecules/actions/index.js) | JavaScript | 1 | 1 | 0 | 2 |
+| [src/components/molecules/index.js](/src/components/molecules/index.js) | JavaScript | 2 | 1 | 0 | 3 |
+| [src/components/molecules/information/InfoBlock.vue](/src/components/molecules/information/InfoBlock.vue) | Vue | 82 | 0 | 7 | 89 |
+| [src/components/molecules/information/index.js](/src/components/molecules/information/index.js) | JavaScript | 1 | 1 | 0 | 2 |
+| [src/components/molecules/lists/BaseList.vue](/src/components/molecules/lists/BaseList.vue) | Vue | 79 | 1 | 11 | 91 |
+| [src/components/navigation/AppTopHeader.vue](/src/components/navigation/AppTopHeader.vue) | Vue | 280 | 2 | 23 | 305 |
 | [src/components/navigation/NavMenu.vue](/src/components/navigation/NavMenu.vue) | Vue | 118 | 1 | 7 | 126 |
+| [src/components/organisms/index.js](/src/components/organisms/index.js) | JavaScript | 1 | 1 | 0 | 2 |
+| [src/components/organisms/notifications/Notification.vue](/src/components/organisms/notifications/Notification.vue) | Vue | 87 | 0 | 5 | 92 |
+| [src/components/organisms/notifications/index.js](/src/components/organisms/notifications/index.js) | JavaScript | 1 | 0 | 0 | 1 |
+| [src/components/organisms/popups/BaseFloatingPopup.vue](/src/components/organisms/popups/BaseFloatingPopup.vue) | Vue | 141 | 1 | 18 | 160 |
 | [src/components/system/MessageProvider.vue](/src/components/system/MessageProvider.vue) | Vue | 11 | 0 | 3 | 14 |
 | [src/components/ui/BasePopup.vue](/src/components/ui/BasePopup.vue) | Vue | 206 | 7 | 25 | 238 |
 | [src/components/ui/CreateCategoryButton.vue](/src/components/ui/CreateCategoryButton.vue) | Vue | 54 | 1 | 7 | 62 |
@@ -77,7 +96,7 @@ Total : 173 files,  25624 codes, 2033 comments, 4161 blanks, all 31818 lines
 | [src/services/BaseCrudService.ts](/src/services/BaseCrudService.ts) | TypeScript | 54 | 22 | 11 | 87 |
 | [src/services/api/ApiService.ts](/src/services/api/ApiService.ts) | TypeScript | 6 | 1 | 4 | 11 |
 | [src/services/api/LocalStorageApiService.ts](/src/services/api/LocalStorageApiService.ts) | TypeScript | 76 | 30 | 32 | 138 |
-| [src/services/system/AppInitService.ts](/src/services/system/AppInitService.ts) | TypeScript | 45 | 20 | 11 | 76 |
+| [src/services/system/AppInitService.ts](/src/services/system/AppInitService.ts) | TypeScript | 50 | 21 | 12 | 83 |
 | [src/services/system/MessageService.ts](/src/services/system/MessageService.ts) | TypeScript | 54 | 33 | 11 | 98 |
 | [src/stores/account/accountService.ts](/src/stores/account/accountService.ts) | TypeScript | 90 | 27 | 13 | 130 |
 | [src/stores/account/accountStore.ts](/src/stores/account/accountStore.ts) | TypeScript | 412 | 126 | 101 | 639 |
@@ -100,6 +119,12 @@ Total : 173 files,  25624 codes, 2033 comments, 4161 blanks, all 31818 lines
 | [src/stores/currency/defaultCurrencies.ts](/src/stores/currency/defaultCurrencies.ts) | TypeScript | 50 | 2 | 2 | 54 |
 | [src/stores/currency/index.ts](/src/stores/currency/index.ts) | TypeScript | 3 | 3 | 1 | 7 |
 | [src/stores/currency/types.ts](/src/stores/currency/types.ts) | TypeScript | 25 | 1 | 3 | 29 |
+| [src/stores/notification/DefaultNotification.ts](/src/stores/notification/DefaultNotification.ts) | TypeScript | 62 | 22 | 6 | 90 |
+| [src/stores/notification/composables/useNotifications.ts](/src/stores/notification/composables/useNotifications.ts) | TypeScript | 75 | 13 | 14 | 102 |
+| [src/stores/notification/index.ts](/src/stores/notification/index.ts) | TypeScript | 27 | 9 | 6 | 42 |
+| [src/stores/notification/notificationService.ts](/src/stores/notification/notificationService.ts) | TypeScript | 145 | 47 | 34 | 226 |
+| [src/stores/notification/notificationStore.ts](/src/stores/notification/notificationStore.ts) | TypeScript | 94 | 60 | 27 | 181 |
+| [src/stores/notification/types.ts](/src/stores/notification/types.ts) | TypeScript | 44 | 2 | 6 | 52 |
 | [src/stores/system/composables/useApp.ts](/src/stores/system/composables/useApp.ts) | TypeScript | 37 | 21 | 9 | 67 |
 | [src/stores/system/composables/usePlatform.ts](/src/stores/system/composables/usePlatform.ts) | TypeScript | 45 | 17 | 11 | 73 |
 | [src/stores/system/composables/useViewport.ts](/src/stores/system/composables/useViewport.ts) | TypeScript | 56 | 27 | 17 | 100 |
@@ -165,7 +190,17 @@ Total : 173 files,  25624 codes, 2033 comments, 4161 blanks, all 31818 lines
 | [src/views/book/popup/EditBookPopup.vue](/src/views/book/popup/EditBookPopup.vue) | Vue | 35 | 1 | 5 | 41 |
 | [src/views/book/popup/NewBookPopup.vue](/src/views/book/popup/NewBookPopup.vue) | Vue | 30 | 1 | 5 | 36 |
 | [src/views/currency/popup/CurrencyPopup.vue](/src/views/currency/popup/CurrencyPopup.vue) | Vue | 162 | 3 | 25 | 190 |
+| [src/views/debug/DebugStoreView.vue](/src/views/debug/DebugStoreView.vue) | Vue | 193 | 4 | 23 | 220 |
+| [src/views/debug/components/BaseStoresDebugPanel.vue](/src/views/debug/components/BaseStoresDebugPanel.vue) | Vue | 203 | 4 | 19 | 226 |
+| [src/views/debug/components/FinanceStoresDebugPanel.vue](/src/views/debug/components/FinanceStoresDebugPanel.vue) | Vue | 278 | 5 | 20 | 303 |
+| [src/views/debug/components/SystemStoresDebugPanel.vue](/src/views/debug/components/SystemStoresDebugPanel.vue) | Vue | 284 | 4 | 21 | 309 |
 | [src/views/icon/popup/IconSelectorPopup.vue](/src/views/icon/popup/IconSelectorPopup.vue) | Vue | 361 | 6 | 52 | 419 |
+| [src/views/notification/NotificationsView.vue](/src/views/notification/NotificationsView.vue) | Vue | 210 | 2 | 29 | 241 |
+| [src/views/notification/components/NotificationItem.vue](/src/views/notification/components/NotificationItem.vue) | Vue | 168 | 1 | 19 | 188 |
+| [src/views/notification/components/NotificationList.vue](/src/views/notification/components/NotificationList.vue) | Vue | 112 | 1 | 13 | 126 |
+| [src/views/notification/components/NotificationPopup.vue](/src/views/notification/components/NotificationPopup.vue) | Vue | 179 | 1 | 22 | 202 |
+| [src/views/notification/composables/useNotifications.ts](/src/views/notification/composables/useNotifications.ts) | TypeScript | 67 | 6 | 10 | 83 |
+| [src/views/notification/initNotifications.ts](/src/views/notification/initNotifications.ts) | TypeScript | 22 | 9 | 4 | 35 |
 | [src/views/profile/pages/ProfileView.vue](/src/views/profile/pages/ProfileView.vue) | Vue | 239 | 7 | 49 | 295 |
 | [src/views/profile/pages/components/DebugAccess.vue](/src/views/profile/pages/components/DebugAccess.vue) | Vue | 53 | 0 | 6 | 59 |
 | [src/views/profile/pages/components/LanguageSettings.vue](/src/views/profile/pages/components/LanguageSettings.vue) | Vue | 61 | 0 | 8 | 69 |
