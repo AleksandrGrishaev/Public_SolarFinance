@@ -2,6 +2,7 @@
 import { useCurrencyStore } from '@/stores/currency';
 import { useUserStore } from '@/stores/user';
 import { useSystemStore } from '@/stores/system';
+import { useThemeStore } from '@/stores/theme/themeStore';
 
 /**
  * Класс для инициализации приложения
@@ -47,9 +48,6 @@ export class AppInitService {
       systemStore.initialize();
       console.log('[AppInitService] System store initialized, platform:', systemStore.platform);
       
-      // Не нужно дублировать вывод информации о системе, 
-      // так как она уже выводится в systemStore.initialize()
-      
       // Инициализация хранилища валют
       const currencyStore = useCurrencyStore();
       await currencyStore.init();
@@ -60,9 +58,10 @@ export class AppInitService {
       await userStore.init();
       console.log('[AppInitService] User store initialized, authenticated:', userStore.isAuthenticated);
       
-      // Инициализация темы теперь делегирована компоненту App.vue
-      // и выполняется через useTheme
-      console.log('[AppInitService] Theme will be initialized in App.vue');
+      // Инициализация темы через ThemeStore
+      const themeStore = useThemeStore();
+      themeStore.init();
+      console.log('[AppInitService] Theme store initialized, current theme:', themeStore.currentTheme);
       
       this._isInitialized = true;
       console.log('[AppInitService] Application initialization complete');

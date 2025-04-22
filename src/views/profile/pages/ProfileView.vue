@@ -63,7 +63,6 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
-// Обновляем импорт для использования нового пути
 import { useTheme } from '@/stores/theme/useTheme';
 import { type ThemeType } from '@/stores/theme/themeStore';
 import ToggleSwitch from '@/components/ui/inputs/ToggleSwitch.vue';

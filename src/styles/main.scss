@@ -34,6 +34,11 @@ html, body {
   overscroll-behavior: none;
 }
 
+// Анимации для плавного переключения тем - перенесено из App.vue
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
 .app-container {
   height: 100vh;
   width: 100%;
@@ -41,6 +46,7 @@ html, body {
   flex-direction: column;
   background-color: var(--app-background);
   color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Анимации переходов */

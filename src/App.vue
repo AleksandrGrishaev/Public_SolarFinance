@@ -30,46 +30,14 @@ import {
   NMessageProvider
 } from 'naive-ui';
 import MessageProvider from './components/system/MessageProvider.vue';
-import { onMounted } from 'vue';
-import { useTheme } from '@/composables/useTheme';
+import { useThemeStore } from '@/stores/theme/themeStore';
 
-// Инициализируем тему
-const { initTheme } = useTheme();
+// Получаем store темы
+const themeStore = useThemeStore();
 
-onMounted(() => {
-  // Инициализируем тему при загрузке приложения
-  initTheme();
+// Инициализируем тему если не инициализирована через AppInitService
+if (!themeStore.isInitialized) {
+  themeStore.init();
   console.log('[App] Тема инициализирована');
-});
+}
 </script>
-
-<style>
-/* Переопределение стилей для компонентов Naive UI */
-.n-card {
-  background-color: var(--bg-main) !important;
-  color: var(--text-usual) !important;
-}
-
-.n-card-header__title {
-  color: var(--text-header) !important;
-}
-
-.n-button:not(.n-button--primary):not(.n-button--info):not(.n-button--success):not(.n-button--warning):not(.n-button--error) {
-  background-color: var(--bg-contrast) !important;
-  color: var(--text-usual) !important;
-}
-
-.n-tag:not(.n-tag--primary):not(.n-tag--info):not(.n-tag--success):not(.n-tag--warning):not(.n-tag--error) {
-  background-color: var(--bg-contrast) !important;
-  color: var(--text-usual) !important;
-}
-
-/* Анимации для плавного переключения тем */
-html {
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.app-container {
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-</style>
