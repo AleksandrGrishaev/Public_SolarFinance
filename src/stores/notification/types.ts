@@ -7,10 +7,8 @@ export enum NotificationType {
   
   export enum NotificationSubtype {
     PROMO = 'promo',
-    UPDATE = 'update',
-    REMINDER = 'reminder',
     INFO = 'info',
-    ERROR = 'error'
+    DEBT = 'debt'
   }
   
   export interface NotificationAction {
@@ -19,7 +17,8 @@ export enum NotificationType {
     handler?: () => void;
   }
   
-  export interface Notification {
+// Базовый интерфейс с общими свойствами
+export interface BaseNotification {
     id: string;
     type: NotificationType;
     subtype?: NotificationSubtype;
@@ -28,11 +27,35 @@ export enum NotificationType {
     read: boolean;
     date: Date;
     action?: NotificationAction;
-    // Дополнительные поля при необходимости
-    priority?: number; // Приоритет уведомления (1-5, где 5 - самый высокий)
-    expireAt?: Date; // Дата, после которой уведомление считается неактуальным
-    icon?: string; // Иконка для уведомления
+    priority?: number;
+    expireAt?: Date;
+    icon?: string;
   }
+  
+  // Интерфейс для INFO уведомлений
+  export interface InfoNotification extends BaseNotification {
+    subtype: NotificationSubtype.INFO;
+    category?: string;
+    tags?: string[];
+    dismissible?: boolean;
+  }
+  
+  // Интерфейс для DEBT уведомлений
+  export interface DebtNotification extends BaseNotification {
+    subtype: NotificationSubtype.DEBT;
+    transactionName: string;
+    amount: number;        // Сумма операции
+    debtAmount: number;    // Сумма долга
+    createdBy: string;     // Имя создателя
+    transactionId: string; // ID транзакции для связи с базой данных
+    currency?: string;     // Валюта (опционально)
+  }
+  
+  // Объединяющий тип для всех видов уведомлений
+  export type Notification = 
+    | (BaseNotification & { subtype?: undefined }) // Для уведомлений без подтипа
+    | InfoNotification
+    | DebtNotification;
   
   export interface NotificationState {
     notifications: Notification[];
@@ -40,9 +63,8 @@ export enum NotificationType {
     error: string | null;
   }
   
-  export interface CreateNotificationPayload {
+  export interface BaseCreateNotificationPayload {
     type: NotificationType;
-    subtype?: NotificationSubtype;
     title: string;
     message: string;
     action?: NotificationAction;
@@ -50,3 +72,25 @@ export enum NotificationType {
     expireAt?: Date;
     icon?: string;
   }
+  
+  export interface CreateInfoNotificationPayload extends BaseCreateNotificationPayload {
+    subtype: NotificationSubtype.INFO;
+    category?: string;
+    tags?: string[];
+    dismissible?: boolean;
+  }
+  
+  export interface CreateDebtNotificationPayload extends BaseCreateNotificationPayload {
+    subtype: NotificationSubtype.DEBT;
+    transactionName: string;
+    amount: number;
+    debtAmount: number;
+    createdBy: string;
+    transactionId: string;
+    currency?: string;
+  }
+  
+  export type CreateNotificationPayload = 
+    | (BaseCreateNotificationPayload & { subtype?: undefined })
+    | CreateInfoNotificationPayload
+    | CreateDebtNotificationPayload;

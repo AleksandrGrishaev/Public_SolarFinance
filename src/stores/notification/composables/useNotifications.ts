@@ -44,25 +44,29 @@ export function useNotifications() {
     return service.showInfo(title, message, action);
   };
   
-  const showError = (title: string, message: string, action?: NotificationAction) => {
-    return service.showError(title, message, action);
-  };
   
-  const showUpdate = (title: string, message: string, action?: NotificationAction) => {
-    return service.showUpdate(title, message, action);
-  };
-  
-  const showReminder = (title: string, message: string, action?: NotificationAction) => {
-    return service.showReminder(title, message, action);
-  };
-  
-  const showPromo = (
-    title: string, 
-    message: string, 
-    action?: NotificationAction, 
-    expireAt?: Date
+  const showDebt = (
+    title: string,
+    message: string,
+    transactionName: string,
+    amount: number,
+    debtAmount: number,
+    createdBy: string,
+    transactionId: string,
+    currency?: string,
+    action?: NotificationAction
   ) => {
-    return service.showPromo(title, message, action, expireAt);
+    return service.showDebt(
+      title, 
+      message, 
+      transactionName, 
+      amount, 
+      debtAmount, 
+      createdBy, 
+      transactionId,
+      currency,
+      action
+    );
   };
   
   // Управление уведомлениями
@@ -84,10 +88,7 @@ export function useNotifications() {
     showUserNotification,
     showSystemNotification,
     showInfo,
-    showError,
-    showUpdate,
-    showReminder,
-    showPromo,
+    showDebt,
     
     // Управление уведомлениями
     markAsRead,

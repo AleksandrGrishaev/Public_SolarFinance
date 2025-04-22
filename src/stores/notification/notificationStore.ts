@@ -1,6 +1,6 @@
 // src/stores/notification/notificationStore.ts
 import { defineStore } from 'pinia';
-import type { 
+import type{ 
   Notification, 
   NotificationState, 
   CreateNotificationPayload
@@ -71,42 +71,76 @@ export const useNotificationStore = defineStore('notifications', {
     /**
      * Загружает уведомления с сервера
      */
-    async fetchNotifications() {
-      this.isLoading = true;
-      this.error = null;
+    // В методе fetchNotifications добавляем тестовое долговое уведомление
+async fetchNotifications() {
+    this.isLoading = true;
+    this.error = null;
+    
+    try {
+      // Здесь должен быть запрос к API
+      // Временная заглушка для демонстрации
+      await new Promise(resolve => setTimeout(resolve, 300));
       
-      try {
-        // Здесь должен быть запрос к API
-        // const response = await api.get('/notifications');
-        // this.notifications = response.data;
-        
-        // Временная заглушка для демонстрации
-        await new Promise(resolve => setTimeout(resolve, 300));
-        
-        // Добавим тестовые уведомления
-        this.notifications = [
-          createNotification({
-            type: 'system',
-            subtype: 'update',
-            title: 'Обновление приложения',
-            message: 'Мы улучшили производительность и добавили новые функции!',
-            priority: 3
-          }),
-          createNotification({
-            type: 'user',
-            subtype: 'reminder',
-            title: 'Напоминание',
-            message: 'Не забудьте заполнить профиль пользователя',
-            priority: 2
-          })
-        ];
-        
-        this.isLoading = false;
-      } catch (error) {
-        this.error = 'Не удалось загрузить уведомления';
-        this.isLoading = false;
-      }
-    },
+      // Добавим тестовые уведомления
+      this.notifications = [
+        createNotification({
+          type: 'system',
+          subtype: 'update',
+          title: 'Обновление приложения',
+          message: 'Мы улучшили производительность и добавили новые функции!',
+          priority: 3
+        }),
+        createNotification({
+          type: 'user',
+          subtype: 'reminder',
+          title: 'Напоминание',
+          message: 'Не забудьте заполнить профиль пользователя',
+          priority: 2
+        }),
+        // Тестовое долговое уведомление
+        createNotification({
+          type: 'user',
+          subtype: 'debt',
+          title: 'Новый долг',
+          message: 'Вам необходимо подтвердить или отклонить новый долг',
+          transactionName: 'Обед в ресторане',
+          amount: 1500,
+          debtAmount: 250,
+          createdBy: 'Алексей Иванов',
+          transactionId: 'transaction-123',
+          currency: 'RUB',
+          action: {
+            text: 'Просмотреть',
+            route: '/transactions/transaction-123'
+          },
+          priority: 4
+        }),
+        // Еще одно тестовое долговое уведомление
+        createNotification({
+          type: 'user',
+          subtype: 'debt',
+          title: 'Новый долг',
+          message: 'Вам необходимо подтвердить или отклонить новый долг',
+          transactionName: 'Покупка продуктов',
+          amount: 2400,
+          debtAmount: 800,
+          createdBy: 'Мария Петрова',
+          transactionId: 'transaction-124',
+          currency: 'RUB',
+          action: {
+            text: 'Просмотреть',
+            route: '/transactions/transaction-124'
+          },
+          priority: 4
+        })
+      ];
+      
+      this.isLoading = false;
+    } catch (error) {
+      this.error = 'Не удалось загрузить уведомления';
+      this.isLoading = false;
+    }
+  },
     
     /**
      * Отмечает уведомление как прочитанное

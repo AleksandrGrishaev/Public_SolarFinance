@@ -2,7 +2,7 @@
 <template>
     <div class="notification-item" :class="{ 'notification-item--read': read }">
       <div class="notification-item__icon">
-        <img :src="getIconPath(iconType)" :alt="iconType" class="notification-item__icon-img" />
+        <component :is="getIconComponent()" size="24" class="notification-item__icon-img" />
       </div>
       <div class="notification-item__content">
         <div class="notification-item__header">
@@ -24,6 +24,7 @@
   <script lang="ts">
   import { defineComponent, computed } from 'vue';
   import { format, formatDistanceToNow, isToday, isYesterday } from 'date-fns';
+  import { IconInfoCircle, IconBell, IconCash, IconDiscount } from '@tabler/icons-vue';
   import BaseButton from '@/components/atoms/buttons/BaseButton.vue';
   import { NotificationSubtype } from '@/stores/notification/types';
   
@@ -83,21 +84,17 @@
         }
       });
       
-      // Map notification types to icon paths
-      const getIconPath = (type: string) => {
-        switch (type) {
+      // Get appropriate icon component based on notification type
+      const getIconComponent = () => {
+        switch (props.iconType) {
           case NotificationSubtype.INFO:
-            return '/icons/notification-info.svg';
-          case NotificationSubtype.ERROR:
-            return '/icons/notification-error.svg';
-          case NotificationSubtype.UPDATE:
-            return '/icons/notification-update.svg';
-          case NotificationSubtype.REMINDER:
-            return '/icons/notification-reminder.svg';
+            return IconInfoCircle;
           case NotificationSubtype.PROMO:
-            return '/icons/notification-promo.svg';
+            return IconDiscount;
+          case NotificationSubtype.DEBT:
+            return IconCash;
           default:
-            return '/icons/notification-default.svg';
+            return IconBell;
         }
       };
       
@@ -118,7 +115,7 @@
         hasAction,
         actionText,
         formattedTime,
-        getIconPath,
+        getIconComponent,
         handleAction
       };
     }
@@ -151,8 +148,6 @@
   }
   
   .notification-item__icon-img {
-    width: var(--icon-size-md);
-    height: var(--icon-size-md);
     border-radius: var(--border-radius-sm);
   }
   

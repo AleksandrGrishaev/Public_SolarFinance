@@ -115,36 +115,34 @@ export class NotificationService {
     );
   }
   
-  public showError(title: string, message: string, action?: NotificationAction) {
+  public showDebt(
+    title: string,
+    message: string,
+    transactionName: string,
+    amount: number,
+    debtAmount: number,
+    createdBy: string,
+    transactionId: string,
+    currency?: string,
+    action?: NotificationAction
+  ) {
     if (!this.store) {
       console.error('NotificationService not initialized. Call init() first.');
       return null;
     }
     
     return this.store.addNotification(
-      DefaultNotifications.error(title, message, action)
-    );
-  }
-  
-  public showUpdate(title: string, message: string, action?: NotificationAction) {
-    if (!this.store) {
-      console.error('NotificationService not initialized. Call init() first.');
-      return null;
-    }
-    
-    return this.store.addNotification(
-      DefaultNotifications.systemUpdate(title, message, action)
-    );
-  }
-  
-  public showReminder(title: string, message: string, action?: NotificationAction) {
-    if (!this.store) {
-      console.error('NotificationService not initialized. Call init() first.');
-      return null;
-    }
-    
-    return this.store.addNotification(
-      DefaultNotifications.userReminder(title, message, action)
+      DefaultNotifications.debt(
+        title, 
+        message, 
+        transactionName, 
+        amount, 
+        debtAmount, 
+        createdBy, 
+        transactionId,
+        currency,
+        action
+      )
     );
   }
   
