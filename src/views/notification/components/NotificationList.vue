@@ -2,7 +2,7 @@
 <template>
     <div class="notification-list">
       <template v-for="(group, date) in groupedNotifications" :key="date">
-        <BaseList :date="date">
+        <BaseList :date="date" :dateFormat="dateFormat">
           <Notification
             v-for="notification in group"
             :key="notification.id"
@@ -11,8 +11,9 @@
             :title="notification.title"
             :notes="notification.notes"
             :description="notification.description"
-            :declineText="notification.declineText || 'Decline'"
-            :acceptText="notification.acceptText || 'Accept'"
+            :declineText="notification.declineText || 'Dismiss'"
+            :acceptText="notification.acceptText || 'View'"
+            :class="{ 'notification--read': notification.read }"
             @decline="onDecline(notification.id)"
             @accept="onAccept(notification.id)"
           />
@@ -40,6 +41,8 @@
     description: string;
     declineText?: string;
     acceptText?: string;
+    read?: boolean;
+    action?: any;
   }
   
   export default defineComponent({
@@ -52,6 +55,10 @@
       notifications: {
         type: Array as PropType<NotificationItem[]>,
         default: () => []
+      },
+      dateFormat: {
+        type: String,
+        default: 'd MMMM'
       }
     },
     emits: ['decline', 'accept'],
@@ -67,7 +74,13 @@
           groups[date].push(notification);
         });
         
-        return groups;
+        // Sort groups by date (newest first)
+        return Object.fromEntries(
+          Object.entries(groups).sort((a, b) => {
+            // Assuming date format is "d MMMM"
+            return new Date(b[0]).getTime() - new Date(a[0]).getTime();
+          })
+        );
       });
       
       const hasNotifications = computed(() => props.notifications.length > 0);
@@ -105,5 +118,9 @@
     justify-content: center;
     align-items: center;
     padding: var(--spacing-xl) 0;
+  }
+  
+  :deep(.notification--read) {
+    opacity: 0.7;
   }
   </style>

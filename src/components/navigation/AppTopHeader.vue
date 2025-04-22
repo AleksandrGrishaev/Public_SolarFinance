@@ -22,9 +22,9 @@
     </div>
     <div class="app-top-header__right">
       <slot name="pre-icons"></slot>
-      <div class="app-top-header__icon-container" v-if="showMessageIcon">
+      <div class="app-top-header__icon-container" v-if="showNotificationIcon">
         <BaseIcon 
-          :icon="IconMessage" 
+          :icon="IconBell" 
           :size="18" 
           rounded="full"
           class="app-top-header__icon"
@@ -35,10 +35,10 @@
           :borderColor="borderColor"
           :padding="padding"
           :autoSize="true"
-          @click="handleMessageClick"
+          @click="handleNotificationClick"
         />
         <div 
-          v-if="hasNotifications" 
+          v-if="hasUnreadNotifications" 
           class="app-top-header__notification-badge"
         ></div>
       </div>
@@ -59,17 +59,24 @@
       />
       <slot name="right"></slot>
     </div>
+    
+    <!-- Notification popup component -->
+    <NotificationPopup ref="notificationPopupRef" />
   </header>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import { IconArrowLeft, IconMessage, IconUser } from '@tabler/icons-vue';
+import { IconArrowLeft, IconBell as IconBellOrig, IconUser } from '@tabler/icons-vue';
+// Create refs for icons to use in template
+const IconBell = IconBellOrig;
 import BaseIcon from '@/components/ui/icons/BaseIcon.vue';
 import { usePlatform } from '@/stores/system/composables/usePlatform';
 import { useApp } from '@/stores/system/composables/useApp';
 import { useRouter, useRoute } from 'vue-router';
 import { useUserStore } from '@/stores/user/userStore';
+import { useNotifications } from '@/stores/notification/composables/useNotifications';
+import NotificationPopup from '@/views/notification/components/NotificationPopup.vue';
 
 const props = defineProps({
   /**
@@ -87,16 +94,9 @@ const props = defineProps({
     default: ''
   },
   /**
-   * Show notification badge on message icon
+   * Show notification icon
    */
-  hasNotifications: {
-    type: Boolean,
-    default: false
-  },
-  /**
-   * Show message icon
-   */
-  showMessageIcon: {
+  showNotificationIcon: {
     type: Boolean,
     default: true
   },
@@ -158,7 +158,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['back', 'message', 'profile']);
+const emit = defineEmits(['back', 'profile', 'notification']);
 
 // Platform detection and safe area
 const { safeAreaInsets } = usePlatform();
@@ -166,11 +166,20 @@ const { goBack } = useApp();
 const router = useRouter();
 const route = useRoute();
 const userStore = useUserStore();
+const { hasUnread } = useNotifications();
+const notificationPopupRef = ref<InstanceType<typeof NotificationPopup> | null>(null);
 
 // Проверяем, находимся ли мы на странице профиля
 const isProfilePage = computed(() => {
   return route.path.includes('/profile');
 });
+
+// Check if there are unread notifications
+const hasUnreadNotifications = computed(() => {
+  return hasUnread.value;
+});
+
+// No need to ref the icons since they're already imported above
 
 // Compute dynamic style for header based on platform
 const headerStyle = computed(() => {
@@ -192,10 +201,13 @@ const handleBackClick = () => {
 };
 
 /**
- * Handle message icon click
+ * Handle notification icon click
  */
-const handleMessageClick = () => {
-  emit('message');
+const handleNotificationClick = () => {
+  emit('notification');
+  if (notificationPopupRef.value) {
+    notificationPopupRef.value.open();
+  }
 };
 
 /**
@@ -213,12 +225,13 @@ onMounted(() => {
   const currentTheme = userStore.currentUser?.settings?.theme || 'system';
   
   console.log('[AppTopHeader] Mounted with props:', {
-    showMessageIcon: props.showMessageIcon,
+    showNotificationIcon: props.showNotificationIcon,
     background: props.background,
     padding: props.padding,
     bordered: props.bordered,
     isProfilePage: isProfilePage.value,
-    userTheme: currentTheme
+    userTheme: currentTheme,
+    hasUnread: hasUnreadNotifications.value
   });
 });
 </script>

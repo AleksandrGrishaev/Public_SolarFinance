@@ -12,7 +12,7 @@
   
   <script lang="ts">
   import { defineComponent } from 'vue';
-  import { format } from 'date-fns';
+  import { format, isValid, parse } from 'date-fns';
   
   export default defineComponent({
     name: 'BaseList',
@@ -34,8 +34,37 @@
       formattedDate(): string {
         if (!this.date) return '';
         
-        const dateObj = typeof this.date === 'string' ? new Date(this.date) : this.date;
-        return format(dateObj, this.dateFormat);
+        // If already the correct format, return as is
+        if (typeof this.date === 'string' && this.date.match(/^\d{1,2}\s\w+$/)) {
+          return this.date;
+        }
+        
+        try {
+          let dateObj: Date;
+          
+          if (typeof this.date === 'string') {
+            // Try to parse the date string
+            dateObj = new Date(this.date);
+            
+            // Check if the date is valid
+            if (!isValid(dateObj)) {
+              // If not valid, try to parse as "d MMMM" format
+              dateObj = parse(this.date, this.dateFormat, new Date());
+            }
+          } else {
+            dateObj = this.date;
+          }
+          
+          // Check if the resulting date is valid
+          if (!isValid(dateObj)) {
+            return this.date.toString();
+          }
+          
+          return format(dateObj, this.dateFormat);
+        } catch (error) {
+          console.error('Error formatting date:', error);
+          return this.date.toString();
+        }
       }
     }
   });

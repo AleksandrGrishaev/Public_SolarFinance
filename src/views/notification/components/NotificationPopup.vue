@@ -11,16 +11,24 @@
       <div class="notification-popup">
         <div class="notification-popup__header">
           <h2 class="en-subheading">Notifications</h2>
-          <BaseIcon 
-            :icon="IconX" 
-            size="md" 
-            clickable
-            @click="onClose"
-          />
+          <div class="notification-popup__actions">
+            <BaseButton 
+              v-if="hasUnread"
+              variant="outline" 
+              text="Mark all read" 
+              @click="markAllAsRead" 
+            />
+            <BaseIcon 
+              :icon="IconX" 
+              size="md" 
+              clickable
+              @click="onClose"
+            />
+          </div>
         </div>
         <div class="notification-popup__content">
           <NotificationList 
-            :notifications="notifications"
+            :notifications="formattedNotifications"
             @decline="onDeclineNotification"
             @accept="onAcceptNotification"
           />
@@ -30,59 +38,80 @@
   </template>
   
   <script lang="ts">
-  import { defineComponent, ref, PropType, watch } from 'vue';
-  import { IconX } from '@tabler/icons-vue';
+  import { defineComponent, ref, computed } from 'vue';
+  import { IconX as IconXOrig } from '@tabler/icons-vue';
+  const IconX = IconXOrig;
+  import { format as formatDate } from 'date-fns';
   import BaseFloatingPopup from '@/components/organisms/popups/BaseFloatingPopup.vue';
   import BaseIcon from '@/components/ui/icons/BaseIcon.vue';
+  import BaseButton from '@/components/atoms/buttons/BaseButton.vue';
   import NotificationList from './NotificationList.vue';
-  
-  interface NotificationItem {
-    id: string;
-    date: string;
-    iconSrc: string;
-    iconAlt?: string;
-    title: string;
-    notes?: string;
-    description: string;
-    declineText?: string;
-    acceptText?: string;
-  }
+  import { useNotifications } from '@/stores/notification/composables/useNotifications';
+  import { NotificationSubtype } from '@/stores/notification/types';
   
   export default defineComponent({
     name: 'NotificationPopup',
     components: {
       BaseFloatingPopup,
       BaseIcon,
+      BaseButton,
       NotificationList
     },
     setup() {
-      const IconX = ref(IconX);
+      // Using IconX directly from import
       const isVisible = ref(false);
-      const notifications = ref<NotificationItem[]>([
-        // Sample data - will be replaced with data from store
-        {
-          id: '1',
-          date: '14 march',
-          iconSrc: 'icon-box0.svg',
-          title: 'New debt',
-          notes: 'Notes: family expense',
-          description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
-        },
-        {
-          id: '2',
-          date: '14 march',
-          iconSrc: 'icon-box0.svg',
-          title: 'Family expense',
-          description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore...'
-        },
-        {
-          id: '3',
-          date: '14 march',
-          iconSrc: 'icon-box0.svg',
-          title: 'Family expense',
-          description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore...'
-        }
-      ]);
+      
+      // Use the store
+      const {
+        notifications,
+        hasUnread,
+        markAllAsRead,
+        deleteNotification,
+        markAsRead
+      } = useNotifications();
+      
+      // Format the notifications for our UI components
+      const formattedNotifications = computed(() => {
+        return notifications.value.map(notification => {
+          // Get appropriate icon based on notification subtype
+          let iconSrc = 'icon-box0.svg'; // Default icon
+          
+          switch (notification.subtype) {
+            case NotificationSubtype.INFO:
+              iconSrc = 'icon-info.svg';
+              break;
+            case NotificationSubtype.ERROR:
+              iconSrc = 'icon-error.svg';
+              break;
+            case NotificationSubtype.UPDATE:
+              iconSrc = 'icon-update.svg';
+              break;
+            case NotificationSubtype.REMINDER:
+              iconSrc = 'icon-reminder.svg';
+              break;
+            case NotificationSubtype.PROMO:
+              iconSrc = 'icon-promo.svg';
+              break;
+          }
+          
+          // Format date for display
+          const formattedDate = formatDate(new Date(notification.date), 'd MMMM');
+          
+          return {
+            id: notification.id,
+            date: formattedDate,
+            iconSrc,
+            iconAlt: notification.subtype || 'notification',
+            title: notification.title,
+            notes: '',
+            description: notification.message,
+            declineText: 'Dismiss',
+            acceptText: notification.action?.text || 'View',
+            read: notification.read,
+            action: notification.action
+          };
+        });
+      });
       
       const open = () => {
         isVisible.value = true;
@@ -97,26 +126,46 @@
       };
       
       const onDeclineNotification = (id: string) => {
-        // Here would be the logic to handle declining a notification
-        console.log('Declined notification:', id);
-        // This would be replaced with store action call
-        notifications.value = notifications.value.filter(n => n.id !== id);
+        console.log('Dismissed notification:', id);
+        deleteNotification(id);
       };
       
       const onAcceptNotification = (id: string) => {
-        // Here would be the logic to handle accepting a notification
         console.log('Accepted notification:', id);
-        // This would be replaced with store action call
-        notifications.value = notifications.value.filter(n => n.id !== id);
+        
+        // Find the notification
+        const notification = notifications.value.find(n => n.id === id);
+        
+        // Mark as read
+        markAsRead(id);
+        
+        // If there's an action handler, execute it
+        if (notification?.action?.handler) {
+          notification.action.handler();
+        }
+        
+        // If there's a route, navigate to it
+        if (notification?.action?.route) {
+          // Assuming you have router injected
+          // router.push(notification.action.route);
+          console.log('Navigate to:', notification.action.route);
+        }
+        
+        // Close the popup if navigating
+        if (notification?.action?.route) {
+          close();
+        }
       };
       
       return {
         IconX,
         isVisible,
-        notifications,
+        formattedNotifications,
+        hasUnread,
         open,
         close,
         onClose,
+        markAllAsRead,
         onDeclineNotification,
         onAcceptNotification
       };
@@ -138,6 +187,12 @@
     align-items: center;
     padding: var(--spacing-md) var(--spacing-lg);
     border-bottom: 1px solid var(--border-color);
+  }
+  
+  .notification-popup__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
   }
   
   .notification-popup__content {
