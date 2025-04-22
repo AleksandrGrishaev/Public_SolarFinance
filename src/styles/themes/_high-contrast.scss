@@ -1,0 +1,59 @@
+// src/styles/themes/_high-contrast.scss
+
+// Полная конфигурация темы с высоким контрастом
+
+html.high-contrast-theme {
+    // Text colors
+    --text-header: #FFFFFF;     // TextHeader - белый
+    --text-usual: #FFFFFF;      // TextUsual - белый
+    --text-subheader: #FFFFFF;  // TextSubHeader - белый
+    --text-grey: #FFFFFF;       // TextGrey - белый
+    --text-inactive: #E0E0E0;   // TextInActive - светло-серый
+    --text-contrast: #000000;   // TextContrast - черный (для контраста на светлом фоне)
+  
+    // Icon colors
+    --bg-icon: #FFFFFF; 
+    --icon-border: var(--border-color);
+    --icon-borderActive: var(--color-primary);
+
+    // Main colors
+    --color-primary: #FFFF00;   // ColorPrimary - ярко-желтый
+    --color-warning: #FF0000;   // ColorWarning - ярко-красный
+    --color-success: #00FF00;   // ColorSuccess - ярко-зеленый
+  
+    // Background colors
+    --bg-contrast: #000000;     // BgContrast - черный
+    --bg-light: #333333;        // BgLight - темно-серый
+    --bg-main: #000000;         // BgMain - черный
+    --bg-superlight: #444444;   // BgContainer - серый
+    
+    // Фоновые цвета компонентов
+    --bg-screen: #000000;       // Черный фон экрана
+    --bg-popup: #000000;        // Фон для попапов
+    --bg-field-light: #333333;  // Темный фон для полей
+    --bg-field-dark: #222222;   // Очень темный фон для полей
+    --bg-dropdown: #000000;     // Фон для выпадающих меню
+    --bg-item-selected: #FFFF00;   // Фон для выбранных элементов - желтый (primary)
+    --bg-item-unselected: #333333; // Фон для невыбранных элементов - темно-серый
+  
+    // Other colors
+    --status-online: #00FF00;   // StatusOnline - ярко-зеленый
+    --status-offline: #FF0000;  // StatusOffline - ярко-красный
+    
+    // Базовые переменные приложения
+    --app-background: var(--bg-screen);
+    --text-primary: var(--text-usual);
+    --text-secondary: var(--text-grey);
+    --border-color: #FFFFFF;    // Белая рамка для высокого контраста
+    
+    // Дополнительные настройки для темы с высоким контрастом
+    --shadow-color: rgba(255, 255, 255, 0.3);
+    --input-placeholder-color: rgba(255, 255, 255, 0.8);
+    
+    // Специфичные настройки компонентов для темы с высоким контрастом
+    --scrollbar-track: #000000;
+    --scrollbar-thumb: #FFFFFF;
+    
+    // Дополнительные настройки для доступности
+    --focus-outline: 3px solid #FFFF00;  // Желтая рамка фокуса для лучшей видимости
+}

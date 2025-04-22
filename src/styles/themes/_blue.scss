@@ -1,0 +1,56 @@
+// src/styles/themes/_blue.scss
+
+// Полная конфигурация синей темы
+
+html.blue-theme {
+    // Text colors
+    --text-header: #FFFFFF;     // TextHeader - белый
+    --text-usual: #F0F8FF;      // TextUsual - очень светлый голубой
+    --text-subheader: #BBDEFB;  // TextSubHeader - светло-голубой
+    --text-grey: #90CAF9;       // TextGrey - голубой
+    --text-inactive: #64B5F6;   // TextInActive - синий
+    --text-contrast: #FFFFFF;   // TextContrast - белый (для контраста на темном фоне)
+  
+    // Icon colors
+    --bg-icon: #90CAF9; 
+    --icon-border: var(--border-color);
+    --icon-borderActive: var(--color-primary);
+
+    // Main colors
+    --color-primary: #2196F3;   // ColorPrimary - синий
+    --color-warning: #F44336;   // ColorWarning - красный
+    --color-success: #4CAF50;   // ColorSuccess - зеленый
+  
+    // Background colors
+    --bg-contrast: #1A237E;     // BgContrast - темно-синий
+    --bg-light: #3949AB;        // BgLight - синий
+    --bg-main: #1E88E5;         // BgMain - голубой
+    --bg-superlight: #E3F2FD;   // BgContainer - очень светлый голубой
+    
+    // Фоновые цвета компонентов
+    --bg-screen: #0D47A1;       // Синий фон экрана
+    --bg-popup: #1565C0;        // Фон для попапов
+    --bg-field-light: #42A5F5;  // Светлый фон для полей
+    --bg-field-dark: #1976D2;   // Чуть темнее фон для полей
+    --bg-dropdown: #1976D2;     // Фон для выпадающих меню
+    --bg-item-selected: #2196F3;   // Фон для выбранных элементов - синий (primary)
+    --bg-item-unselected: #64B5F6; // Фон для невыбранных элементов - светло-синий
+  
+    // Other colors
+    --status-online: #4CAF50;   // StatusOnline - зеленый
+    --status-offline: #F44336;  // StatusOffline - красный
+    
+    // Базовые переменные приложения
+    --app-background: var(--bg-screen);
+    --text-primary: var(--text-usual);
+    --text-secondary: var(--text-grey);
+    --border-color: #1565C0;    // Синяя рамка
+    
+    // Дополнительные настройки для синей темы
+    --shadow-color: rgba(0, 0, 0, 0.2);
+    --input-placeholder-color: rgba(255, 255, 255, 0.5);
+    
+    // Специфичные настройки компонентов для синей темы
+    --scrollbar-track: #0D47A1;
+    --scrollbar-thumb: #1976D2;
+}

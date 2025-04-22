@@ -4,17 +4,30 @@
     
     <n-card title="Тема оформления" class="theme-card">
       <n-space vertical>
-        <div class="theme-switch-container">
+        <!-- Переключатель темы с выпадающим списком -->
+        <div class="theme-select-container">
+          <span class="theme-label">Выберите тему:</span>
+          <n-select
+            v-model:value="selectedTheme"
+            :options="themeOptions"
+            @update:value="handleThemeChange"
+            size="medium"
+            class="theme-select"
+          />
+        </div>
+        
+        <!-- Для обратной совместимости: переключатель темный/светлый режим -->
+        <div class="theme-switch-container mt-3">
           <span>Светлая тема</span>
           <ToggleSwitch 
             v-model="isDarkMode" 
-            @update:modelValue="handleThemeToggle"
+            @update:modelValue="handleDarkModeToggle"
           />
           <span>Темная тема</span>
         </div>
         
-        <p class="theme-description">
-          {{ isDarkMode ? 'Тёмная тема активирована' : 'Светлая тема активирована' }}
+        <p class="theme-description mt-2">
+          Текущая тема: <strong>{{ getThemeDisplayName }}</strong>
         </p>
         
         <!-- Тестовые элементы для проверки применения стилей -->
@@ -49,22 +62,40 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount } from 'vue';
-// Исправлено: правильный импорт useTheme
-import { useTheme } from '@/composables/useTheme';
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
+// Обновляем импорт для использования нового пути
+import { useTheme } from '@/stores/theme/useTheme';
+import { type ThemeType } from '@/stores/theme/themeStore';
 import ToggleSwitch from '@/components/ui/inputs/ToggleSwitch.vue';
 import { useUserStore } from '@/stores/user/userStore';
+import { NSelect } from 'naive-ui';
 
-// Исправлено: правильное название функции
-const { isDarkMode, toggleTheme } = useTheme();
+// Используем обновленный composable
+const { isDarkMode, currentTheme, setTheme } = useTheme();
 const userStore = useUserStore();
 
-// Обработчик переключения темы с логированием
-const handleThemeToggle = (value: boolean) => {
-  console.log('[ProfileView] Переключение темы:', value ? 'темная' : 'светлая');
-  
-  // Переключаем тему
-  toggleTheme(value);
+// Создаем реактивное значение для выбранной темы
+const selectedTheme = ref(currentTheme.value);
+
+// Определяем доступные опции тем
+const themeOptions = [
+  { label: 'Светлая тема', value: 'light' },
+  { label: 'Темная тема', value: 'dark' },
+  { label: 'Синяя тема', value: 'blue' },
+  { label: 'Высокий контраст', value: 'high-contrast' },
+  { label: 'Системная тема', value: 'system' }
+];
+
+// Вычисляемое свойство для отображаемого имени темы
+const getThemeDisplayName = computed(() => {
+  const option = themeOptions.find(opt => opt.value === selectedTheme.value);
+  return option ? option.label : 'Не определено';
+});
+
+// Обработчик изменения темы в селекторе
+const handleThemeChange = (value: ThemeType) => {
+  console.log(`[ProfileView] Changing theme to: ${value}`);
+  setTheme(value);
   
   // Выводим информацию о теме из userStore
   console.log('[ProfileView] Тема пользователя из userStore:', 
@@ -76,6 +107,26 @@ const handleThemeToggle = (value: boolean) => {
   // Обновляем отображение CSS-переменных
   updateCssVarsDisplay();
 };
+
+// Обработчик переключения темной/светлой темы (для обратной совместимости)
+const handleDarkModeToggle = (value: boolean) => {
+  console.log('[ProfileView] Переключение темы:', value ? 'темная' : 'светлая');
+  
+  // Обновляем выбранную тему
+  selectedTheme.value = value ? 'dark' : 'light';
+  
+  // Устанавливаем тему
+  setTheme(selectedTheme.value);
+  
+  // Обновляем отображение CSS-переменных
+  updateCssVarsDisplay();
+};
+
+// Следим за изменением темы в store
+watch(currentTheme, (newTheme) => {
+  // Обновляем локальное значение
+  selectedTheme.value = newTheme;
+});
 
 // Функция для отображения текущих CSS-переменных
 const updateCssVarsDisplay = () => {
@@ -122,18 +173,14 @@ onMounted(() => {
   // Проверяем CSS классы документа
   console.log('[ProfileView] Текущие классы на documentElement:', document.documentElement.className);
   
+  // Обновляем локальное значение выбранной темы
+  selectedTheme.value = currentTheme.value;
+  
   // Инициализируем отображение CSS-переменных
   updateCssVarsDisplay();
   
   // Наблюдаем за изменениями класса на documentElement
   themeObserver.observe(document.documentElement, { attributes: true });
-  
-  // Принудительно применяем тему (для надежности)
-  setTimeout(() => {
-    const isDark = userStore.currentUser?.settings?.theme === 'dark';
-    toggleTheme(isDark);
-    updateCssVarsDisplay();
-  }, 100);
 });
 
 onBeforeUnmount(() => {
@@ -167,6 +214,20 @@ h1 {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.theme-select-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.theme-label {
+  min-width: 120px;
+}
+
+.theme-select {
+  width: 200px;
 }
 
 /* Стили для тестовых элементов */
