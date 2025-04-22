@@ -2,7 +2,8 @@
   <div class="profile-view">
     <h1>Настройки профиля</h1>
     
-    <n-card title="Тема оформления" class="theme-card">
+    <!-- Тема оформления -->
+    <n-card title="Тема оформления" class="profile-card">
       <n-space vertical>
         <!-- Переключатель темы с выпадающим списком -->
         <div class="theme-select-container">
@@ -29,34 +30,39 @@
         <p class="theme-description mt-2">
           Текущая тема: <strong>{{ getThemeDisplayName }}</strong>
         </p>
-        
-        <!-- Тестовые элементы для проверки применения стилей -->
-        <div class="theme-test-container">
-          <div class="test-item bg-contrast">
-            bg-contrast
-          </div>
-          <div class="test-item bg-main">
-            bg-main
-          </div>
-          <div class="test-item">
-            <span class="color-primary">Text Primary</span>
-          </div>
-          <div class="test-item bg-color-primary">
-            Primary Background
-          </div>
-        </div>
       </n-space>
     </n-card>
 
-    <!-- Дополнительная карточка с тестовыми элементами -->
-    <n-card title="Тестовые цвета темы" class="theme-card">
-      <n-space vertical>
-        <!-- Отображение текущих CSS-переменных -->
-        <div class="css-vars-container">
-          <div class="css-vars-title">CSS переменные:</div>
-          <div id="css-vars-content" class="css-vars-content"></div>
+    <!-- Локализация -->
+    <n-card title="Локализация" class="profile-card">
+      <language-settings />
+    </n-card>
+    
+    <!-- Разработка и отладка -->
+    <n-card title="Разработка и отладка" class="profile-card" v-if="isDebugEnabled">
+      <debug-access />
+      
+      <!-- Тестовые элементы для проверки применения стилей -->
+      <div class="theme-test-container">
+        <div class="test-item bg-contrast">
+          bg-contrast
         </div>
-      </n-space>
+        <div class="test-item bg-main">
+          bg-main
+        </div>
+        <div class="test-item">
+          <span class="color-primary">Text Primary</span>
+        </div>
+        <div class="test-item bg-color-primary">
+          Primary Background
+        </div>
+      </div>
+      
+      <!-- Отображение текущих CSS-переменных -->
+      <div class="css-vars-container mt-3">
+        <div class="css-vars-title">CSS переменные:</div>
+        <div id="css-vars-content" class="css-vars-content"></div>
+      </div>
     </n-card>
   </div>
 </template>
@@ -67,7 +73,9 @@ import { useTheme } from '@/stores/theme/useTheme';
 import { type ThemeType } from '@/stores/theme/themeStore';
 import ToggleSwitch from '@/components/ui/inputs/ToggleSwitch.vue';
 import { useUserStore } from '@/stores/user/userStore';
-import { NSelect } from 'naive-ui';
+import { NSelect, NCard, NSpace } from 'naive-ui';
+import LanguageSettings from './components/LanguageSettings.vue';
+import DebugAccess from './components/DebugAccess.vue';
 
 // Используем обновленный composable
 const { isDarkMode, currentTheme, setTheme } = useTheme();
@@ -84,6 +92,10 @@ const themeOptions = [
   { label: 'Высокий контраст', value: 'high-contrast' },
   { label: 'Системная тема', value: 'system' }
 ];
+
+// Флаг для отображения инструментов отладки
+// В реальном приложении его можно привязать к роли пользователя или режиму разработки
+const isDebugEnabled = ref(process.env.NODE_ENV === 'development' || true);
 
 // Вычисляемое свойство для отображаемого имени темы
 const getThemeDisplayName = computed(() => {
@@ -196,16 +208,16 @@ onBeforeUnmount(() => {
 h1 {
   margin-bottom: 20px;
   font-size: 24px;
-  color: var(--text-header); /* Используем CSS-переменную */
+  color: var(--text-header);
 }
 
-.theme-card {
-  margin-bottom: 16px;
+.profile-card {
+  margin-bottom: 20px;
 }
 
 .theme-description {
   margin-top: 8px;
-  color: var(--text-primary); /* Используем CSS-переменную */
+  color: var(--text-primary);
   font-size: 14px;
 }
 
@@ -275,5 +287,9 @@ h1 {
 
 .css-vars-content li {
   margin-bottom: 5px;
+}
+
+.mt-3 {
+  margin-top: 16px;
 }
 </style>

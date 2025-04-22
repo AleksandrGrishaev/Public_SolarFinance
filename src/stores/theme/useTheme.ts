@@ -1,9 +1,10 @@
 // src/stores/theme/useTheme.ts
-import { computed, onMounted, onBeforeUnmount } from 'vue';
+import { computed } from 'vue';
 import { useThemeStore, type ThemeType } from './themeStore';
 
 /**
  * Composable для работы с темой, который использует ThemeStore
+ * Предоставляет удобный API для компонентов
  */
 export function useTheme() {
   const themeStore = useThemeStore();
@@ -30,18 +31,6 @@ export function useTheme() {
       themeStore.init();
     }
   }
-  
-  // Инициализируем тему при монтировании
-  onMounted(() => {
-    initTheme();
-  });
-  
-  // Очищаем ресурсы при размонтировании
-  onBeforeUnmount(() => {
-    // Эта функция ничего не делает в текущей реализации, 
-    // но может потребоваться для будущих улучшений
-    themeStore.cleanup();
-  });
   
   return {
     isDarkMode,

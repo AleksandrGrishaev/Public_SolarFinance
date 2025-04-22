@@ -22,32 +22,26 @@
       
       <!-- Settings List -->
       <div class="settings-list">
-        <!-- Theme Toggle -->
+        <!-- Profile Settings -->
         <div class="settings-item">
           <div class="settings-item-label">
             <n-icon size="20" class="settings-icon">
-              <icon-moon />
+              <icon-user />
             </n-icon>
-            <span>Тёмная тема</span>
+            <span>Профиль</span>
           </div>
-          <n-switch v-model:value="isDarkTheme" @update:value="toggleTheme" />
-        </div>
-        
-        <!-- Language Selection -->
-        <div class="settings-item">
-          <div class="settings-item-label">
-            <n-icon size="20" class="settings-icon">
-              <icon-language />
-            </n-icon>
-            <span>Язык</span>
-          </div>
-          <n-select
-            v-model:value="selectedLanguage"
-            :options="languageOptions"
-            size="small"
-            style="width: 120px"
-            @update:value="changeLanguage"
-          />
+          <n-button 
+            size="small" 
+            @click="router.push('/profile')"
+            ghost
+          >
+            <template #icon>
+              <n-icon>
+                <icon-settings />
+              </n-icon>
+            </template>
+            Настройки
+          </n-button>
         </div>
         
         <!-- App Version -->
@@ -61,29 +55,6 @@
           <span class="settings-value">1.0.0</span>
         </div>
         
-<!-- Debug Tools - только для разработки -->
-<div class="settings-item">
-  <div class="settings-item-label">
-    <n-icon size="20" class="settings-icon">
-      <icon-code />
-    </n-icon>
-    <span>Инструменты разработчика</span>
-  </div>
-  <n-button 
-    size="small" 
-    @click="router.push('/debug')"
-    type="info"
-    ghost
-  >
-    <template #icon>
-      <n-icon>
-        <icon-database />
-      </n-icon>
-    </template>
-    Debug
-  </n-button>
-</div>
-
         <!-- Logout Button -->
         <n-button 
           class="logout-button" 
@@ -110,42 +81,27 @@ import {
   NAvatar, 
   NButton, 
   NIcon, 
-  NSwitch,
-  NSelect,
-  SelectOption,
   useMessage 
 } from 'naive-ui';
 import { 
-  IconMoon, 
   IconInfoCircle, 
   IconLogout,
-  IconLanguage,
-  IconCode,
-  IconDatabase
+  IconUser,
+  IconSettings
 } from '@tabler/icons-vue';
 import { useUserStore } from '@/stores/user';
-import { useThemeStore } from '@/stores/theme';
 
 // Router
 const router = useRouter();
 
 // Stores
 const userStore = useUserStore();
-const themeStore = useThemeStore();
 
 // Message provider
 const message = useMessage();
 
 // Local state
 const isLoggingOut = ref(false);
-const isDarkTheme = ref(themeStore.isDark);
-const selectedLanguage = ref(userStore.userSettings?.language || 'ru');
-
-// Доступные языки
-const languageOptions = [
-  { label: 'Русский', value: 'ru' },
-  { label: 'English', value: 'en' }
-] as SelectOption[];
 
 // User initials for avatar
 const userInitials = computed(() => {
@@ -156,32 +112,6 @@ const userInitials = computed(() => {
     .join('')
     .toUpperCase();
 });
-
-// Toggle theme
-const toggleTheme = (value: boolean) => {
-  if (value) {
-    themeStore.setDarkTheme();
-  } else {
-    themeStore.setLightTheme();
-  }
-  
-  // Сохраняем настройку в профиле пользователя
-  if (userStore.currentUser) {
-    userStore.updateUserSettings({ 
-      theme: value ? 'dark' : 'light'
-    });
-  }
-};
-
-// Change language
-const changeLanguage = (value: string) => {
-  // Сохраняем выбранный язык в профиле пользователя
-  if (userStore.currentUser) {
-    userStore.updateUserSettings({ 
-      language: value 
-    });
-  }
-};
 
 // Logout handler
 const handleLogout = async () => {
@@ -230,7 +160,7 @@ const handleLogout = async () => {
   align-items: center;
   margin-bottom: 30px;
   padding: 16px;
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: var(--bg-field-light);
   border-radius: 12px;
 }
 
@@ -246,6 +176,7 @@ const handleLogout = async () => {
   font-size: 18px;
   font-weight: 600;
   margin: 0 0 4px 0;
+  color: var(--text-header);
 }
 
 .user-role {
@@ -265,7 +196,7 @@ const handleLogout = async () => {
   justify-content: space-between;
   align-items: center;
   padding: 16px;
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: var(--bg-field-light);
   border-radius: 12px;
 }
 
@@ -277,7 +208,7 @@ const handleLogout = async () => {
 }
 
 .settings-icon {
-  color: var(--accent-color);
+  color: var(--color-primary);
 }
 
 .settings-value {

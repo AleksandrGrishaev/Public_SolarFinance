@@ -288,11 +288,19 @@
             <n-card title="Тема">
               <n-descriptions bordered>
                 <n-descriptions-item label="Текущая тема">
-                  {{ isDarkMode ? 'dark' : 'light' }}
+                  {{ themeStore.currentTheme }}
                 </n-descriptions-item>
                 <n-descriptions-item label="Темная тема">
-                  <n-tag :type="isDarkMode ? 'success' : 'default'">
-                    {{ isDarkMode ? 'Да' : 'Нет' }}
+                  <n-tag :type="themeStore.isDarkTheme ? 'success' : 'default'">
+                    {{ themeStore.isDarkTheme ? 'Да' : 'Нет' }}
+                  </n-tag>
+                </n-descriptions-item>
+                <n-descriptions-item label="CSS класс темы">
+                  {{ themeStore.themeClass }}
+                </n-descriptions-item>
+                <n-descriptions-item label="Авто-определено">
+                  <n-tag :type="themeStore.isAutoDetected ? 'info' : 'default'">
+                    {{ themeStore.isAutoDetected ? 'Да' : 'Нет' }}
                   </n-tag>
                 </n-descriptions-item>
                 <n-descriptions-item label="Тема в настройках пользователя">
@@ -306,9 +314,11 @@
               <n-divider />
 
               <n-button-group>
-                <n-button @click="setLightTheme">Светлая тема</n-button>
-                <n-button @click="setDarkTheme">Темная тема</n-button>
-                <n-button @click="toggleCurrentTheme">Переключить</n-button>
+                <n-button @click="setTheme('light')">Светлая тема</n-button>
+                <n-button @click="setTheme('dark')">Темная тема</n-button>
+                <n-button @click="setTheme('blue')">Синяя тема</n-button>
+                <n-button @click="setTheme('high-contrast')">Высокий контраст</n-button>
+                <n-button @click="setTheme('system')">Системная</n-button>
               </n-button-group>
               
               <n-divider />
@@ -397,8 +407,8 @@ import { useAccountStore } from '@/stores/account';
 import { useTransactionStore } from '@/stores/transaction';
 import { useCategoryStore } from '@/stores/category';
 import { useCurrencyStore } from '@/stores/currency';
-// Импорт useSimpleTheme вместо ThemeStore
-import { useSimpleTheme } from '@/composables/useSimpleTheme';
+// Импорт ThemeStore вместо useSimpleTheme
+import { useThemeStore } from '@/stores/theme/themeStore';
 
 // Инициализация хранилищ
 const userStore = useUserStore();
@@ -407,8 +417,8 @@ const accountStore = useAccountStore();
 const transactionStore = useTransactionStore();
 const categoryStore = useCategoryStore();
 const currencyStore = useCurrencyStore();
-// Используем useSimpleTheme вместо ThemeStore
-const { isDarkMode, toggleTheme } = useSimpleTheme();
+// Используем ThemeStore
+const themeStore = useThemeStore();
 
 // Активный элемент меню
 const activeKey = ref('user');
@@ -430,10 +440,10 @@ const cssVariables = computed(() => {
   ];
 });
 
-// Функции управления темой
-const setLightTheme = () => toggleTheme(false);
-const setDarkTheme = () => toggleTheme(true);
-const toggleCurrentTheme = () => toggleTheme(!isDarkMode.value);
+// Функция для установки темы
+const setTheme = (theme) => {
+  themeStore.setTheme(theme);
+};
 
 // Опции меню - используем вычисляемое свойство для правильного обновления
 const menuOptions = computed(() => [
@@ -652,7 +662,8 @@ const refreshStores = async () => {
       bookStore.refreshBooks(),
       accountStore.refreshAccounts(),
       transactionStore.refreshTransactions(),
-      currencyStore.fetchLatestRates()
+      currencyStore.fetchLatestRates(),
+      themeStore.init() // Добавляем инициализацию темы
     ]);
   } catch (error) {
     console.error('Error refreshing stores:', error);
@@ -688,6 +699,7 @@ onMounted(async () => {
     if (!accountStore.isInitialized) await accountStore.init();
     if (!transactionStore.isInitialized) await transactionStore.init();
     if (!categoryStore.isInitialized) await categoryStore.init();
+    if (!themeStore.isInitialized) themeStore.init();
     
     console.log('All stores initialized successfully');
     
