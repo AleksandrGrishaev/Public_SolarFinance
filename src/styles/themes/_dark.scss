@@ -12,6 +12,11 @@
   --text-inactive: #DBDADD;   // TextInActive - темно-серый
   --text-contrast: #FFFFFF;   // TextContrast - белый (для контрастного текста)
 
+//Icon colors
+--bg-icon:#444444; 
+--icon-border: var(--border-color)
+--icon-borderActive: var(--color-primary)
+
   // Main colors
   --color-primary: #FFD452;   // ColorPrimary - желтый
   --color-warning: #A44942;   // ColorWarning - красный

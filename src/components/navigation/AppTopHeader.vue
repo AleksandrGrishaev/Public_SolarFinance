@@ -51,8 +51,8 @@
         clickable
         :background="background"
         :color="iconColor"
-        :bordered="bordered"
-        :borderColor="borderColor"
+        :bordered="true"
+        :borderColor="isProfilePage ? 'var(--icon-borderActive)' : borderColor"
         :padding="padding"
         :autoSize="true"
         @click="handleProfileClick"
@@ -63,11 +63,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { IconArrowLeft, IconMessage, IconUser } from '@tabler/icons-vue';
 import BaseIcon from '@/components/ui/icons/BaseIcon.vue';
 import { usePlatform } from '@/stores/system/composables/usePlatform';
 import { useApp } from '@/stores/system/composables/useApp';
+import { useRouter, useRoute } from 'vue-router';
+import { useUserStore } from '@/stores/user/userStore';
 
 const props = defineProps({
   /**
@@ -161,6 +163,14 @@ const emit = defineEmits(['back', 'message', 'profile']);
 // Platform detection and safe area
 const { safeAreaInsets } = usePlatform();
 const { goBack } = useApp();
+const router = useRouter();
+const route = useRoute();
+const userStore = useUserStore();
+
+// Проверяем, находимся ли мы на странице профиля
+const isProfilePage = computed(() => {
+  return route.path.includes('/profile');
+});
 
 // Compute dynamic style for header based on platform
 const headerStyle = computed(() => {
@@ -193,15 +203,22 @@ const handleMessageClick = () => {
  */
 const handleProfileClick = () => {
   emit('profile');
+  // Переходим на страницу профиля
+  router.push('/profile');
 };
 
 // Добавляем для отладки
 onMounted(() => {
+  // Получаем информацию о теме пользователя
+  const currentTheme = userStore.currentUser?.settings?.theme || 'system';
+  
   console.log('[AppTopHeader] Mounted with props:', {
     showMessageIcon: props.showMessageIcon,
     background: props.background,
     padding: props.padding,
-    bordered: props.bordered
+    bordered: props.bordered,
+    isProfilePage: isProfilePage.value,
+    userTheme: currentTheme
   });
 });
 </script>

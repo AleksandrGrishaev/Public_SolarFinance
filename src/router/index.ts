@@ -92,6 +92,28 @@ const routes: Array<RouteRecordRaw> = [
       }
     ]
   },
+  // Profile route - используем IosLayout
+  {
+    path: '/profile',
+    component: IosLayout,
+    children: [
+      {
+        path: '',
+        name: 'profile',
+        component: () => import('@/views/profile/pages/ProfileView.vue'),
+        meta: {
+          requiresAuth: true,
+          title: '',
+          header: {
+            show: true,
+            showBack: true,
+            showMessageIcon: true,
+            hasNotifications: true
+          }
+        }
+      }
+    ]
+  },
   // DebugStore
   {
     path: '/debug',

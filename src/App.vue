@@ -5,8 +5,8 @@
         <n-notification-provider>
           <n-message-provider>
             <message-provider>
-              <!-- Оставляем div без класса темы - теперь это управляется через document.documentElement -->
-              <div class="app-container">
+              <!-- Добавляем ключ для принудительной перерисовки при изменении темы -->
+              <div class="app-container" :key="themeVersion">
                 <router-view v-slot="{ Component }">
                   <transition name="fade" mode="out-in">
                     <component :is="Component" />
@@ -32,7 +32,11 @@ import {
 } from 'naive-ui';
 import { useThemeStore } from './stores/theme';
 import MessageProvider from './components/system/MessageProvider.vue';
+import { useSimpleTheme } from './composables/useSimpleTheme.ts';
 
 // Получение хранилища темы
 const themeStore = useThemeStore();
+
+// Получаем ссылку на версию темы для обновления DOM
+const { themeVersion } = useSimpleTheme();
 </script>
