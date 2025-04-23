@@ -372,6 +372,7 @@
     display: flex;
     flex-direction: column;
     background-color: var(--bg-screen);
+    overflow-y: auto; /* Добавляем вертикальную прокрутку */
   }
   
   .debt-view__header {
@@ -385,6 +386,65 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    flex-shrink: 0; /* Предотвращаем сжатие при переполнении */
+  }
+  
+  .debt-view__content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Добавляем вертикальную прокрутку для контента */
+    padding-bottom: 60px; /* Добавляем отступ снизу, чтобы контент не перекрывался нижним меню */
+  }
+  
+  .debt-balance-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 16px;
+    flex-shrink: 0; /* Предотвращаем сжатие при переполнении */
+  }
+  
+  .balance-card {
+    padding: 12px;
+    border-radius: 8px;
+    background-color: var(--bg-light);
+    text-align: center;
+    min-width: 100px;
+  }
+  
+  .balance-card.positive-balance {
+    background-color: var(--success-bg);
+    color: var(--success-color);
+  }
+  
+  .balance-card.negative-balance {
+    background-color: var(--danger-bg);
+    color: var(--danger-color);
+  }
+  
+  .debt-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0; /* Предотвращаем сжатие при переполнении */
+  }
+  
+  .tab {
+    padding: 12px 16px;
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--text-secondary);
+    border-bottom: 2px solid transparent;
+  }
+  
+  .tab.active {
+    color: var(--accent-color);
+    border-bottom-color: var(--accent-color);
+  }
+  
+  .debt-list-container {
+    flex: 1;
+    overflow-y: auto; /* Добавляем вертикальную прокрутку для списка долгов */
   }
   
   .filter-section {
@@ -424,7 +484,54 @@
     background-color: var(--bg-light);
     color: var(--text-usual);
     border: none;
-    font-size: 14px
+    font-size: 14px;
   }
-
+  
+  /* Стили для диалогового окна отмены долга */
+  .cancel-debt-dialog {
+    padding: 16px;
+  }
+  
+  .cancel-debt-dialog h2 {
+    margin-top: 0;
+    color: var(--text-heading);
+  }
+  
+  .reason-input {
+    margin: 16px 0;
+  }
+  
+  .form-textarea {
+    width: 100%;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    resize: vertical;
+    font-family: inherit;
+  }
+  
+  .dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  
+  .dialog-button {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+  }
+  
+  .secondary-button {
+    background-color: var(--bg-light);
+    color: var(--text-usual);
+  }
+  
+  .primary-button {
+    background-color: var(--accent-color);
+    color: white;
+  }
   </style>

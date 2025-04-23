@@ -166,6 +166,7 @@ onMounted(() => {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 
 .menu-container {
