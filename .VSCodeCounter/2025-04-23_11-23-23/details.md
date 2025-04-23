@@ -1,10 +1,10 @@
 # Details
 
-Date : 2025-04-22 23:04:01
+Date : 2025-04-23 11:23:23
 
 Directory /Users/peaker/dev/solar-finance/src
 
-Total : 214 files,  29887 codes, 2292 comments, 4672 blanks, all 36851 lines
+Total : 214 files,  29931 codes, 2293 comments, 4680 blanks, all 36904 lines
 
 [Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
@@ -56,7 +56,7 @@ Total : 214 files,  29887 codes, 2292 comments, 4672 blanks, all 36851 lines
 | [src/components/organisms/index.js](/src/components/organisms/index.js) | JavaScript | 1 | 1 | 0 | 2 |
 | [src/components/organisms/notifications/Notification.vue](/src/components/organisms/notifications/Notification.vue) | Vue | 87 | 0 | 5 | 92 |
 | [src/components/organisms/notifications/index.js](/src/components/organisms/notifications/index.js) | JavaScript | 1 | 0 | 0 | 1 |
-| [src/components/organisms/popups/BaseFloatingPopup.vue](/src/components/organisms/popups/BaseFloatingPopup.vue) | Vue | 156 | 1 | 19 | 176 |
+| [src/components/organisms/popups/BaseFloatingPopup.vue](/src/components/organisms/popups/BaseFloatingPopup.vue) | Vue | 185 | 1 | 23 | 209 |
 | [src/components/providers/AlertProvider.vue](/src/components/providers/AlertProvider.vue) | Vue | 6 | 1 | 1 | 8 |
 | [src/components/system/MessageProvider.vue](/src/components/system/MessageProvider.vue) | Vue | 11 | 0 | 3 | 14 |
 | [src/components/ui/BasePopup.vue](/src/components/ui/BasePopup.vue) | Vue | 206 | 7 | 25 | 238 |
@@ -202,10 +202,10 @@ Total : 214 files,  29887 codes, 2292 comments, 4672 blanks, all 36851 lines
 | [src/views/debug/components/SystemStoresDebugPanel.vue](/src/views/debug/components/SystemStoresDebugPanel.vue) | Vue | 271 | 4 | 20 | 295 |
 | [src/views/icon/popup/IconSelectorPopup.vue](/src/views/icon/popup/IconSelectorPopup.vue) | Vue | 361 | 6 | 52 | 419 |
 | [src/views/notification/NotificationsView.vue](/src/views/notification/NotificationsView.vue) | Vue | 255 | 2 | 42 | 299 |
-| [src/views/notification/components/NotificationDebtItem.vue](/src/views/notification/components/NotificationDebtItem.vue) | Vue | 333 | 1 | 32 | 366 |
-| [src/views/notification/components/NotificationItem.vue](/src/views/notification/components/NotificationItem.vue) | Vue | 331 | 1 | 36 | 368 |
+| [src/views/notification/components/NotificationDebtItem.vue](/src/views/notification/components/NotificationDebtItem.vue) | Vue | 327 | 1 | 32 | 360 |
+| [src/views/notification/components/NotificationItem.vue](/src/views/notification/components/NotificationItem.vue) | Vue | 325 | 2 | 35 | 362 |
 | [src/views/notification/components/NotificationList.vue](/src/views/notification/components/NotificationList.vue) | Vue | 173 | 3 | 20 | 196 |
-| [src/views/notification/components/NotificationPopup.vue](/src/views/notification/components/NotificationPopup.vue) | Vue | 242 | 1 | 40 | 283 |
+| [src/views/notification/components/NotificationPopup.vue](/src/views/notification/components/NotificationPopup.vue) | Vue | 269 | 1 | 45 | 315 |
 | [src/views/notification/composables/useNotifications.ts](/src/views/notification/composables/useNotifications.ts) | TypeScript | 67 | 6 | 10 | 83 |
 | [src/views/profile/pages/ProfileView.vue](/src/views/profile/pages/ProfileView.vue) | Vue | 239 | 7 | 49 | 295 |
 | [src/views/profile/pages/components/DebugAccess.vue](/src/views/profile/pages/components/DebugAccess.vue) | Vue | 53 | 0 | 6 | 59 |

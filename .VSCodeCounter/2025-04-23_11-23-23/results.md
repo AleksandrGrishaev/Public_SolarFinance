@@ -1,17 +1,17 @@
 # Summary
 
-Date : 2025-04-22 23:04:01
+Date : 2025-04-23 11:23:23
 
 Directory /Users/peaker/dev/solar-finance/src
 
-Total : 214 files,  29887 codes, 2292 comments, 4672 blanks, all 36851 lines
+Total : 214 files,  29931 codes, 2293 comments, 4680 blanks, all 36904 lines
 
 Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
 ## Languages
 | language | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| Vue | 103 | 18,370 | 341 | 2,540 | 21,251 |
+| Vue | 103 | 18,414 | 342 | 2,548 | 21,304 |
 | TypeScript | 82 | 7,527 | 1,817 | 1,387 | 10,731 |
 | Markdown | 8 | 3,388 | 0 | 610 | 3,998 |
 | SCSS | 11 | 586 | 125 | 135 | 846 |
@@ -20,12 +20,12 @@ Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-
 ## Directories
 | path | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| . | 214 | 29,887 | 2,292 | 4,672 | 36,851 |
+| . | 214 | 29,931 | 2,293 | 4,680 | 36,904 |
 | . (Files) | 2 | 72 | 9 | 9 | 90 |
 | about | 8 | 3,388 | 0 | 610 | 3,998 |
 | about (Files) | 3 | 762 | 0 | 152 | 914 |
 | about/WorkFlow | 5 | 2,626 | 0 | 458 | 3,084 |
-| components | 64 | 8,560 | 172 | 1,161 | 9,893 |
+| components | 64 | 8,589 | 172 | 1,165 | 9,926 |
 | components (Files) | 1 | 3 | 1 | 0 | 4 |
 | components/atoms | 10 | 532 | 9 | 55 | 596 |
 | components/atoms (Files) | 1 | 3 | 1 | 0 | 4 |
@@ -42,11 +42,11 @@ Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-
 | components/molecules/information | 2 | 83 | 1 | 7 | 91 |
 | components/molecules/lists | 1 | 84 | 1 | 12 | 97 |
 | components/navigation | 2 | 398 | 3 | 30 | 431 |
-| components/organisms | 5 | 313 | 3 | 35 | 351 |
+| components/organisms | 5 | 342 | 3 | 39 | 384 |
 | components/organisms (Files) | 1 | 1 | 1 | 0 | 2 |
 | components/organisms/alerts | 1 | 68 | 1 | 11 | 80 |
 | components/organisms/notifications | 2 | 88 | 0 | 5 | 93 |
-| components/organisms/popups | 1 | 156 | 1 | 19 | 176 |
+| components/organisms/popups | 1 | 185 | 1 | 23 | 209 |
 | components/providers | 1 | 6 | 1 | 1 | 8 |
 | components/system | 1 | 11 | 0 | 3 | 14 |
 | components/ui | 25 | 4,307 | 86 | 602 | 4,995 |
@@ -91,7 +91,7 @@ Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-
 | styles/themes | 7 | 317 | 92 | 85 | 494 |
 | types | 1 | 5 | 0 | 0 | 5 |
 | utils | 1 | 16 | 9 | 4 | 29 |
-| views | 62 | 11,223 | 600 | 1,718 | 13,541 |
+| views | 62 | 11,238 | 601 | 1,722 | 13,561 |
 | views (Files) | 6 | 1,533 | 24 | 172 | 1,729 |
 | views/account | 10 | 2,386 | 125 | 394 | 2,905 |
 | views/account/popup | 10 | 2,386 | 125 | 394 | 2,905 |
@@ -111,9 +111,9 @@ Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-
 | views/debug/components | 3 | 752 | 13 | 59 | 824 |
 | views/icon | 1 | 361 | 6 | 52 | 419 |
 | views/icon/popup | 1 | 361 | 6 | 52 | 419 |
-| views/notification | 6 | 1,401 | 14 | 180 | 1,595 |
+| views/notification | 6 | 1,416 | 15 | 184 | 1,615 |
 | views/notification (Files) | 1 | 255 | 2 | 42 | 299 |
-| views/notification/components | 4 | 1,079 | 6 | 128 | 1,213 |
+| views/notification/components | 4 | 1,094 | 7 | 132 | 1,233 |
 | views/notification/composables | 1 | 67 | 6 | 10 | 83 |
 | views/profile | 3 | 353 | 7 | 63 | 423 |
 | views/profile/pages | 3 | 353 | 7 | 63 | 423 |
