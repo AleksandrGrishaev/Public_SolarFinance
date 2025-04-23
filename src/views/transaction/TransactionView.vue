@@ -89,6 +89,30 @@
       @reorder="handleCategoriesReordered"
       @toggleActive="handleToggleActiveCategory"
     />
+
+    <!-- Диалоги для подтверждения распределения и выбора должника -->
+  <DistributionConfirmDialog
+    v-model="confirmationDialog.show"
+    :title="confirmationDialog.title"
+    :message="confirmationDialog.message"
+    :confirm-text="confirmationDialog.confirmText"
+    :cancel-text="confirmationDialog.cancelText"
+    :current-distribution="distributionPercentage"
+    :standard-distribution="confirmationDialog.standardDistribution"
+    :sides="distributionOwners"
+    :preview-amount="parseFloat(amount) || 1000"
+    :currency="sourceCurrencySymbol"
+    @confirm="confirmationDialog.onConfirm"
+    @cancel="confirmationDialog.onCancel"
+  />
+  
+  <DebtorSelectionDialog
+    v-model="debtorDialog.show"
+    :users="availableDebtors"
+    :current-user-id="currentUserId"
+    @select="onDebtorSelected"
+    @cancel="hideDebtorDialog"
+  />
   </div>
 </template>
 
@@ -113,6 +137,8 @@ import { useUserStore } from '../../stores/user';
 import { useBookStore } from '../../stores/book';
 import { useCurrencyStore } from '../../stores/currency';
 import { messageService } from '../../services/system/MessageService';
+import { useAdvancedDistribution } from './composables/useAdvancedDistribution';
+import { useTransactionSaver } from './composables/useTransactionSaver';
 import { useDistributionControl } from './composables/useDistributionControl';
 import { useRouter } from 'vue-router';
 
@@ -130,12 +156,15 @@ const manualDestinationAmount = ref('0');
 const amountSectionRef = ref(null);
 const isSaving = ref(false);
 
+
 // Инициализируем хранилища
 const accountStore = useAccountStore();
 const transactionStore = useTransactionStore();
 const userStore = useUserStore();
 const bookStore = useBookStore();
 const currencyStore = useCurrencyStore();
+const transactionSaver = useTransactionSaver();
+
 
 // Инициализируем основной хук, но не деструктурируем методы, которые будем переопределять
 const transactionState = useTransaction(emit);
@@ -161,10 +190,6 @@ const {
   selectedCategory,
   filteredCategories,
   
-  // From useDistribution
-  distributionPercentage,
-  shouldShowDistribution,
-  distributionOwners,
   
   // Methods
   initAllStores,
@@ -176,6 +201,20 @@ const {
   handleCategoriesReordered,
   handleToggleActiveCategory
 } = transactionState;
+
+// Инициализация улучшенной логики распределения
+const {
+  distributionPercentage,
+  distributionOwners,
+  shouldShowDistribution,
+  shouldAutoShowSlider,
+  isNonStandardDistribution,
+  getStandardDistributionValue,
+  saveDistributionSetting,
+  loadDistributionSetting,
+  checkCategoryDistributionConflict
+} = useAdvancedDistribution(selectedBook, selectedType, selectedAccount, selectedCategory);
+
 
 // Инициализируем хук для работы с валютами
 const {
@@ -191,7 +230,13 @@ const {
   isSliderVisible,
   showDistributionToggle,
   toggleDistributionVisibility
-} = useDistributionControl(shouldShowDistribution, selectedType);
+} = useDistributionControl(
+  shouldShowDistribution,
+  shouldAutoShowSlider,
+  isNonStandardDistribution,
+  selectedType,
+  distributionOwners
+);
 
 
 // Добавить функцию обновления заголовка
@@ -206,6 +251,17 @@ const updateHeaderConfig = () => {
     background: 'var(--bg-dropdown)'
   });
 };
+
+// Диалог подтверждения
+const confirmationDialog = ref({
+  show: false,
+  title: '',
+  message: '',
+  confirmText: '',
+  cancelText: '',
+  onConfirm: null,
+  onCancel: null
+});
 
 // Добавить в onBeforeMount
 onBeforeMount(() => {
@@ -232,6 +288,18 @@ const handleDestinationAmountActive = (value: string) => {
 
 const handleUpdateDestinationAmount = (value: string) => {
   manualDestinationAmount.value = value;
+};
+
+const showConfirmationDialog = (options) => {
+  confirmationDialog.value = {
+    show: true,
+    title: options.title || 'Подтверждение',
+    message: options.message || '',
+    confirmText: options.confirmText || 'Подтвердить',
+    cancelText: options.cancelText || 'Отмена',
+    onConfirm: options.onConfirm || (() => {}),
+    onCancel: options.onCancel || (() => {})
+  };
 };
 
 // Переопределяем обработчик ввода с клавиатуры
@@ -304,14 +372,33 @@ const handleCategorySelect = (category) => {
   if (category) {
     selectedCategory.value = category;
     
-    // Автоматически сохраняем транзакцию после выбора категории
-    saveRegularTransaction();
+    // Проверка конфликта распределения
+    if (checkCategoryDistributionConflict(category)) {
+      // Показываем диалог подтверждения
+      showConfirmationDialog({
+        title: 'Подтвердите распределение',
+        message: `Обычно расходы в категории "${category.name}" распределяются как ${category.defaultDistribution}/${100-category.defaultDistribution}, но сейчас установлено ${distributionPercentage.value}/${100-distributionPercentage.value}. Сохранить с текущим распределением?`,
+        confirmText: 'Сохранить как есть',
+        cancelText: 'Использовать стандартное',
+        onConfirm: () => {
+          // Сохраняем с текущим распределением
+          saveRegularTransaction();
+        },
+        onCancel: () => {
+          // Обновляем на стандартное и сохраняем
+          distributionPercentage.value = category.defaultDistribution;
+          saveRegularTransaction();
+        }
+      });
+      return true;
+    }
     
-    return true; // Показываем компоненту, что успешно обработали выбор
-  } else {
-    console.warn('[TransactionView] Attempted to select null category');
-    return false;
+    // Автоматически сохраняем транзакцию
+    saveRegularTransaction();
+    return true;
   }
+  
+  return false;
 };
 
 // Проверка валидности транзакции для перевода
@@ -371,111 +458,80 @@ const validateRegularTransaction = () => {
 // Основной обработчик добавления транзакции
 const handleAddTransaction = async () => {
   if (selectedType.value === 'transfer') {
-    // Для переводов выполняем валидацию и сразу сохраняем
+    // Для переводов проверяем основные условия
     if (validateTransferTransaction()) {
       await saveTransferTransaction();
     }
+  } else if (selectedType.value === 'debt') {
+    // Для долгов показываем диалог выбора должника
+    if (validateDebtTransaction()) {
+      showDebtorSelectionDialog();
+    }
+  } else if (selectedType.value === 'exchange') {
+    // Для обмена валют
+    if (validateExchangeTransaction()) {
+      await saveExchangeTransaction();
+    }
   } else {
-    // Для доходов и расходов проверяем базовые поля
+    // Для доходов и расходов
     if (validateRegularTransaction()) {
-      // Если категория уже выбрана, сохраняем транзакцию
       if (selectedCategory.value) {
-        await saveRegularTransaction();
+        // Если категория уже выбрана, проверяем конфликт распределения
+        if (checkCategoryDistributionConflict(selectedCategory.value)) {
+          showConfirmationDialog({
+            title: 'Подтвердите распределение',
+            message: `Обычно расходы в категории "${selectedCategory.value.name}" распределяются как ${selectedCategory.value.defaultDistribution}/${100-selectedCategory.value.defaultDistribution}, но сейчас установлено ${distributionPercentage.value}/${100-distributionPercentage.value}. Сохранить с текущим распределением?`,
+            confirmText: 'Сохранить как есть',
+            cancelText: 'Использовать стандартное',
+            onConfirm: () => {
+              saveRegularTransaction();
+            },
+            onCancel: () => {
+              distributionPercentage.value = selectedCategory.value.defaultDistribution;
+              saveRegularTransaction();
+            }
+          });
+        } else {
+          await saveRegularTransaction();
+        }
       } else {
-        // Если категория не выбрана, открываем селектор категорий
+        // Если категория не выбрана, открываем селектор
         showCategorySelector.value = true;
       }
     }
   }
 };
 
+
 // Сохранение обычной транзакции (доход/расход)
 const saveRegularTransaction = async () => {
   try {
     isSaving.value = true;
     
-    // Проверяем наличие выбранной категории
-    if (!selectedCategory.value) {
-      messageService.error('Необходимо выбрать категорию');
-      showCategorySelector.value = true;
-      return;
-    }
-    
-    // Конвертируем сумму в число
-    const amountValue = parseFloat(amount.value);
-    const finalAmount = selectedType.value === 'expense' 
-      ? -Math.abs(amountValue) 
-      : Math.abs(amountValue);
-    
-    // Получаем данные о выбранном счете
-    const account = accountStore.getAccountById(selectedAccount.value);
-    if (!account) {
-      throw new Error(`Счет с ID ${selectedAccount.value} не найден`);
-    }
-    
-    // Получаем данные о выбранной книге
-    const book = bookStore.getBookById(selectedBook.value);
-    if (!book) {
-      throw new Error(`Книга с ID ${selectedBook.value} не найдена`);
-    }
-    
-    // Получаем текущего пользователя
-    const currentUser = userStore.currentUser;
-    if (!currentUser) {
-      throw new Error('Не найден авторизованный пользователь');
-    }
-    
-    // Определяем курс конвертации и сумму в валюте книги
-    let bookRate = 1;
-    let bookAmount = finalAmount;
-    
-    if (account.currency !== book.currency) {
-      bookRate = currencyStore.getExchangeRate(account.currency, book.currency);
-      bookAmount = finalAmount * bookRate;
-    }
-    
-    // Формируем данные транзакции
+    // Собираем данные для сохранения
     const transactionData = {
-      date: new Date(),
-      amount: finalAmount,
-      currency: account.currency,
-      bookCurrency: book.currency,
-      bookRate: bookRate,
-      bookAmount: bookAmount,
-      type: selectedType.value,
-      categoryId: selectedCategory.value.id,
-      sourceEntityId: selectedAccount.value,
-      sourceEntityType: 'account',
-      executedByOwnerId: currentUser.id,
-      responsibleOwnerIds: [currentUser.id],
-      bookId: selectedBook.value
+      amount: amount.value,
+      selectedType: selectedType.value,
+      selectedBook: selectedBook.value,
+      selectedAccount: selectedAccount.value,
+      selectedCategory: selectedCategory.value,
+      distributionPercentage: distributionPercentage.value,
+      distributionOwners: distributionOwners.value,
+      shouldShowDistribution: shouldShowDistribution.value
     };
     
-    // Добавляем правила распределения
-    if (shouldShowDistribution.value && distributionOwners.value.length > 0) {
-      transactionData.distributionRules = [
-        {
-          ownerId: distributionOwners.value[0].id,
-          percentage: distributionPercentage.value
-        },
-        {
-          ownerId: distributionOwners.value[1].id,
-          percentage: 100 - distributionPercentage.value
-        }
-      ];
+    // Сохраняем транзакцию через composable
+    await transactionSaver.saveRegularTransaction(transactionData);
+    
+    // Сохраняем настройки распределения, если оно нестандартное
+    if (isNonStandardDistribution.value && selectedCategory.value) {
+      saveDistributionSetting(selectedBook.value, selectedCategory.value.id);
     }
-    
-    // Сохраняем транзакцию
-    await transactionStore.addTransaction(transactionData);
-    
-    // Показываем уведомление
-    messageService.success('Транзакция успешно добавлена');
     
     // Сбрасываем форму
     resetForm();
   } catch (error) {
     console.error('[TransactionView] Ошибка при сохранении транзакции:', error);
-    messageService.error('Произошла ошибка при сохранении транзакции');
   } finally {
     isSaving.value = false;
   }
@@ -486,70 +542,138 @@ const saveTransferTransaction = async () => {
   try {
     isSaving.value = true;
     
-    // Конвертируем сумму в число
-    const amountValue = Math.abs(parseFloat(amount.value));
-    
-    // Получаем данные о выбранных счетах
-    const sourceAccount = accountStore.getAccountById(selectedAccount.value);
-    const destAccount = accountStore.getAccountById(destinationAccount.value);
-    
-    if (!sourceAccount || !destAccount) {
-      throw new Error('Исходный или целевой счет не найден');
-    }
-    
-    // Получаем текущего пользователя
-    const currentUser = userStore.currentUser;
-    if (!currentUser) {
-      throw new Error('Не найден авторизованный пользователь');
-    }
-    
-    // 1. Создаем транзакцию списания со счета-источника
-    const withdrawalData = {
-      date: new Date(),
-      amount: -amountValue,
-      currency: sourceAccount.currency,
-      type: 'transfer',
-      description: `Перевод на счет ${destAccount.name}`,
-      sourceEntityId: sourceAccount.id,
-      sourceEntityType: 'account',
-      destinationEntityId: destAccount.id,
-      destinationEntityType: 'account',
-      executedByOwnerId: currentUser.id,
-      responsibleOwnerIds: [currentUser.id],
-      bookId: selectedBook.value
+    // Собираем данные для сохранения
+    const transactionData = {
+      amount: amount.value,
+      selectedBook: selectedBook.value,
+      selectedAccount: selectedAccount.value,
+      destinationAccount: destinationAccount.value,
+      manualDestinationAmount: !isSourceAmountActive.value ? manualDestinationAmount.value : null
     };
     
-    // 2. Создаем транзакцию пополнения счета-назначения
-    const depositData = {
-      date: new Date(),
-      amount: amountValue,
-      currency: destAccount.currency,
-      type: 'transfer',
-      description: `Перевод со счета ${sourceAccount.name}`,
-      sourceEntityId: sourceAccount.id,
-      sourceEntityType: 'account',
-      destinationEntityId: destAccount.id,
-      destinationEntityType: 'account',
-      executedByOwnerId: currentUser.id,
-      responsibleOwnerIds: [currentUser.id],
-      bookId: selectedBook.value
-    };
-    
-    // Добавляем транзакции через хранилище
-    await transactionStore.addTransaction(withdrawalData);
-    await transactionStore.addTransaction(depositData);
-    
-    // Показываем уведомление об успехе
-    messageService.success('Перевод между счетами успешно выполнен');
+    // Сохраняем через composable
+    await transactionSaver.saveTransferTransaction(transactionData);
     
     // Сбрасываем форму
     resetForm();
   } catch (error) {
     console.error('[TransactionView] Ошибка при выполнении перевода:', error);
-    messageService.error('Произошла ошибка при выполнении перевода');
   } finally {
     isSaving.value = false;
   }
+};
+
+
+// После выбора должника сохраняем транзакцию долга
+const saveDebtTransaction = async (debtorId) => {
+  try {
+    isSaving.value = true;
+    
+    const transactionData = {
+      amount: amount.value,
+      selectedBook: selectedBook.value,
+      selectedAccount: selectedAccount.value,
+      selectedCategory: selectedCategory.value,
+      distributionPercentage: distributionPercentage.value,
+      distributionOwners: distributionOwners.value,
+      debtorId
+    };
+    
+    await transactionSaver.saveDebtTransaction(transactionData);
+    
+    resetForm();
+  } catch (error) {
+    console.error('[TransactionView] Ошибка при сохранении долга:', error);
+  } finally {
+    isSaving.value = false;
+  }
+};
+
+// Состояние диалога выбора должника
+const debtorDialog = ref({
+  show: false
+});
+
+// Доступные должники (другие пользователи)
+const availableDebtors = computed(() => {
+  const currentUserId = userStore.currentUser?.id;
+  const bookId = selectedBook.value;
+  
+  if (!currentUserId || !bookId) return [];
+  
+  // Загружаем пользователей для выбранной книги
+  const book = bookStore.getBookById(bookId);
+  if (!book || !book.ownerIds) return [];
+  
+  // Формируем список пользователей
+  return book.ownerIds
+    .filter(id => id !== currentUserId) // Исключаем текущего пользователя
+    .map(id => {
+      // Получаем данные пользователя из хранилища
+      const user = userStore.getUserById(id);
+      if (!user) {
+        // Если пользователь не найден, создаем плейсхолдер
+        return {
+          id,
+          name: id === 'user_1' ? 'Alex' : 'Sasha',
+          color: id === 'user_1' ? '#4CAF50' : '#9C27B0'
+        };
+      }
+      return {
+        id: user.id,
+        name: user.name,
+        color: user.color
+      };
+    });
+});
+
+// ID текущего пользователя
+const currentUserId = computed(() => userStore.currentUser?.id || '');
+
+// Показать диалог выбора должника
+const showDebtorSelectionDialog = () => {
+  debtorDialog.value.show = true;
+};
+
+// Скрыть диалог выбора должника
+const hideDebtorDialog = () => {
+  debtorDialog.value.show = false;
+};
+
+// Обработчик выбора должника
+const onDebtorSelected = (debtorId) => {
+  // Сохраняем транзакцию долга с выбранным должником
+  saveDebtTransaction(debtorId);
+};
+
+// Добавляем проверку для долговых транзакций
+const validateDebtTransaction = () => {
+  // Проверяем сумму
+  const amountValue = parseFloat(amount.value);
+  if (isNaN(amountValue) || amountValue === 0) {
+    messageService.error('Сумма должна быть больше нуля');
+    return false;
+  }
+  
+  // Проверяем выбранный счет
+  if (!selectedAccount.value) {
+    messageService.error('Выберите счет для транзакции');
+    return false;
+  }
+  
+  // Проверяем выбранную книгу
+  if (!selectedBook.value) {
+    messageService.error('Выберите книгу для транзакции');
+    return false;
+  }
+  
+  // Проверяем, есть ли другие пользователи для выбора должника
+  if (availableDebtors.value.length === 0) {
+    messageService.error('Нет доступных пользователей для создания долга');
+    return false;
+  }
+  
+  return true;
 };
 
 // Сброс формы после успешного добавления
