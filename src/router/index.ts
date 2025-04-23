@@ -49,23 +49,7 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/book/page/BooksView.vue'),
         meta: {
           requiresAuth: true,
-          title: 'Books'
-        }
-      }
-    ]
-  },
-  // MoreView - используем IosLayout
-  {
-    path: '/more',
-    component: IosLayout,
-    children: [
-      {
-        path: '',
-        name: 'more',
-        component: () => import('@/views/MoreView.vue'),
-        meta: {
-          requiresAuth: true,
-          title: 'Настройки'
+          title: ''
         }
       }
     ]
@@ -104,6 +88,28 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           requiresAuth: true,
           title: '',
+          header: {
+            show: true,
+            showBack: true,
+            showMessageIcon: true,
+            hasNotifications: true
+          }
+        }
+      }
+    ]
+  },
+  // Debt route - добавляем маршрут для долгов
+  {
+    path: '/debt',
+    component: IosLayout,
+    children: [
+      {
+        path: '',
+        name: 'debt',
+        component: () => import('@/views/debt/DebtView.vue'),
+        meta: {
+          requiresAuth: true,
+          title: 'Долги',
           header: {
             show: true,
             showBack: true,
