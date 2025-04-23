@@ -3,15 +3,17 @@
   <BaseFloatingPopup
     v-model="isVisible"
     position="bottom"
-    :width="'90%'"
+    :width="'100%'"
     :max-width="'400px'"
     :height="'auto'"
     @close="onClose"
   >
     <div class="notification-popup">
       <div class="notification-popup__header">
-        <div class="mark-read-button" @click="markAllAsRead" v-if="hasUnread">
-          Mark all read
+        <div class="header-actions">
+          <div class="mark-read-button" @click="markAllAsRead" v-if="hasUnread">
+            Mark all read
+          </div>
         </div>
         <div class="close-icon" @click="onClose">
           <IconX size="20" color="var(--color-warning, #A44942)" />
@@ -234,12 +236,18 @@ export default defineComponent({
   padding: 13px 21px 13px 21px;
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   align-self: stretch;
   flex-shrink: 0;
   position: relative;
-  overflow: hidden;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header-actions {
+  /* This container ensures the Mark all read button has a fixed position */
+  display: flex;
+  flex: 1;
 }
 
 .mark-read-button {
@@ -261,14 +269,19 @@ export default defineComponent({
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0; /* Prevent shrinking */
 }
 
 .notification-popup__content {
   flex: 1;
   overflow-y: auto;
   position: relative;
+  padding-bottom: 10px;
+  max-height: 90vh; /* Limit the height to enable scrolling for many notifications */
 }
 
+/* Remove the gradient overlay at the bottom */
+/* 
 .notification-popup__content::after {
   content: "";
   position: absolute;
@@ -278,6 +291,7 @@ export default defineComponent({
   height: 40px;
   background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.3));
   backdrop-filter: blur(4px);
-  pointer-events: none; /* Allows clicking through the gradient */
+  pointer-events: none;
 }
+*/
 </style>
