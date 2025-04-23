@@ -50,8 +50,8 @@
     </div>
   </template>
   
-  <script setup>
-  import { ref } from 'vue';
+  <script setup lang="ts">
+  import { ref, watch } from 'vue';
   
   const props = defineProps({
     modelValue: {
