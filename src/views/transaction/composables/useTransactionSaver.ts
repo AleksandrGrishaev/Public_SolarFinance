@@ -6,6 +6,7 @@ import { useBookStore } from '@/stores/book';
 import { useUserStore } from '@/stores/user';
 import { useTransactionStore } from '@/stores/transaction';
 import { useCurrencyStore } from '@/stores/currency';
+import { useDebtStore } from '@/stores/debt'; // Импортируем DebtStore
 import { messageService } from '@/services/system/MessageService';
 
 export function useTransactionSaver() {
@@ -15,6 +16,7 @@ export function useTransactionSaver() {
   const userStore = useUserStore();
   const transactionStore = useTransactionStore();
   const currencyStore = useCurrencyStore();
+  const debtStore = useDebtStore(); // Добавляем хранилище долгов
 
   /**
    * Сохранение обычной транзакции (доход/расход)
@@ -75,6 +77,7 @@ export function useTransactionSaver() {
         bookAmount: bookAmount,
         type: selectedType,
         categoryId: selectedCategory?.id,
+        description: selectedCategory?.name || `${selectedType === 'income' ? 'Доход' : 'Расход'}`,
         sourceEntityId: selectedAccount,
         sourceEntityType: 'account',
         executedByOwnerId: currentUser.id,
@@ -98,6 +101,13 @@ export function useTransactionSaver() {
       
       // Сохраняем транзакцию
       const savedTransaction = await transactionStore.addTransaction(transactionData);
+      
+      // Обновляем баланс счета
+      if (savedTransaction) {
+        // Обновляем баланс выбранного счета
+        const newBalance = account.currentBalance + finalAmount;
+        await accountStore.updateAccountBalance(selectedAccount, newBalance);
+      }
       
       // Показываем уведомление
       messageService.success('Транзакция успешно добавлена');
@@ -190,6 +200,17 @@ export function useTransactionSaver() {
       const withdrawal = await transactionStore.addTransaction(withdrawalData);
       const deposit = await transactionStore.addTransaction(depositData);
       
+      // Обновляем балансы счетов
+      if (withdrawal && deposit) {
+        // Обновляем баланс счета-источника
+        const newSourceBalance = sourceAccount.currentBalance - amountValue;
+        await accountStore.updateAccountBalance(selectedAccount, newSourceBalance);
+        
+        // Обновляем баланс счета-назначения
+        const newDestBalance = destAccount.currentBalance + destAmount;
+        await accountStore.updateAccountBalance(destinationAccount, newDestBalance);
+      }
+      
       // Показываем уведомление об успехе
       messageService.success('Перевод между счетами успешно выполнен');
       
@@ -218,7 +239,7 @@ export function useTransactionSaver() {
     try {
       // Конвертируем сумму в число
       const amountValue = parseFloat(amount);
-      const finalAmount = -Math.abs(amountValue); // Долги всегда отрицательные с точки зрения плательщика
+      const finalAmount = -Math.abs(amountValue); // Долги всегда отрицательные для плательщика
       
       // Получаем данные о выбранном счете
       const account = accountStore.getAccountById(selectedAccount);
@@ -238,25 +259,68 @@ export function useTransactionSaver() {
         throw new Error('Не найден авторизованный пользователь');
       }
       
+      // Определяем описание транзакции
+      let description = 'Транзакция с долгом';
+      if (selectedCategory) {
+        description = `Долг: ${selectedCategory.name}`;
+      }
+      
+      // Определяем курс конвертации и сумму в валюте книги
+      let bookRate = 1;
+      let bookAmount = finalAmount;
+      
+      if (account.currency !== book.currency) {
+        bookRate = currencyStore.getExchangeRate(account.currency, book.currency);
+        bookAmount = finalAmount * bookRate;
+      }
+      
       // Формируем данные транзакции
       const transactionData = {
         date: new Date(),
         amount: finalAmount,
         currency: account.currency,
-        type: 'debt',
+        bookCurrency: book.currency,
+        bookRate: bookRate,
+        bookAmount: bookAmount,
+        type: 'debt', // Специальный тип для долгов
         categoryId: selectedCategory?.id,
+        description,
         sourceEntityId: selectedAccount,
         sourceEntityType: 'account',
         executedByOwnerId: currentUser.id,
-        responsibleOwnerIds: [debtorId || distributionOwners[1].id], // По умолчанию второй владелец
+        responsibleOwnerIds: [debtorId || distributionOwners[1]?.id], // По умолчанию второй владелец
         bookId: selectedBook
       };
       
       // Сохраняем транзакцию
       const savedTransaction = await transactionStore.addTransaction(transactionData);
       
+      // Обновляем баланс счета
+      if (savedTransaction) {
+        // Обновляем баланс выбранного счета
+        const newBalance = account.currentBalance + finalAmount;
+        await accountStore.updateAccountBalance(selectedAccount, newBalance);
+        
+        // Создаем новый долг на основе транзакции
+        const debtData = {
+          amount: Math.abs(amountValue),
+          currency: account.currency,
+          type: 'internal',
+          source: 'transaction',
+          bookId: selectedBook,
+          fromUserId: debtorId || distributionOwners[1]?.id, // Кто должен (выбранный в диалоге или второй владелец)
+          toUserId: currentUser.id, // Кому должен (текущий пользователь)
+          sourceTransactionId: savedTransaction.id,
+          description: description || 'Долг по транзакции'
+        };
+        
+        // Создаем долг в хранилище долгов
+        const savedDebt = await debtStore.addDebt(debtData);
+        console.log('[useTransactionSaver] Добавлен новый долг:', savedDebt);
+      }
+      
       // Показываем уведомление
-      messageService.success('Долг успешно добавлен');
+      messageService.success('Транзакция с долгом успешно добавлена');
       
       return savedTransaction;
     } catch (error) {
@@ -348,6 +412,17 @@ export function useTransactionSaver() {
       // Добавляем транзакции через хранилище
       const withdrawal = await transactionStore.addTransaction(withdrawalData);
       const deposit = await transactionStore.addTransaction(depositData);
+      
+      // Обновляем балансы счетов
+      if (withdrawal && deposit) {
+        // Обновляем баланс счета-источника
+        const newSourceBalance = sourceAccount.currentBalance - amountValue;
+        await accountStore.updateAccountBalance(selectedAccount, newSourceBalance);
+        
+        // Обновляем баланс счета-назначения
+        const newDestBalance = destAccount.currentBalance + destAmount;
+        await accountStore.updateAccountBalance(destinationAccount, newDestBalance);
+      }
       
       // Показываем уведомление об успехе
       messageService.success('Обмен валюты успешно выполнен');

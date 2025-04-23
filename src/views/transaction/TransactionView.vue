@@ -36,26 +36,28 @@
         
         <!-- Используем фильтрованные счета на основе выбранной книги и передаем ID книги -->
         <account-selector 
-      :accounts="filteredAccounts" 
-      v-model="selectedAccount"
-      :is-transfer="selectedType === 'transfer'"
-      :destination-account-id="destinationAccount"
-      :bookId="selectedBook"
-      :showDistributionToggle="showDistributionToggle"
-      :isDistributionVisible="isSliderVisible"
-      @update:destination-account-id="handleDestinationAccountChange"
-      @toggle-distribution="toggleDistributionVisibility"
-    />
+          :accounts="filteredAccounts" 
+          v-model="selectedAccount"
+          :is-transfer="selectedType === 'transfer'"
+          :destination-account-id="destinationAccount"
+          :bookId="selectedBook"
+          :showDistributionToggle="showDistributionToggle"
+          :isDistributionVisible="isSliderVisible"
+          @update:destination-account-id="handleDestinationAccountChange"
+          @toggle-distribution="toggleDistributionVisibility"
+        />
         
         <!-- Слайдер отображается только если есть правила распределения в книге и это не перевод -->
         <percentage-slider 
-  v-show="isSliderVisible"
-  :owners="distributionOwners" 
-  v-model="distributionPercentage"
-  :total-amount="parseFloat(amount) || 0"
-  :currency="sourceCurrencySymbol"
-  :class="{ 'invisible': !isSliderVisible }"
-/>
+          v-show="isSliderVisible"
+          :owners="distributionOwners" 
+          v-model="distributionPercentage"
+          :total-amount="parseFloat(amount) || 0"
+          :currency="sourceCurrencySymbol"
+          :class="{ 'invisible': !isSliderVisible }"
+          :is-non-standard="isNonStandardDistribution"
+          :standard-value="getStandardDistributionValue"
+        />
       </div>
       
       <div class="keypad-container">
@@ -91,33 +93,34 @@
     />
 
     <!-- Диалоги для подтверждения распределения и выбора должника -->
-  <DistributionConfirmDialog
-    v-model="confirmationDialog.show"
-    :title="confirmationDialog.title"
-    :message="confirmationDialog.message"
-    :confirm-text="confirmationDialog.confirmText"
-    :cancel-text="confirmationDialog.cancelText"
-    :current-distribution="distributionPercentage"
-    :standard-distribution="confirmationDialog.standardDistribution"
-    :sides="distributionOwners"
-    :preview-amount="parseFloat(amount) || 1000"
-    :currency="sourceCurrencySymbol"
-    @confirm="confirmationDialog.onConfirm"
-    @cancel="confirmationDialog.onCancel"
-  />
+    <distribution-confirm-dialog
+      v-model="confirmationDialog.show"
+      :title="confirmationDialog.title"
+      :message="confirmationDialog.message"
+      :confirm-text="confirmationDialog.confirmText"
+      :cancel-text="confirmationDialog.cancelText"
+      :current-distribution="distributionPercentage"
+      :standard-distribution="confirmationDialog.standardDistribution"
+      :sides="distributionOwners"
+      :preview-amount="parseFloat(amount) || 1000"
+      :currency="sourceCurrencySymbol"
+      @confirm="confirmationDialog.onConfirm"
+      @cancel="confirmationDialog.onCancel"
+    />
   
-  <DebtorSelectionDialog
-    v-model="debtorDialog.show"
-    :users="availableDebtors"
-    :current-user-id="currentUserId"
-    @select="onDebtorSelected"
-    @cancel="hideDebtorDialog"
-  />
+    <debtor-selection-dialog
+      v-model="debtorDialog.show"
+      :users="availableDebtors"
+      :current-user-id="currentUserId"
+      @select="onDebtorSelected"
+      @cancel="hideDebtorDialog"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, watch, ref, computed, onBeforeMount } from 'vue';
+import { useRouter } from 'vue-router';
 import BookSelector from './components/BookSelector.vue';
 import TransactionTypeSelector from './components/TransactionTypeSelector.vue';
 import AccountSelector from './components/AccountSelector.vue';
@@ -126,6 +129,8 @@ import NumberKeypad from './components/NumberKeypad.vue';
 import CategorySelector from '../../components/categories/CategorySelector.vue';
 import CategoryListPopup from '../../components/categories/CategoryListPopup.vue';
 import AmountSection from './components/AmountSection.vue';
+import DistributionConfirmDialog from './components/DistributionConfirmDialog.vue';
+import DebtorSelectionDialog from './components/DebtorSelectionDialog.vue';
 
 // Импортируем хуки и сервисы
 import { useTransaction } from './composables/useTransaction.ts';
@@ -136,13 +141,11 @@ import { useTransactionStore } from '../../stores/transaction';
 import { useUserStore } from '../../stores/user';
 import { useBookStore } from '../../stores/book';
 import { useCurrencyStore } from '../../stores/currency';
+import { useDebtStore } from '../../stores/debt'; // Добавляем импорт DebtStore
 import { messageService } from '../../services/system/MessageService';
 import { useAdvancedDistribution } from './composables/useAdvancedDistribution';
 import { useTransactionSaver } from './composables/useTransactionSaver';
 import { useDistributionControl } from './composables/useDistributionControl';
-import { useRouter } from 'vue-router';
-
-
 
 // Определяем события для emit
 const emit = defineEmits(['update:showMenu', 'update:header']);
@@ -156,20 +159,17 @@ const manualDestinationAmount = ref('0');
 const amountSectionRef = ref(null);
 const isSaving = ref(false);
 
-
 // Инициализируем хранилища
 const accountStore = useAccountStore();
 const transactionStore = useTransactionStore();
 const userStore = useUserStore();
 const bookStore = useBookStore();
 const currencyStore = useCurrencyStore();
+const debtStore = useDebtStore(); // Инициализируем DebtStore
 const transactionSaver = useTransactionSaver();
-
 
 // Инициализируем основной хук, но не деструктурируем методы, которые будем переопределять
 const transactionState = useTransaction(emit);
-
-
 
 // Деструктурируем только нужные переменные и методы
 const {
@@ -189,7 +189,6 @@ const {
   showCategoryList,
   selectedCategory,
   filteredCategories,
-  
   
   // Methods
   initAllStores,
@@ -215,7 +214,6 @@ const {
   checkCategoryDistributionConflict
 } = useAdvancedDistribution(selectedBook, selectedType, selectedAccount, selectedCategory);
 
-
 // Инициализируем хук для работы с валютами
 const {
   sourceCurrencySymbol,
@@ -238,7 +236,6 @@ const {
   distributionOwners
 );
 
-
 // Добавить функцию обновления заголовка
 const updateHeaderConfig = () => {
   emit('update:header', {
@@ -259,6 +256,7 @@ const confirmationDialog = ref({
   message: '',
   confirmText: '',
   cancelText: '',
+  standardDistribution: 50,
   onConfirm: null,
   onCancel: null
 });
@@ -297,6 +295,7 @@ const showConfirmationDialog = (options) => {
     message: options.message || '',
     confirmText: options.confirmText || 'Подтвердить',
     cancelText: options.cancelText || 'Отмена',
+    standardDistribution: options.standardDistribution || 50,
     onConfirm: options.onConfirm || (() => {}),
     onCancel: options.onCancel || (() => {})
   };
@@ -380,6 +379,7 @@ const handleCategorySelect = (category) => {
         message: `Обычно расходы в категории "${category.name}" распределяются как ${category.defaultDistribution}/${100-category.defaultDistribution}, но сейчас установлено ${distributionPercentage.value}/${100-distributionPercentage.value}. Сохранить с текущим распределением?`,
         confirmText: 'Сохранить как есть',
         cancelText: 'Использовать стандартное',
+        standardDistribution: category.defaultDistribution,
         onConfirm: () => {
           // Сохраняем с текущим распределением
           saveRegularTransaction();
@@ -431,7 +431,7 @@ const validateTransferTransaction = () => {
   return true;
 };
 
-// Проверка валидности транзакции для дохода/расхода
+// Проверка валидности транзакции для дохода/расхода/долга
 const validateRegularTransaction = () => {
   // Проверяем сумму
   const amountValue = parseFloat(amount.value);
@@ -483,6 +483,7 @@ const handleAddTransaction = async () => {
             message: `Обычно расходы в категории "${selectedCategory.value.name}" распределяются как ${selectedCategory.value.defaultDistribution}/${100-selectedCategory.value.defaultDistribution}, но сейчас установлено ${distributionPercentage.value}/${100-distributionPercentage.value}. Сохранить с текущим распределением?`,
             confirmText: 'Сохранить как есть',
             cancelText: 'Использовать стандартное',
+            standardDistribution: selectedCategory.value.defaultDistribution,
             onConfirm: () => {
               saveRegularTransaction();
             },
@@ -501,7 +502,6 @@ const handleAddTransaction = async () => {
     }
   }
 };
-
 
 // Сохранение обычной транзакции (доход/расход)
 const saveRegularTransaction = async () => {
@@ -563,12 +563,80 @@ const saveTransferTransaction = async () => {
   }
 };
 
+// Проверка валидности обмена валют
+const validateExchangeTransaction = () => {
+  // Проверяем на основные условия
+  if (!validateTransferTransaction()) {
+    return false;
+  }
+  
+  // Дополнительные проверки для обмена валют
+  const sourceAccount = accountStore.getAccountById(selectedAccount.value);
+  const destAccount = accountStore.getAccountById(destinationAccount.value);
+  
+  if (!sourceAccount || !destAccount) {
+    messageService.error('Выберите корректные счета для обмена валют');
+    return false;
+  }
+  
+  // Проверяем, что счета имеют разные валюты
+  if (sourceAccount.currency === destAccount.currency) {
+    messageService.warning('Для обмена валют выберите счета с разными валютами');
+    return false;
+  }
+  
+  return true;
+};
+
+// Сохранение транзакции обмена валют
+const saveExchangeTransaction = async () => {
+  try {
+    isSaving.value = true;
+    
+    // Собираем данные для сохранения
+    const transactionData = {
+      amount: amount.value,
+      selectedBook: selectedBook.value,
+      selectedAccount: selectedAccount.value,
+      destinationAccount: destinationAccount.value,
+      manualDestinationAmount: !isSourceAmountActive.value ? manualDestinationAmount.value : null,
+      exchangeRate: null // Можно добавить ручной курс обмена если нужно
+    };
+    
+    // Сохраняем через composable
+    await transactionSaver.saveExchangeTransaction(transactionData);
+    
+    // Сбрасываем форму
+    resetForm();
+  } catch (error) {
+    console.error('[TransactionView] Ошибка при выполнении обмена валют:', error);
+  } finally {
+    isSaving.value = false;
+  }
+};
+
+// Проверка валидности для долговых транзакций
+const validateDebtTransaction = () => {
+  // Проверяем основные условия
+  if (!validateRegularTransaction()) {
+    return false;
+  }
+  
+  // Проверяем, есть ли другие пользователи для выбора должника
+  if (availableDebtors.value.length === 0) {
+    messageService.error('Нет доступных пользователей для создания долга');
+    return false;
+  }
+  
+  return true;
+};
 
 // После выбора должника сохраняем транзакцию долга
 const saveDebtTransaction = async (debtorId) => {
   try {
     isSaving.value = true;
     
+    // Создаем транзакцию расхода
     const transactionData = {
       amount: amount.value,
       selectedBook: selectedBook.value,
@@ -579,11 +647,37 @@ const saveDebtTransaction = async (debtorId) => {
       debtorId
     };
     
-    await transactionSaver.saveDebtTransaction(transactionData);
+    // Сохраняем транзакцию через composable
+    const transaction = await transactionSaver.saveDebtTransaction(transactionData);
     
+    // Создаем долг на основе транзакции
+    if (transaction) {
+      // Формируем данные для долга
+      const debtData = {
+        amount: Math.abs(parseFloat(amount.value)),
+        currency: transaction.currency || accountStore.getAccountById(selectedAccount.value)?.currency || 'RUB',
+        type: 'internal',
+        source: 'transaction',
+        bookId: selectedBook.value,
+        fromUserId: debtorId, // Кто должен (выбранный в диалоге)
+        toUserId: userStore.currentUser?.id, // Кому должен (текущий пользователь)
+        sourceTransactionId: transaction.id,
+        description: transaction.description || 'Долг по транзакции'
+      };
+      
+      // Добавляем долг
+      const debt = await debtStore.addDebt(debtData);
+      console.log('[TransactionView] Создан долг:', debt);
+      
+      // Показываем сообщение об успехе
+      messageService.success('Транзакция и долг успешно созданы');
+    }
+    
+    // Сбрасываем форму
     resetForm();
   } catch (error) {
     console.error('[TransactionView] Ошибка при сохранении долга:', error);
+    messageService.error('Ошибка при создании долга');
   } finally {
     isSaving.value = false;
   }
@@ -610,7 +704,7 @@ const availableDebtors = computed(() => {
     .filter(id => id !== currentUserId) // Исключаем текущего пользователя
     .map(id => {
       // Получаем данные пользователя из хранилища
-      const user = userStore.getUserById(id);
+      const user = userStore.users.find(u => u.id === id);
       if (!user) {
         // Если пользователь не найден, создаем плейсхолдер
         return {
@@ -622,7 +716,7 @@ const availableDebtors = computed(() => {
       return {
         id: user.id,
         name: user.name,
-        color: user.color
+        color: user.settings?.color
       };
     });
 });
@@ -646,36 +740,6 @@ const onDebtorSelected = (debtorId) => {
   saveDebtTransaction(debtorId);
 };
 
-// Добавляем проверку для долговых транзакций
-const validateDebtTransaction = () => {
-  // Проверяем сумму
-  const amountValue = parseFloat(amount.value);
-  if (isNaN(amountValue) || amountValue === 0) {
-    messageService.error('Сумма должна быть больше нуля');
-    return false;
-  }
-  
-  // Проверяем выбранный счет
-  if (!selectedAccount.value) {
-    messageService.error('Выберите счет для транзакции');
-    return false;
-  }
-  
-  // Проверяем выбранную книгу
-  if (!selectedBook.value) {
-    messageService.error('Выберите книгу для транзакции');
-    return false;
-  }
-  
-  // Проверяем, есть ли другие пользователи для выбора должника
-  if (availableDebtors.value.length === 0) {
-    messageService.error('Нет доступных пользователей для создания долга');
-    return false;
-  }
-  
-  return true;
-};
-
 // Сброс формы после успешного добавления
 const resetForm = () => {
   amount.value = '0';
@@ -687,10 +751,23 @@ const resetForm = () => {
 // Инициализируем хранилища и сообщаем макету, что нужно показать меню
 onMounted(async () => {
   emit('update:showMenu', true);
-  await initAllStores();
   
-  // Инициализируем хранилище валют
-  await initCurrencyStore();
+  try {
+    // Инициализируем основные хранилища
+    await initAllStores();
+    
+    // Инициализируем хранилище валют
+    await initCurrencyStore();
+    
+    // Инициализируем хранилище долгов
+    if (!debtStore.isInitialized) {
+      await debtStore.init();
+      console.log('[TransactionView] DebtStore initialized');
+    }
+  } catch (error) {
+    console.error('[TransactionView] Error initializing stores:', error);
+    messageService.error('Ошибка при инициализации приложения');
+  }
 });
 
 // Следим за изменениями типа транзакции для обновления интерфейса
@@ -702,6 +779,15 @@ watch(() => selectedType.value, (newType) => {
   // При смене типа транзакции с перевода на другой тип, сбрасываем сумму
   if (newType !== 'transfer' && isTransferWithDifferentCurrencies.value) {
     amount.value = '0';
+  }
+  
+  // Для долга показываем слайдер распределения
+  if (newType === 'debt') {
+    // Для долгов слайдер распределения имеет особый смысл
+    // он показывает распределение между текущим пользователем и должником
+    if (!isSliderVisible.value) {
+      toggleDistributionVisibility();
+    }
   }
 });
 
@@ -716,7 +802,6 @@ watch([selectedAccount, destinationAccount, convertedAmount], () => {
     }
   }
 });
-
 
 </script>
 

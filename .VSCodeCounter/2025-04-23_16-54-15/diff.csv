@@ -1,0 +1,10 @@
+"filename", "language", "Vue", "TypeScript", "comment", "blank", "total"
+"/Users/peaker/dev/solar-finance/src/layouts/IosLayout.vue", "Vue", 1, 0, 0, 0, 1
+"/Users/peaker/dev/solar-finance/src/views/debt/DebtView.vue", "Vue", 91, 0, 0, 16, 107
+"/Users/peaker/dev/solar-finance/src/views/transaction/TransactionView.vue", "Vue", 192, 0, 1, 16, 209
+"/Users/peaker/dev/solar-finance/src/views/transaction/components/DebtorSelectionDialog.vue", "Vue", 215, 0, 1, 33, 249
+"/Users/peaker/dev/solar-finance/src/views/transaction/components/DistributionConfirmDialog.vue", "Vue", 188, 0, 1, 24, 213
+"/Users/peaker/dev/solar-finance/src/views/transaction/components/PercentageSlider.vue", "Vue", 46, 0, -2, 3, 47
+"/Users/peaker/dev/solar-finance/src/views/transaction/composables/useAdvancedDistribution.ts", "TypeScript", 0, 123, 28, 36, 187
+"/Users/peaker/dev/solar-finance/src/views/transaction/composables/useTransactionSaver.ts", "TypeScript", 0, 325, 62, 57, 444
+"Total", "-", 733, 448, 91, 185, 1457

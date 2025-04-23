@@ -1,18 +1,18 @@
 # Summary
 
-Date : 2025-04-23 13:46:39
+Date : 2025-04-23 16:54:15
 
 Directory /Users/peaker/dev/solar-finance/src
 
-Total : 226 files,  32984 codes, 2518 comments, 5178 blanks, all 40680 lines
+Total : 230 files,  34165 codes, 2609 comments, 5363 blanks, all 42137 lines
 
 Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
 ## Languages
 | language | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| Vue | 109 | 20,488 | 363 | 2,855 | 23,706 |
-| TypeScript | 88 | 8,506 | 2,021 | 1,578 | 12,105 |
+| Vue | 111 | 21,221 | 364 | 2,947 | 24,532 |
+| TypeScript | 90 | 8,954 | 2,111 | 1,671 | 12,736 |
 | Markdown | 8 | 3,388 | 0 | 610 | 3,998 |
 | SCSS | 11 | 586 | 125 | 135 | 846 |
 | JavaScript | 10 | 16 | 9 | 0 | 25 |
@@ -20,7 +20,7 @@ Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-
 ## Directories
 | path | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| . | 226 | 32,984 | 2,518 | 5,178 | 40,680 |
+| . | 230 | 34,165 | 2,609 | 5,363 | 42,137 |
 | . (Files) | 2 | 72 | 9 | 9 | 90 |
 | about | 8 | 3,388 | 0 | 610 | 3,998 |
 | about (Files) | 3 | 762 | 0 | 152 | 914 |
@@ -63,7 +63,7 @@ Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-
 | composables/transaction | 1 | 126 | 42 | 25 | 193 |
 | composables/ui | 5 | 267 | 83 | 62 | 412 |
 | constants | 1 | 26 | 6 | 6 | 38 |
-| layouts | 3 | 242 | 4 | 34 | 280 |
+| layouts | 3 | 243 | 4 | 34 | 281 |
 | router | 1 | 177 | 17 | 10 | 204 |
 | services | 5 | 240 | 107 | 70 | 417 |
 | services (Files) | 1 | 54 | 22 | 11 | 87 |
@@ -92,7 +92,7 @@ Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-
 | styles/themes | 7 | 317 | 92 | 85 | 494 |
 | types | 1 | 5 | 0 | 0 | 5 |
 | utils | 1 | 16 | 9 | 4 | 29 |
-| views | 68 | 13,429 | 668 | 2,074 | 16,171 |
+| views | 72 | 14,609 | 759 | 2,259 | 17,627 |
 | views (Files) | 6 | 1,533 | 24 | 172 | 1,729 |
 | views/account | 10 | 2,386 | 125 | 394 | 2,905 |
 | views/account/popup | 10 | 2,386 | 125 | 394 | 2,905 |
@@ -107,8 +107,8 @@ Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-
 | views/book/popup | 2 | 65 | 2 | 10 | 77 |
 | views/currency | 1 | 162 | 3 | 25 | 190 |
 | views/currency/popup | 1 | 162 | 3 | 25 | 190 |
-| views/debt | 6 | 2,191 | 67 | 352 | 2,610 |
-| views/debt (Files) | 1 | 384 | 2 | 44 | 430 |
+| views/debt | 6 | 2,282 | 67 | 368 | 2,717 |
+| views/debt (Files) | 1 | 475 | 2 | 60 | 537 |
 | views/debt/components | 4 | 1,510 | 15 | 232 | 1,757 |
 | views/debt/composables | 1 | 297 | 50 | 76 | 423 |
 | views/debug | 4 | 945 | 17 | 82 | 1,044 |
@@ -124,9 +124,9 @@ Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-
 | views/profile/pages | 3 | 353 | 7 | 63 | 423 |
 | views/profile/pages (Files) | 1 | 239 | 7 | 49 | 295 |
 | views/profile/pages/components | 2 | 114 | 0 | 14 | 128 |
-| views/transaction | 15 | 2,142 | 230 | 359 | 2,731 |
-| views/transaction (Files) | 1 | 588 | 8 | 96 | 692 |
-| views/transaction/components | 6 | 897 | 15 | 123 | 1,035 |
-| views/transaction/composables | 8 | 657 | 207 | 140 | 1,004 |
+| views/transaction | 19 | 3,231 | 321 | 528 | 4,080 |
+| views/transaction (Files) | 1 | 780 | 9 | 112 | 901 |
+| views/transaction/components | 8 | 1,346 | 15 | 183 | 1,544 |
+| views/transaction/composables | 10 | 1,105 | 297 | 233 | 1,635 |
 
 Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
