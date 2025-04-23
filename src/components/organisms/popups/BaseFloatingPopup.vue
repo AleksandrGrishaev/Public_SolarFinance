@@ -139,7 +139,7 @@ export default defineComponent({
   border-radius: var(--border-radius-lg, 16px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   overflow: hidden; 
-  max-height: 90vh;
+  max-height: 95vh;
   display: flex;
   flex-direction: column;
   padding: 0 16px;

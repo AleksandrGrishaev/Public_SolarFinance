@@ -11,7 +11,7 @@
     <div class="notification-popup">
       <div class="notification-popup__header">
         <div class="header-actions">
-          <div class="mark-read-button" @click="markAllAsRead" v-if="hasUnread">
+          <div class="mark-read-button" @click="handleMarkAllAsRead" v-if="hasUnread">
             Mark all read
           </div>
         </div>
@@ -53,6 +53,7 @@ export default defineComponent({
     NotificationList,
     IconX
   },
+  expose: ['open', 'close'],
   setup() {
     const router = useRouter();
     const isVisible = ref(false);
@@ -94,6 +95,18 @@ export default defineComponent({
       });
     });
     
+    // Function to check if popup should close after notifications are deleted/modified
+    const checkAndCloseIfEmpty = () => {
+      if (notifications.value.length === 0) {
+        setTimeout(() => {
+          isVisible.value = false;
+        }, 500);
+        return true;
+      }
+      return false;
+    };
+
+    // Public methods
     const open = () => {
       isVisible.value = true;
     };
@@ -105,9 +118,26 @@ export default defineComponent({
     const onClose = () => {
       close();
     };
+
+    // Mark all as read
+    const handleMarkAllAsRead = () => {
+      markAllAsRead();
+      
+      // Show a success alert
+      alerts.success('Notifications marked as read', {
+        duration: 2000
+      });
+      
+      // Close popup after a brief delay
+      setTimeout(() => {
+        close();
+      }, 500);
+    };
     
+    // Handle notification actions
     const onDeleteNotification = (id: string) => {
       deleteNotification(id);
+      checkAndCloseIfEmpty();
     };
     
     const onDeclineNotification = (id: string) => {
@@ -118,6 +148,8 @@ export default defineComponent({
       alerts.info('Notification dismissed', {
         duration: 2000
       });
+      
+      checkAndCloseIfEmpty();
     };
     
     const onAcceptNotification = (id: string) => {
@@ -149,6 +181,11 @@ export default defineComponent({
         title: notification?.action?.text || 'Success',
         duration: 3000
       });
+      
+      // If we're not already navigating, check if we should close the popup
+      if (!notification?.action?.route) {
+        checkAndCloseIfEmpty();
+      }
     };
     
     const onReadNotification = (id: string) => {
@@ -166,15 +203,10 @@ export default defineComponent({
       
       // Close popup
       close();
-      
-      // Optionally, don't delete the notification yet as the user is just viewing it
     };
     
     const onDebtDecline = (data: { id: string, transactionId: string }) => {
       console.log('Decline debt transaction:', data);
-      
-      // Here should be logic for declining the debt
-      // For example, calling an API to change transaction status
       
       // Delete the notification
       deleteNotification(data.id);
@@ -185,13 +217,12 @@ export default defineComponent({
         message: 'You have declined the debt request',
         duration: 3000
       });
+      
+      checkAndCloseIfEmpty();
     };
     
     const onDebtAccept = (data: { id: string, transactionId: string }) => {
       console.log('Accept debt transaction:', data);
-      
-      // Here should be logic for accepting the debt
-      // For example, calling an API to change transaction status
       
       // Delete the notification
       deleteNotification(data.id);
@@ -202,6 +233,8 @@ export default defineComponent({
         message: 'You have successfully accepted the debt',
         duration: 3000
       });
+      
+      checkAndCloseIfEmpty();
     };
     
     return {
@@ -211,14 +244,14 @@ export default defineComponent({
       open,
       close,
       onClose,
-      markAllAsRead,
+      handleMarkAllAsRead,
+      onDeleteNotification,
       onDeclineNotification,
       onAcceptNotification,
       onReadNotification,
       onDebtView,
       onDebtDecline,
-      onDebtAccept,
-      onDeleteNotification
+      onDebtAccept
     };
   }
 });
@@ -233,7 +266,7 @@ export default defineComponent({
 }
 
 .notification-popup__header {
-  padding: 13px 21px 13px 21px;
+  padding: 13px 13px 13px 13px;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -277,21 +310,6 @@ export default defineComponent({
   overflow-y: auto;
   position: relative;
   padding-bottom: 10px;
-  max-height: 90vh; /* Limit the height to enable scrolling for many notifications */
+  max-height: 95vh; /* Limit the height to enable scrolling for many notifications */
 }
-
-/* Remove the gradient overlay at the bottom */
-/* 
-.notification-popup__content::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 40px;
-  background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.3));
-  backdrop-filter: blur(4px);
-  pointer-events: none;
-}
-*/
 </style>
