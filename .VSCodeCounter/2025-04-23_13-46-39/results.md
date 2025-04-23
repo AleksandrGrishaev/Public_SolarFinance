@@ -1,18 +1,18 @@
 # Summary
 
-Date : 2025-04-23 11:23:23
+Date : 2025-04-23 13:46:39
 
 Directory /Users/peaker/dev/solar-finance/src
 
-Total : 214 files,  29931 codes, 2293 comments, 4680 blanks, all 36904 lines
+Total : 226 files,  32984 codes, 2518 comments, 5178 blanks, all 40680 lines
 
 Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
 ## Languages
 | language | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| Vue | 103 | 18,414 | 342 | 2,548 | 21,304 |
-| TypeScript | 82 | 7,527 | 1,817 | 1,387 | 10,731 |
+| Vue | 109 | 20,488 | 363 | 2,855 | 23,706 |
+| TypeScript | 88 | 8,506 | 2,021 | 1,578 | 12,105 |
 | Markdown | 8 | 3,388 | 0 | 610 | 3,998 |
 | SCSS | 11 | 586 | 125 | 135 | 846 |
 | JavaScript | 10 | 16 | 9 | 0 | 25 |
@@ -20,12 +20,12 @@ Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-
 ## Directories
 | path | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| . | 214 | 29,931 | 2,293 | 4,680 | 36,904 |
+| . | 226 | 32,984 | 2,518 | 5,178 | 40,680 |
 | . (Files) | 2 | 72 | 9 | 9 | 90 |
 | about | 8 | 3,388 | 0 | 610 | 3,998 |
 | about (Files) | 3 | 762 | 0 | 152 | 914 |
 | about/WorkFlow | 5 | 2,626 | 0 | 458 | 3,084 |
-| components | 64 | 8,589 | 172 | 1,165 | 9,926 |
+| components | 65 | 8,769 | 176 | 1,196 | 10,141 |
 | components (Files) | 1 | 3 | 1 | 0 | 4 |
 | components/atoms | 10 | 532 | 9 | 55 | 596 |
 | components/atoms (Files) | 1 | 3 | 1 | 0 | 4 |
@@ -41,7 +41,7 @@ Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-
 | components/molecules/actions | 2 | 153 | 2 | 13 | 168 |
 | components/molecules/information | 2 | 83 | 1 | 7 | 91 |
 | components/molecules/lists | 1 | 84 | 1 | 12 | 97 |
-| components/navigation | 2 | 398 | 3 | 30 | 431 |
+| components/navigation | 3 | 578 | 7 | 61 | 646 |
 | components/organisms | 5 | 342 | 3 | 39 | 384 |
 | components/organisms (Files) | 1 | 1 | 1 | 0 | 2 |
 | components/organisms/alerts | 1 | 68 | 1 | 11 | 80 |
@@ -64,18 +64,19 @@ Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-
 | composables/ui | 5 | 267 | 83 | 62 | 412 |
 | constants | 1 | 26 | 6 | 6 | 38 |
 | layouts | 3 | 242 | 4 | 34 | 280 |
-| router | 1 | 171 | 17 | 10 | 198 |
+| router | 1 | 177 | 17 | 10 | 204 |
 | services | 5 | 240 | 107 | 70 | 417 |
 | services (Files) | 1 | 54 | 22 | 11 | 87 |
 | services/api | 2 | 82 | 31 | 36 | 149 |
 | services/system | 2 | 104 | 54 | 23 | 181 |
-| stores | 47 | 4,483 | 1,003 | 726 | 6,212 |
+| stores | 52 | 5,159 | 1,157 | 841 | 7,157 |
 | stores/account | 5 | 643 | 164 | 119 | 926 |
 | stores/alert | 1 | 77 | 9 | 15 | 101 |
 | stores/book | 5 | 272 | 64 | 42 | 378 |
 | stores/category | 5 | 671 | 104 | 120 | 895 |
 | stores/common | 1 | 9 | 1 | 1 | 11 |
 | stores/currency | 5 | 360 | 60 | 69 | 489 |
+| stores/debt | 5 | 676 | 154 | 115 | 945 |
 | stores/notification | 6 | 548 | 152 | 91 | 791 |
 | stores/notification (Files) | 5 | 470 | 139 | 79 | 688 |
 | stores/notification/composables | 1 | 78 | 13 | 12 | 103 |
@@ -91,7 +92,7 @@ Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-
 | styles/themes | 7 | 317 | 92 | 85 | 494 |
 | types | 1 | 5 | 0 | 0 | 5 |
 | utils | 1 | 16 | 9 | 4 | 29 |
-| views | 62 | 11,238 | 601 | 1,722 | 13,561 |
+| views | 68 | 13,429 | 668 | 2,074 | 16,171 |
 | views (Files) | 6 | 1,533 | 24 | 172 | 1,729 |
 | views/account | 10 | 2,386 | 125 | 394 | 2,905 |
 | views/account/popup | 10 | 2,386 | 125 | 394 | 2,905 |
@@ -106,6 +107,10 @@ Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-
 | views/book/popup | 2 | 65 | 2 | 10 | 77 |
 | views/currency | 1 | 162 | 3 | 25 | 190 |
 | views/currency/popup | 1 | 162 | 3 | 25 | 190 |
+| views/debt | 6 | 2,191 | 67 | 352 | 2,610 |
+| views/debt (Files) | 1 | 384 | 2 | 44 | 430 |
+| views/debt/components | 4 | 1,510 | 15 | 232 | 1,757 |
+| views/debt/composables | 1 | 297 | 50 | 76 | 423 |
 | views/debug | 4 | 945 | 17 | 82 | 1,044 |
 | views/debug (Files) | 1 | 193 | 4 | 23 | 220 |
 | views/debug/components | 3 | 752 | 13 | 59 | 824 |

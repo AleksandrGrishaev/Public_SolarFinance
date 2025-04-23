@@ -3,7 +3,7 @@
 <template>
   <BasePopup 
     v-model="isVisible" 
-    title="Category list" 
+    title="Edit category list" 
     :rightIcon="IconPlus"
     @rightIconClick="showAddCategoryPopup = true"
   >

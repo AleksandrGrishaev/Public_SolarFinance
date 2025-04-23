@@ -1,10 +1,10 @@
 # Details
 
-Date : 2025-04-23 11:23:23
+Date : 2025-04-23 13:46:39
 
 Directory /Users/peaker/dev/solar-finance/src
 
-Total : 214 files,  29931 codes, 2293 comments, 4680 blanks, all 36904 lines
+Total : 226 files,  32984 codes, 2518 comments, 5178 blanks, all 40680 lines
 
 [Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
@@ -51,7 +51,8 @@ Total : 214 files,  29931 codes, 2293 comments, 4680 blanks, all 36904 lines
 | [src/components/molecules/information/index.js](/src/components/molecules/information/index.js) | JavaScript | 1 | 1 | 0 | 2 |
 | [src/components/molecules/lists/BaseList.vue](/src/components/molecules/lists/BaseList.vue) | Vue | 84 | 1 | 12 | 97 |
 | [src/components/navigation/AppTopHeader.vue](/src/components/navigation/AppTopHeader.vue) | Vue | 280 | 2 | 23 | 305 |
-| [src/components/navigation/NavMenu.vue](/src/components/navigation/NavMenu.vue) | Vue | 118 | 1 | 7 | 126 |
+| [src/components/navigation/NavMenu.vue](/src/components/navigation/NavMenu.vue) | Vue | 207 | 4 | 24 | 235 |
+| [src/components/navigation/SubNavigation.vue](/src/components/navigation/SubNavigation.vue) | Vue | 91 | 1 | 14 | 106 |
 | [src/components/organisms/alerts/AlertContainer.vue](/src/components/organisms/alerts/AlertContainer.vue) | Vue | 68 | 1 | 11 | 80 |
 | [src/components/organisms/index.js](/src/components/organisms/index.js) | JavaScript | 1 | 1 | 0 | 2 |
 | [src/components/organisms/notifications/Notification.vue](/src/components/organisms/notifications/Notification.vue) | Vue | 87 | 0 | 5 | 92 |
@@ -97,7 +98,7 @@ Total : 214 files,  29931 codes, 2293 comments, 4680 blanks, all 36904 lines
 | [src/layouts/EmptyLayout.vue](/src/layouts/EmptyLayout.vue) | Vue | 15 | 0 | 2 | 17 |
 | [src/layouts/IosLayout.vue](/src/layouts/IosLayout.vue) | Vue | 157 | 1 | 23 | 181 |
 | [src/main.ts](/src/main.ts) | TypeScript | 30 | 9 | 9 | 48 |
-| [src/router/index.ts](/src/router/index.ts) | TypeScript | 171 | 17 | 10 | 198 |
+| [src/router/index.ts](/src/router/index.ts) | TypeScript | 177 | 17 | 10 | 204 |
 | [src/services/BaseCrudService.ts](/src/services/BaseCrudService.ts) | TypeScript | 54 | 22 | 11 | 87 |
 | [src/services/api/ApiService.ts](/src/services/api/ApiService.ts) | TypeScript | 6 | 1 | 4 | 11 |
 | [src/services/api/LocalStorageApiService.ts](/src/services/api/LocalStorageApiService.ts) | TypeScript | 76 | 30 | 32 | 138 |
@@ -125,6 +126,11 @@ Total : 214 files,  29931 codes, 2293 comments, 4680 blanks, all 36904 lines
 | [src/stores/currency/defaultCurrencies.ts](/src/stores/currency/defaultCurrencies.ts) | TypeScript | 50 | 2 | 2 | 54 |
 | [src/stores/currency/index.ts](/src/stores/currency/index.ts) | TypeScript | 3 | 3 | 1 | 7 |
 | [src/stores/currency/types.ts](/src/stores/currency/types.ts) | TypeScript | 25 | 1 | 3 | 29 |
+| [src/stores/debt/debtService.ts](/src/stores/debt/debtService.ts) | TypeScript | 156 | 43 | 24 | 223 |
+| [src/stores/debt/debtStore.ts](/src/stores/debt/debtStore.ts) | TypeScript | 355 | 92 | 78 | 525 |
+| [src/stores/debt/defaultDebts.ts](/src/stores/debt/defaultDebts.ts) | TypeScript | 116 | 5 | 1 | 122 |
+| [src/stores/debt/index.ts](/src/stores/debt/index.ts) | TypeScript | 4 | 2 | 1 | 7 |
+| [src/stores/debt/types.ts](/src/stores/debt/types.ts) | TypeScript | 45 | 12 | 11 | 68 |
 | [src/stores/notification/DefaultNotification.ts](/src/stores/notification/DefaultNotification.ts) | TypeScript | 89 | 17 | 5 | 111 |
 | [src/stores/notification/composables/useNotifications.ts](/src/stores/notification/composables/useNotifications.ts) | TypeScript | 78 | 13 | 12 | 103 |
 | [src/stores/notification/index.ts](/src/stores/notification/index.ts) | TypeScript | 27 | 9 | 6 | 42 |
@@ -196,6 +202,12 @@ Total : 214 files,  29931 codes, 2293 comments, 4680 blanks, all 36904 lines
 | [src/views/book/popup/EditBookPopup.vue](/src/views/book/popup/EditBookPopup.vue) | Vue | 35 | 1 | 5 | 41 |
 | [src/views/book/popup/NewBookPopup.vue](/src/views/book/popup/NewBookPopup.vue) | Vue | 30 | 1 | 5 | 36 |
 | [src/views/currency/popup/CurrencyPopup.vue](/src/views/currency/popup/CurrencyPopup.vue) | Vue | 162 | 3 | 25 | 190 |
+| [src/views/debt/DebtView.vue](/src/views/debt/DebtView.vue) | Vue | 384 | 2 | 44 | 430 |
+| [src/views/debt/components/DebtAddForm.vue](/src/views/debt/components/DebtAddForm.vue) | Vue | 443 | 4 | 62 | 509 |
+| [src/views/debt/components/DebtDetail.vue](/src/views/debt/components/DebtDetail.vue) | Vue | 404 | 5 | 68 | 477 |
+| [src/views/debt/components/DebtList.vue](/src/views/debt/components/DebtList.vue) | Vue | 385 | 4 | 60 | 449 |
+| [src/views/debt/components/DebtPaymentForm.vue](/src/views/debt/components/DebtPaymentForm.vue) | Vue | 278 | 2 | 42 | 322 |
+| [src/views/debt/composables/useDebts.ts](/src/views/debt/composables/useDebts.ts) | TypeScript | 297 | 50 | 76 | 423 |
 | [src/views/debug/DebugStoreView.vue](/src/views/debug/DebugStoreView.vue) | Vue | 193 | 4 | 23 | 220 |
 | [src/views/debug/components/BaseStoresDebugPanel.vue](/src/views/debug/components/BaseStoresDebugPanel.vue) | Vue | 203 | 4 | 19 | 226 |
 | [src/views/debug/components/FinanceStoresDebugPanel.vue](/src/views/debug/components/FinanceStoresDebugPanel.vue) | Vue | 278 | 5 | 20 | 303 |
