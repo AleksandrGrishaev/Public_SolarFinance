@@ -48,7 +48,7 @@
       <div class="name-info">
         <BaseTitle :text="title" />
         <BaseDescription :text="message" />
-        <div class="time-info">{{ formattedTime }}</div>
+        <!-- Удалили отображение времени/даты -->
       </div>
       <div v-if="action && action.text" class="action-indicator">
         <IconChevronRight size="16" />
@@ -286,12 +286,6 @@ export default defineComponent({
   flex: 1;
   position: relative;
   overflow: hidden;
-}
-
-.time-info {
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.6);
-  margin-top: 2px;
 }
 
 /* Action indicator arrow */

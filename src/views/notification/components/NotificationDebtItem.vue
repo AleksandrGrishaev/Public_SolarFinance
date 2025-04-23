@@ -48,7 +48,6 @@
           <BaseTitle :text="`New debt from ${createdBy}`" />
           <BaseDescription :text="`Notes: ${transactionName}. ${message}`" />
           <div class="debt-amount">{{ formattedDebtAmount }}</div>
-          <div class="debt-time">{{ formattedTime }}</div>
         </div>
         <ExpressAction 
           declineText="Decline"
@@ -294,11 +293,6 @@ export default defineComponent({
   margin-top: 4px;
 }
 
-.debt-time {
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.6);
-  margin-top: 2px;
-}
 
 /* Swipe states */
 .notification.swiping {
