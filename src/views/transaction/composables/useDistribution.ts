@@ -408,35 +408,39 @@ export function useDistribution(
    * Настройка распределения для конкретного типа транзакции
    */
   const setupDistributionForTransactionType = (type) => {
+    // Для переводов всегда скрываем распределение
+    if (type === 'transfer') {
+      isSliderVisible.value = false;
+      shouldShowDistribution.value = false;
+      return; // Ранний выход - не нужно проверять категорию
+    }
+    
     // Для долгов всегда показываем распределение
     if (type === 'debt') {
       isSliderVisible.value = true;
       shouldShowDistribution.value = true;
-      
-      // Существующая логика для долга
-      // ...
+      return; // Ранний выход - не нужно проверять категорию
     } 
-    // Для других типов транзакций
+    
+    // Для других типов транзакций (income, expense, exchange)
+    // Проверяем наличие второго участника
+    if (secondUserId.value) {
+      isSliderVisible.value = true;
+      shouldShowDistribution.value = true;
+    }
+    // Проверяем категорию, но только если она определена
+    else if (selectedCategoryRef?.value && selectedCategoryRef.value.hasDistribution) {
+      isSliderVisible.value = selectedCategoryRef.value.showDistribution || false;
+      shouldShowDistribution.value = selectedCategoryRef.value.showDistribution || false;
+      
+      if (selectedCategoryRef.value.defaultDistribution !== undefined) {
+        distributionPercentage.value = selectedCategoryRef.value.defaultDistribution;
+      }
+    }
+    // Скрываем слайдер для остальных случаев
     else {
-      // НОВОЕ: Проверяем наличие второго участника
-      if (secondUserId.value) {
-        isSliderVisible.value = true;
-        shouldShowDistribution.value = true;
-      }
-      // Существующая логика для категорий с настройками распределения
-      else if (selectedCategory.value && selectedCategory.value.hasDistribution) {
-        isSliderVisible.value = selectedCategory.value.showDistribution || false;
-        shouldShowDistribution.value = selectedCategory.value.showDistribution || false;
-        
-        if (selectedCategory.value.defaultDistribution !== undefined) {
-          distributionPercentage.value = selectedCategory.value.defaultDistribution;
-        }
-      }
-      // Скрываем слайдер для остальных случаев
-      else {
-        isSliderVisible.value = false;
-        shouldShowDistribution.value = false;
-      }
+      isSliderVisible.value = false;
+      shouldShowDistribution.value = false;
     }
   };
   
