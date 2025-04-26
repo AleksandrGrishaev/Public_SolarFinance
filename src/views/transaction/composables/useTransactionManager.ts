@@ -267,6 +267,8 @@ export function useTransactionManager(emit) {
     handleAddPerson: distribution.handleAddPerson,
     handlePersonSelect: distribution.handlePersonSelect,
     setPopupVisibility: distribution.setPopupVisibility,
+    handlePersonRemove: distribution.handlePersonRemove,
+    removeSecondPerson: distribution.removeSecondPerson,
     
     // Currency
     sourceCurrencySymbol: currency.sourceCurrencySymbol,

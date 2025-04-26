@@ -97,11 +97,12 @@
       :slot-index="currentSlotIndex"
       @select="handlePersonSelect"
       @add="handlePersonAdd"
+      @remove="handlePersonRemove"
     />
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { onMounted, ref, onBeforeMount } from 'vue';
 import LoadingOverlay from './components/LoadingOverlay.vue';
 import AmountSection from './components/AmountSection.vue';
@@ -165,6 +166,8 @@ const {
   handleAddPerson,
   handlePersonSelect,
   setPopupVisibility,
+  handlePersonRemove,
+  removeSecondPerson,
   
   // Валюты
   sourceCurrencySymbol,

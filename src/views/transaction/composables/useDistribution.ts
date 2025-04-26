@@ -371,6 +371,17 @@ export function useDistribution(
   };
   
   /**
+   * Обработчик удаления участника из попапа
+   */
+  const handlePersonRemove = () => {
+    // Удаляем второго участника
+    removeSecondPerson();
+    
+    // Закрываем попап
+    personSelectionPopupVisible.value = false;
+  };
+  
+  /**
    * Удаление второго участника из распределения
    */
   const removeSecondPerson = () => {
@@ -506,6 +517,7 @@ export function useDistribution(
     handlePersonSelect,
     removeSecondPerson,
     setPopupVisibility,
+    handlePersonRemove, 
     
     // Работа с типами транзакций
     setupDistributionForTransactionType,
