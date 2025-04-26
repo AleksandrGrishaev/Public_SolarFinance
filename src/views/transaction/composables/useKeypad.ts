@@ -12,18 +12,36 @@ export function useKeypad() {
    * Обработка нажатия кнопки на клавиатуре
    * @param value Введенное значение
    */
-  const handleKeypadInput = (value: string) => {
-    // Если уже есть точка, то не добавляем вторую
-    if (value === '.' && amount.value.includes('.')) {
-      return;
+  const handleKeypadInput = (value) => {
+    // НОВОЕ: Проверяем наличие второго участника
+    if (secondUserId.value && !isSliderVisible.value) {
+      isSliderVisible.value = true;
+      shouldShowDistribution.value = true;
     }
     
-    // Если сумма равна нулю и вводится не точка, то заменяем ноль на введенное значение
-    if (amount.value === '0' && value !== '.') {
-      amount.value = value;
+    // Существующая логика обработки нажатий
+    if ((selectedType.value === 'transfer' || selectedType.value === 'exchange') && 
+        isTransferWithDifferentCurrencies.value) {
+      
+      if (!isSourceAmountActive.value) {
+        if (value === '.' && manualDestinationAmount.value.includes('.')) {
+          return;
+        }
+        
+        if (manualDestinationAmount.value === '0' && value !== '.') {
+          updateManualDestinationAmount(value);
+        } else {
+          updateManualDestinationAmount(
+            manualDestinationAmount.value + value
+          );
+        }
+      } else {
+        // Стандартный ввод для исходной суммы
+        core.handleKeypadInput(value);
+      }
     } else {
-      // Иначе добавляем символ к текущему значению
-      amount.value += value;
+      // Стандартный ввод для всех остальных случаев
+      core.handleKeypadInput(value);
     }
   };
 

@@ -97,7 +97,7 @@ export function useRegularTransaction(
       };
       
       // Добавляем правила распределения
-      if (shouldShowDistribution.value && distributionOwners.value?.length > 0) {
+      if (distributionOwners.value?.length > 1) {
         transactionData.distributionRules = [
           {
             ownerId: distributionOwners.value[0].id,
@@ -106,6 +106,14 @@ export function useRegularTransaction(
           {
             ownerId: distributionOwners.value[1].id,
             percentage: 100 - distributionPercentage.value
+          }
+        ];
+      } else if (distributionOwners.value?.length === 1) {
+        // Если у нас есть только один участник, устанавливаем ему 100%
+        transactionData.distributionRules = [
+          {
+            ownerId: distributionOwners.value[0].id,
+            percentage: 100
           }
         ];
       }
@@ -121,7 +129,7 @@ export function useRegularTransaction(
       }
       
       // Сохраняем настройки распределения, если оно нестандартное
-      if (isNonStandardDistribution.value && selectedCategory.value) {
+      if ((isNonStandardDistribution.value || distributionOwners.value?.length > 1) && selectedCategory.value) {
         saveDistributionSetting(selectedBook.value, selectedCategory.value.id);
       }
       

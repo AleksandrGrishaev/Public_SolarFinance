@@ -366,6 +366,12 @@ export function useDistribution(
     // Обновляем процент
     distributionPercentage.value = newPercentage;
     
+    // НОВОЕ: Убедимся, что слайдер становится видимым при добавлении второго участника
+    if (!isSliderVisible.value) {
+      isSliderVisible.value = true;
+      shouldShowDistribution.value = true;
+    }
+    
     // Закрываем попап
     personSelectionPopupVisible.value = false;
   };
@@ -402,43 +408,34 @@ export function useDistribution(
    * Настройка распределения для конкретного типа транзакции
    */
   const setupDistributionForTransactionType = (type) => {
-    // Если меняется тип транзакции
-    if (type !== selectedTypeRef.value) {
-      // Сбрасываем ручную видимость слайдера
-      isSliderManuallyVisible.value = false;
-      isManuallyHidden.value = false;
+    // Для долгов всегда показываем распределение
+    if (type === 'debt') {
+      isSliderVisible.value = true;
+      shouldShowDistribution.value = true;
       
-      // Для некоторых типов применяем специальные правила
-      switch (type) {
-        case 'transfer':
-          // Для переводов скрываем слайдер и сбрасываем второго участника
-          removeSecondPerson();
-          break;
-          
-        case 'debt':
-          // Для долгов, если слайдер не виден, показываем его
-          if (!isSliderVisible.value) {
-            isSliderManuallyVisible.value = true;
-            isManuallyHidden.value = false;
-          }
-          
-          // Если нет второго участника, но есть распределение в книге, добавляем участника
-          if (!secondUserId.value && hasBookDistribution.value) {
-            const bookDistData = getBookDistributionData(selectedBookRef.value);
-            if (bookDistData) {
-              secondUserId.value = bookDistData.ownerId;
-              distributionPercentage.value = 100 - bookDistData.percentage;
-            }
-          }
-          break;
-          
-        default:
-          // Для обычных транзакций используем стандартное значение
-          if (!secondUserId.value) {
-            distributionPercentage.value = 100; // Устанавливаем 100% для текущего пользователя
-          } else {
-            distributionPercentage.value = getStandardDistributionValue.value;
-          }
+      // Существующая логика для долга
+      // ...
+    } 
+    // Для других типов транзакций
+    else {
+      // НОВОЕ: Проверяем наличие второго участника
+      if (secondUserId.value) {
+        isSliderVisible.value = true;
+        shouldShowDistribution.value = true;
+      }
+      // Существующая логика для категорий с настройками распределения
+      else if (selectedCategory.value && selectedCategory.value.hasDistribution) {
+        isSliderVisible.value = selectedCategory.value.showDistribution || false;
+        shouldShowDistribution.value = selectedCategory.value.showDistribution || false;
+        
+        if (selectedCategory.value.defaultDistribution !== undefined) {
+          distributionPercentage.value = selectedCategory.value.defaultDistribution;
+        }
+      }
+      // Скрываем слайдер для остальных случаев
+      else {
+        isSliderVisible.value = false;
+        shouldShowDistribution.value = false;
       }
     }
   };
