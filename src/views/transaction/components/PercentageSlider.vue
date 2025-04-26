@@ -1,21 +1,17 @@
 <!-- src/views/transaction/components/PercentageSlider.vue -->
 <template>
-  <div 
-    class="percentage-slider-wrapper"
-    :class="{
-      'standard-distribution': !isNonStandard,
-      'custom-distribution': isNonStandard
-    }"
-  >
-    <!-- Используем BasePercentageSlider только если у нас есть второй участник -->
+  <div class="percentage-slider-wrapper">
+    <!-- Всегда используем BasePercentageSlider независимо от количества участников -->
     <BasePercentageSlider
-      v-if="hasSecondOwner"
       :sides="owners"
-      :modelValue="modelValue"
+      :modelValue="hasSecondOwner ? modelValue : 100"
+      :disabled="!hasSecondOwner"
       :totalValue="totalAmount"
       :valueSuffix="currency"
       :valueDecimals="2"
       :valueFormatter="formatAmountValue"
+      :leftColor="owners[0].color"
+      :rightColor="owners.length > 1 ? owners[1].color : '#333333'"
       @update:modelValue="updateValue"
     >
       <!-- Слот для кастомизации первой стороны -->
@@ -27,49 +23,46 @@
         >
           {{ owners[0].name }}
         </span>
-        <span class="side-percentage" :style="{ color: owners[0].color }">{{ modelValue }}%</span>
+        <span class="side-percentage" :style="{ color: owners[0].color }">{{ hasSecondOwner ? modelValue : 100 }}%</span>
         <span class="side-value" :style="{ color: owners[0].color }">{{ formatAmount(leftAmount) }}</span>
       </template>
       
       <!-- Слот для кастомизации второй стороны -->
       <template #side-2>
-        <span 
-          class="side-name clickable" 
-          :style="{ color: owners[1].color }"
-          @click="onPersonClick(1)"
-        >
-          {{ owners[1].name }}
-        </span>
-        <span class="side-percentage" :style="{ color: owners[1].color }">{{ 100 - modelValue }}%</span>
-        <span class="side-value" :style="{ color: owners[1].color }">{{ formatAmount(rightAmount) }}</span>
-      </template>
-    </BasePercentageSlider>
-    
-    <!-- Кастомный вид, когда у нас только один участник и кнопка добавления -->
-    <div v-else class="slider-container">
-      <!-- Левая сторона слайдера (первый участник, всегда текущий пользователь) -->
-      <div 
-        class="person-side left-side" 
-        :style="{ width: '100%', backgroundColor: owners[0].color || '#53B794' }"
-        @click="onPersonClick(0)"
-      >
-        <div class="person-info">
-          <div class="person-name">{{ owners[0].name }}</div>
-          <div class="person-amount">{{ formatAmount(totalAmount) }}</div>
+        <!-- Если второго участника нет, показываем только кнопку добавления -->
+        <div v-if="!hasSecondOwner" class="add-person-container">
+          <div 
+            class="add-person-btn"
+            @click.stop="$emit('add-person')"
+          >
+            <AddIconButton />
+          </div>
         </div>
         
-        <!-- Кнопка добавления второго участника -->
-        <div 
-          class="add-person-btn"
-          @click.stop="$emit('add-person')"
-        >
-          <AddIconButton />
-          <span>Add</span>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Уведомление о нестандартном распределении удалено -->
+        <!-- Если второй участник есть, показываем его данные -->
+        <template v-else>
+          <span 
+            class="side-name clickable"
+            :style="{ color: owners[1].color }"
+            @click="onPersonClick(1)"
+          >
+            {{ owners[1].name }}
+          </span>
+          <span 
+            class="side-percentage"
+            :style="{ color: owners[1].color }"
+          >
+            {{ 100 - modelValue }}%
+          </span>
+          <span 
+            class="side-value"
+            :style="{ color: owners[1].color }"
+          >
+            {{ formatAmount(rightAmount) }}
+          </span>
+        </template>
+      </template>
+    </BasePercentageSlider>
   </div>
 </template>
 
@@ -146,7 +139,12 @@ const updateValue = (newValue) => {
 
 // Обработчик клика на участника
 const onPersonClick = (index) => {
-  emit('person-click', index);
+  if (index === 1 && !hasSecondOwner.value) {
+    // Если нет второго участника и кликнули на его место, эмитим добавление
+    emit('add-person');
+  } else {
+    emit('person-click', index);
+  }
 };
 </script>
 
@@ -158,61 +156,31 @@ const onPersonClick = (index) => {
   transition: all 0.3s ease;
 }
 
-/* Стили для кастомного вида с одним участником */
-.slider-container {
-  position: relative;
-  height: 48px;
-  display: flex;
-  border-radius: 24px;
-  overflow: hidden;
-  margin: 0 var(--spacing-sm);
-}
-
-.person-side {
-  height: 100%;
+/* Стили для контейнера кнопки добавления */
+.add-person-container {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 16px;
-  transition: width 0.2s ease;
-  min-width: 10%;
-  cursor: pointer;
-}
-
-.person-info {
-  display: flex;
-  flex-direction: column;
   justify-content: center;
+  width: 100%;
+  height: 100%;
 }
 
-.person-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.person-amount {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.7);
-}
-
+/* Стили для кнопки добавления второго участника */
 .add-person-btn {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 4px;
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 12px;
+  justify-content: center;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Стили для нестандартного распределения - оставляем для общего стиля */
-.custom-distribution {
-  background-color: rgba(255, 152, 0, 0.1);
-  border: 1px solid var(--color-warning, #ff9800);
-  padding: 6px 4px;
+.add-person-btn:hover {
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 /* Добавляем стили для кликабельных имен участников */
@@ -223,5 +191,25 @@ const onPersonClick = (index) => {
 
 .clickable:hover {
   opacity: 0.8;
+}
+
+/* Стилизация слотов в слайдере */
+.side-name, .side-percentage, .side-value {
+  display: block;
+  text-align: center;
+}
+
+.side-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.side-percentage {
+  font-size: 14px;
+}
+
+.side-value {
+  font-size: 12px;
+  opacity: 0.9;
 }
 </style>

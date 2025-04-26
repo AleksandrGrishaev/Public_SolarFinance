@@ -75,7 +75,11 @@ export function useDistribution(
     const allUsers = userStore.getAllUsers();
     
     // Используем цвет из настроек пользователя, если он есть
-    const userColor = userStore.currentUser?.settings?.color || '#53B794';
+    // Добавляем префикс # если его нет
+    let userColor = userStore.currentUser?.settings?.color || '53B794';
+    if (userColor && !userColor.startsWith('#')) {
+      userColor = `#${userColor}`;
+    }
     
     const leftSide = {
       id: currentUserId,
@@ -91,7 +95,12 @@ export function useDistribution(
     
     // Находим второго пользователя и его настройки цвета
     const secondUser = allUsers.find(user => user.id === secondUserId.value);
-    const secondUserColor = secondUser?.settings?.color || '#DB9894';
+    let secondUserColor = secondUser?.settings?.color || 'DB9894';
+    
+    // Добавляем префикс # если его нет
+    if (secondUserColor && !secondUserColor.startsWith('#')) {
+      secondUserColor = `#${secondUserColor}`;
+    }
     
     const rightSide = {
       id: secondUserId.value,

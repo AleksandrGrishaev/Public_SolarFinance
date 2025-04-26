@@ -44,7 +44,7 @@
           v-model="distributionPercentage"
           :total-amount="parseFloat(amount) || 0"
           :currency="sourceCurrencySymbol"
-          :is-non-standard="isNonStandardDistribution"
+          :is-non-standard="false"
           :standard-value="getStandardDistributionValue"
           @person-click="handlePersonClick"
           @add-person="handleAddPerson"
