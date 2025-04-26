@@ -13,7 +13,7 @@
               Пользовательских: {{ notificationStore.userNotifications.length }}
             </n-alert>
 
-            <!-- Кнопки управления уведомлениями - убрана кнопка создания тестовых уведомлений -->
+            <!-- Кнопки управления уведомлениями -->
             <n-space>
               <n-button @click="notificationStore.markAllAsRead()" :disabled="!notificationStore.hasUnread">
                 Пометить все как прочитанные
@@ -68,7 +68,8 @@
                 />
               </n-tab-pane>
               <n-tab-pane name="raw" tab="Raw JSON">
-                <n-code language="json">{{ formatJson(notificationStore.$state) }}</n-code>
+                <!-- Замена n-code на JsonViewer -->
+                <json-viewer :json="notificationStore.$state" :show-card="false" />
               </n-tab-pane>
             </n-tabs>
           </n-space>
@@ -88,12 +89,17 @@
             <n-tab-pane name="keys" tab="По ключам">
               <n-collapse>
                 <n-collapse-item v-for="key in localStorageKeys" :key="key" :title="key">
-                  <n-code language="json">{{ formatLocalStorageItem(key) }}</n-code>
+                  <!-- Замена n-code на JsonViewer с обработкой возможного fallback для нестандартных данных -->
+                  <div v-if="isParsableJson(key)">
+                    <json-viewer :json="getParsedLocalStorageItem(key)" :show-card="false" />
+                  </div>
+                  <n-code v-else language="text">{{ localStorage.getItem(key) }}</n-code>
                 </n-collapse-item>
               </n-collapse>
             </n-tab-pane>
             <n-tab-pane name="raw" tab="Raw JSON">
-              <n-code language="json">{{ formatRawLocalStorage() }}</n-code>
+              <!-- Замена n-code на JsonViewer -->
+              <json-viewer :json="getRawLocalStorageObj()" :show-card="false" />
             </n-tab-pane>
           </n-tabs>
         </n-card>
@@ -103,7 +109,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, h } from 'vue';
+import { computed, h, ref } from 'vue';
 import { 
   NTabs, 
   NTabPane, 
@@ -124,16 +130,105 @@ import { useNotificationStore } from '@/stores/notification/notificationStore';
 import { useNotificationService } from '@/stores/notification/notificationService';
 import { NotificationType, NotificationSubtype } from '@/stores/notification/types';
 
+// Импорт нового JsonViewer компонента
+import JsonViewer from './JsonViewerComponent.vue';
+
 // Инициализация хранилищ и сервисов
 const notificationStore = useNotificationStore();
 const notificationService = useNotificationService();
 
-// Форматирование JSON для отображения
+// Форматирование JSON для отображения - оставляем для обратной совместимости
 const formatJson = (obj: any): string => {
   return JSON.stringify(obj, null, 2);
 };
 
-// Удален метод createTestNotifications
+// Проверка, может ли значение быть распарсено как JSON
+const isParsableJson = (key: string): boolean => {
+  try {
+    const item = localStorage.getItem(key);
+    if (!item) return false;
+    JSON.parse(item);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
+// Получение парсированного значения из localStorage
+const getParsedLocalStorageItem = (key: string): any => {
+  try {
+    const item = localStorage.getItem(key);
+    if (!item) return null;
+    return JSON.parse(item);
+  } catch (e) {
+    return null;
+  }
+};
+
+// Получение объекта, содержащего все данные localStorage
+const getRawLocalStorageObj = (): Record<string, any> => {
+  const storage: Record<string, any> = {};
+  
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key) {
+      try {
+        const value = localStorage.getItem(key);
+        storage[key] = value ? JSON.parse(value) : null;
+      } catch (e) {
+        storage[key] = localStorage.getItem(key);
+      }
+    }
+  }
+  
+  return storage;
+};
+
+// Получение ключей localStorage
+const localStorageKeys = computed(() => {
+  const keys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key) {
+      keys.push(key);
+    }
+  }
+  return keys;
+});
+
+// Форматирование элемента localStorage - оставляем для обратной совместимости
+const formatLocalStorageItem = (key: string): string => {
+  try {
+    const item = localStorage.getItem(key);
+    if (!item) return '';
+    
+    // Пытаемся распарсить JSON
+    const parsed = JSON.parse(item);
+    return JSON.stringify(parsed, null, 2);
+  } catch (e) {
+    // Если не удалось распарсить, возвращаем как строку
+    return localStorage.getItem(key) || '';
+  }
+};
+
+// Форматирование всего содержимого localStorage - оставляем для обратной совместимости
+const formatRawLocalStorage = (): string => {
+  const storage: Record<string, any> = {};
+  
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key) {
+      try {
+        const value = localStorage.getItem(key);
+        storage[key] = value ? JSON.parse(value) : null;
+      } catch (e) {
+        storage[key] = localStorage.getItem(key);
+      }
+    }
+  }
+  
+  return JSON.stringify(storage, null, 2);
+};
 
 // Столбцы для таблицы уведомлений
 const notificationColumns = [
@@ -169,7 +264,7 @@ const notificationColumns = [
       );
     }
   },
-  { title: 'Заголовок', key: 'title', width: 100 }, // Расширено поле Заголовок
+  { title: 'Заголовок', key: 'title', width: 100 },
   { title: 'Сообщение', key: 'message', width: 300 },
   { 
     title: 'Прочитано', 
@@ -235,52 +330,6 @@ const notificationColumns = [
     }
   }
 ];
-
-// Получение ключей localStorage
-const localStorageKeys = computed(() => {
-  const keys = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key) {
-      keys.push(key);
-    }
-  }
-  return keys;
-});
-
-// Форматирование элемента localStorage
-const formatLocalStorageItem = (key: string): string => {
-  try {
-    const item = localStorage.getItem(key);
-    if (!item) return '';
-    
-    // Пытаемся распарсить JSON
-    const parsed = JSON.parse(item);
-    return JSON.stringify(parsed, null, 2);
-  } catch (e) {
-    // Если не удалось распарсить, возвращаем как строку
-    return localStorage.getItem(key) || '';
-  }
-};
-
-// Форматирование всего содержимого localStorage
-const formatRawLocalStorage = (): string => {
-  const storage: Record<string, any> = {};
-  
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key) {
-      try {
-        const value = localStorage.getItem(key);
-        storage[key] = value ? JSON.parse(value) : null;
-      } catch (e) {
-        storage[key] = localStorage.getItem(key);
-      }
-    }
-  }
-  
-  return JSON.stringify(storage, null, 2);
-};
 </script>
 
 <style scoped>

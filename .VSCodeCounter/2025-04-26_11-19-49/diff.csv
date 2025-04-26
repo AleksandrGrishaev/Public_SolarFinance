@@ -1,0 +1,12 @@
+"filename", "language", "TypeScript", "Vue", "comment", "blank", "total"
+"/Users/peaker/dev/solar-finance/src/components/atoms/buttons/AddIconButton.vue", "Vue", 0, 69, 1, 8, 78
+"/Users/peaker/dev/solar-finance/src/components/ui/views/BasePercentageSlider.vue", "Vue", 0, 16, 1, 4, 21
+"/Users/peaker/dev/solar-finance/src/stores/common/types.ts", "TypeScript", -9, 0, -1, -1, -11
+"/Users/peaker/dev/solar-finance/src/stores/user/types.ts", "TypeScript", 8, 0, 0, 2, 10
+"/Users/peaker/dev/solar-finance/src/views/person/components/PersonSelectionPopup.vue", "Vue", 0, 164, 4, 23, 191
+"/Users/peaker/dev/solar-finance/src/views/person/composables/usePersonSelection.ts", "TypeScript", 71, 0, 24, 14, 109
+"/Users/peaker/dev/solar-finance/src/views/transaction/TransactionView.vue", "Vue", 0, 16, 1, 2, 19
+"/Users/peaker/dev/solar-finance/src/views/transaction/components/PercentageSlider.vue", "Vue", 0, 84, 5, 11, 100
+"/Users/peaker/dev/solar-finance/src/views/transaction/composables/useDistribution.ts", "TypeScript", 93, 0, 48, 31, 172
+"/Users/peaker/dev/solar-finance/src/views/transaction/composables/useTransactionManager.ts", "TypeScript", 7, 0, 1, 1, 9
+"Total", "-", 170, 349, 84, 95, 698
