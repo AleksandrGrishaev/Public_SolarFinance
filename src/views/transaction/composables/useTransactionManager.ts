@@ -169,6 +169,7 @@ export function useTransactionManager(emit) {
     }
   };
   
+
   // Обработчик выбора категории, учитывающий тип транзакции
   const handleCategorySelect = (category) => {
     core.selectedCategory.value = category;
@@ -228,6 +229,9 @@ export function useTransactionManager(emit) {
         currency.isTransferWithDifferentCurrencies.value) {
       core.amount.value = '0';
     }
+    
+    // Настраиваем распределение для нового типа транзакции
+    distribution.setupDistributionForTransactionType(newType);
   });
   
   // Сброс ручной суммы при изменении валют или счетов
@@ -257,6 +261,12 @@ export function useTransactionManager(emit) {
     isNonStandardDistribution: distribution.isNonStandardDistribution,
     getStandardDistributionValue: distribution.getStandardDistributionValue,
     toggleDistributionVisibility: distribution.toggleDistributionVisibility,
+    personSelectionPopupVisible: distribution.personSelectionPopupVisible,
+    currentSlotIndex: distribution.currentSlotIndex,
+    handlePersonClick: distribution.handlePersonClick,
+    handleAddPerson: distribution.handleAddPerson,
+    handlePersonSelect: distribution.handlePersonSelect,
+    setPopupVisibility: distribution.setPopupVisibility,
     
     // Currency
     sourceCurrencySymbol: currency.sourceCurrencySymbol,

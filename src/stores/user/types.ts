@@ -1,5 +1,15 @@
 // src/stores/user/types.ts
-import type { Person, PersonType } from '../common/types';
+
+export interface Person {
+  id: string;
+  name: string;
+  type: PersonType;
+  avatar?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type PersonType = 'user' | 'owner' | 'family_member' | 'external_contact';
 
 export interface User extends Person {
   type: Extract<PersonType, 'user'>;

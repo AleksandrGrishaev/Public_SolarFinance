@@ -5,7 +5,7 @@ import { useUserStore } from '@/stores/user';
 import { useCategoryStore } from '@/stores/category';
 
 /**
- * Объединенный composable для логики распределения транзакций
+ * Composable для логики распределения транзакций между участниками
  */
 export function useDistribution(
   selectedBookRef,
@@ -18,13 +18,18 @@ export function useDistribution(
   const userStore = useUserStore();
   const categoryStore = useCategoryStore();
   
-  // State
-  const distributionPercentage = ref(50);
+  // State для распределения
+  const distributionPercentage = ref(100); // По умолчанию 100% для текущего пользователя
   const isSliderManuallyVisible = ref(false);
   const isManuallyHidden = ref(false);
   const distributionSettings = ref({});
   
-  // ---- БАЗОВАЯ ФУНКЦИОНАЛЬНОСТЬ ----
+  // State для выбора пользователей
+  const secondUserId = ref(null); // ID второго участника (null означает, что не выбран)
+  const personSelectionPopupVisible = ref(false);
+  const currentSlotIndex = ref(1); // Индекс слота для добавления пользователя (всегда 1 для второго)
+  
+  // ---- БАЗОВАЯ ФУНКЦИОНАЛЬНОСТЬ РАСПРЕДЕЛЕНИЯ ----
   
   /**
    * Определяет, должны ли отображаться элементы распределения по бизнес-правилам
@@ -39,49 +44,66 @@ export function useDistribution(
   });
   
   /**
+   * Получение данных о распределении из книги
+   */
+  const getBookDistributionData = (bookId) => {
+    const book = bookStore.getBookById(bookId);
+    if (!book || !book.distributionRules || book.distributionRules.length === 0) {
+      return null;
+    }
+    
+    // Находим правила распределения, где текущий пользователь не является владельцем
+    const currentUserId = userStore.currentUser?.id || 'user_1';
+    const otherOwnerRule = book.distributionRules.find(rule => rule.ownerId !== currentUserId);
+    
+    if (otherOwnerRule) {
+      return {
+        ownerId: otherOwnerRule.ownerId,
+        percentage: otherOwnerRule.percentage
+      };
+    }
+    
+    return null;
+  };
+  
+  /**
    * Получение данных владельцев для распределения
    */
   const distributionOwners = computed(() => {
-    const book = bookStore.getBookById(selectedBookRef.value);
-    if (!book || !book.distributionRules) return [];
+    // Текущий пользователь всегда первый (слева)
+    const currentUserId = userStore.currentUser?.id || 'user_1';
+    const allUsers = userStore.getAllUsers();
     
-    // Получаем данные пользователей для слайдера на основе правил распределения
-    return book.distributionRules.map(rule => {
-      // Пытаемся получить пользователя из currentUser
-      let userName = 'Unknown';
-      
-      // Проверяем, является ли пользователь текущим
-      if (userStore.currentUser && userStore.currentUser.id === rule.ownerId) {
-        userName = userStore.currentUser.name;
-      } else {
-        // Для других пользователей используем имя по умолчанию
-        // или пытаемся найти в другом месте
-        switch(rule.ownerId) {
-          case 'user_1':
-            userName = 'Alex';
-            break;
-          case 'user_2':
-            userName = 'Sasha';
-            break;
-          default:
-            userName = `User ${rule.ownerId.replace('user_', '')}`;
-        }
-      }
-      
-      // Ограничиваем длину имени до 10 символов
-      if (userName.length > 10) {
-        userName = userName.substring(0, 9) + '…';
-      }
-      
-      return {
-        id: rule.ownerId,
-        name: userName,
-        percentage: rule.percentage
-      };
-    });
+    // Используем цвет из настроек пользователя, если он есть
+    const userColor = userStore.currentUser?.settings?.color || '#53B794';
+    
+    const leftSide = {
+      id: currentUserId,
+      name: userStore.currentUser?.name || 'You',
+      color: userColor,
+      percentage: distributionPercentage.value
+    };
+    
+    // Если у нас нет второго выбранного пользователя, то возвращаем только первого
+    if (!secondUserId.value) {
+      return [leftSide];
+    }
+    
+    // Находим второго пользователя и его настройки цвета
+    const secondUser = allUsers.find(user => user.id === secondUserId.value);
+    const secondUserColor = secondUser?.settings?.color || '#DB9894';
+    
+    const rightSide = {
+      id: secondUserId.value,
+      name: secondUser?.name || (secondUserId.value === 'user_2' ? 'Sasha' : 'Unknown'),
+      color: secondUserColor,
+      percentage: 100 - distributionPercentage.value
+    };
+    
+    return [leftSide, rightSide];
   });
   
-  // ---- РАСШИРЕННАЯ ФУНКЦИОНАЛЬНОСТЬ ----
+  // ---- РАСШИРЕННАЯ ФУНКЦИОНАЛЬНОСТЬ РАСПРЕДЕЛЕНИЯ ----
   
   /**
    * Инициализация - загрузка сохраненных настроек
@@ -101,7 +123,7 @@ export function useDistribution(
   const getStandardDistributionValue = computed(() => {
     const book = bookStore.getBookById(selectedBookRef.value);
     
-    if (!book) return 50;
+    if (!book) return 100; // По умолчанию 100% для текущего пользователя
     
     // Если у категории есть стандартное распределение, используем его
     if (selectedCategoryRef?.value && selectedCategoryRef.value.defaultDistribution !== undefined) {
@@ -114,29 +136,42 @@ export function useDistribution(
       return distributionSettings.value[`${book.id}-${selectedCategoryRef.value.id}`];
     }
     
-    // Если категория не указана или настройки не найдены, используем стандартные правила
-    if (book.type === 'family') {
-      // Для семейной книги используем правила из самой книги
-      if (book.distributionRules && book.distributionRules.length > 0) {
-        return book.distributionRules[0].percentage;
+    // Если есть распределение по книге, используем его
+    if (book.distributionRules && book.distributionRules.length > 0) {
+      // Находим правило для текущего пользователя
+      const currentUserId = userStore.currentUser?.id || 'user_1';
+      const userRule = book.distributionRules.find(rule => rule.ownerId === currentUserId);
+      
+      if (userRule) {
+        return userRule.percentage;
       }
-      return 50; // По умолчанию 50/50
+      
+      // Если нет правила для текущего пользователя, возвращаем обратное значение
+      // от первого правила (предполагая, что есть только 2 правила)
+      return 100 - book.distributionRules[0].percentage;
     }
     
-    // Для личной книги определяем владельца
-    if (book.type === 'personal') {
-      if (book.ownerIds[0] === 'user_1') return 100; // Первый владелец
-      if (book.ownerIds[0] === 'user_2') return 0; // Второй владелец
-    }
-    
-    return 50; // По умолчанию 50/50
+    return 100; // Если нет правил, 100% для текущего пользователя
   });
   
   /**
    * Проверка, является ли текущее распределение нестандартным
    */
   const isNonStandardDistribution = computed(() => {
+    if (distributionOwners.value.length < 2) {
+      // Если нет второго участника, распределение всегда стандартное
+      return false;
+    }
+    
     return Math.abs(distributionPercentage.value - getStandardDistributionValue.value) > 1;
+  });
+  
+  /**
+   * Проверка, есть ли правила распределения в книге
+   */
+  const hasBookDistribution = computed(() => {
+    const book = bookStore.getBookById(selectedBookRef.value);
+    return book && book.distributionRules && book.distributionRules.length > 0;
   });
   
   /**
@@ -149,14 +184,11 @@ export function useDistribution(
     // Если это долг или обмен валют, всегда показываем слайдер
     if (['debt', 'exchange'].includes(selectedTypeRef.value)) return true;
     
-    const book = bookStore.getBookById(selectedBookRef.value);
-    if (!book) return false;
+    // Если в книге есть распределение, показываем слайдер
+    if (hasBookDistribution.value) return true;
     
-    // Семейная книга - показываем слайдер
-    if (book.type === 'family') return true;
-    
-    // Показываем, если распределение отличается от стандартного
-    if (isNonStandardDistribution.value) return true;
+    // Если уже выбран второй участник, показываем слайдер
+    if (secondUserId.value) return true;
     
     return false;
   });
@@ -230,23 +262,11 @@ export function useDistribution(
   });
   
   /**
-   * Проверяем, есть ли данные для распределения
-   */
-  const hasDistributionData = computed(() => {
-    return distributionOwners.value && 
-           Array.isArray(distributionOwners.value) && 
-           distributionOwners.value.length >= 2;
-  });
-  
-  /**
    * Конечная видимость слайдера
    */
   const isSliderVisible = computed(() => {
     // Если это перевод, всегда скрываем слайдер
     if (selectedTypeRef.value === 'transfer') return false;
-    
-    // Если у нас нет данных для распределения, скрываем слайдер
-    if (!hasDistributionData.value) return false;
     
     // Если пользователь явно переключил состояние слайдера, 
     // уважаем его выбор (isSliderManuallyVisible)
@@ -262,12 +282,6 @@ export function useDistribution(
    * Обработчик переключения отображения слайдера
    */
   const toggleDistributionVisibility = () => {
-    // Если у нас нет данных для распределения, не разрешаем включать слайдер
-    if (!hasDistributionData.value && !isSliderManuallyVisible.value) {
-      console.log('[useDistribution] Cannot show slider: no distribution data available');
-      return;
-    }
-    
     // Когда пользователь впервые нажимает на кнопку, если слайдер виден,
     // то мы просто скрываем его, запоминая что это было ручное действие
     if (isSliderVisible.value && !isManuallyHidden.value && !isSliderManuallyVisible.value) {
@@ -278,30 +292,167 @@ export function useDistribution(
       isSliderManuallyVisible.value = !isSliderManuallyVisible.value;
       isManuallyHidden.value = !isSliderManuallyVisible.value;
     }
+    
+    // Если слайдер становится видимым и нет второго участника, 
+    // но в книге есть распределение, добавляем участника из распределения
+    if (isSliderManuallyVisible.value && 
+        !secondUserId.value && 
+        hasBookDistribution.value) {
+      
+      const bookDistributionData = getBookDistributionData(selectedBookRef.value);
+      if (bookDistributionData) {
+        // Устанавливаем второго участника из распределения книги
+        secondUserId.value = bookDistributionData.ownerId;
+        
+        // Устанавливаем процент из распределения книги
+        distributionPercentage.value = 100 - bookDistributionData.percentage;
+      }
+    }
+  };
+  
+  // ---- УПРАВЛЕНИЕ ВЫБОРОМ УЧАСТНИКОВ ----
+  
+  /**
+   * Обработчик клика на участника распределения
+   */
+  const handlePersonClick = (index) => {
+    if (index === 0) {
+      // Клик по текущему пользователю - игнорируем
+      return;
+    }
+    
+    // Открываем попап выбора пользователя для второй стороны
+    personSelectionPopupVisible.value = true;
+    currentSlotIndex.value = index;
+  };
+  
+  /**
+   * Обработчик добавления участника
+   */
+  const handleAddPerson = () => {
+    // Открываем попап выбора пользователя
+    personSelectionPopupVisible.value = true;
+    currentSlotIndex.value = 1; // 1 - индекс слота для второго участника
+  };
+  
+  /**
+   * Обработчик выбора участника из попапа
+   */
+  const handlePersonSelect = (data) => {
+    // Добавляем выбранного участника как второго
+    secondUserId.value = data.person.id;
+    
+    // Определяем процент распределения для нового участника
+    let newPercentage = 50; // По умолчанию 50/50
+    
+    // Если распределение книги содержит этого участника, используем его процент
+    const book = bookStore.getBookById(selectedBookRef.value);
+    if (book && book.distributionRules) {
+      const userRule = book.distributionRules.find(rule => rule.ownerId === data.person.id);
+      if (userRule) {
+        newPercentage = 100 - userRule.percentage;
+      }
+    }
+    
+    // Обновляем процент
+    distributionPercentage.value = newPercentage;
+    
+    // Закрываем попап
+    personSelectionPopupVisible.value = false;
+  };
+  
+  /**
+   * Удаление второго участника из распределения
+   */
+  const removeSecondPerson = () => {
+    secondUserId.value = null;
+    distributionPercentage.value = 100; // 100% для текущего пользователя
+  };
+  
+  /**
+   * Программное обновление видимости попапа
+   */
+  const setPopupVisibility = (visible) => {
+    personSelectionPopupVisible.value = visible;
+  };
+  
+  // ---- ОБРАБОТЧИКИ ДЛЯ РАЗНЫХ ТИПОВ ТРАНЗАКЦИЙ ----
+  
+  /**
+   * Настройка распределения для конкретного типа транзакции
+   */
+  const setupDistributionForTransactionType = (type) => {
+    // Если меняется тип транзакции
+    if (type !== selectedTypeRef.value) {
+      // Сбрасываем ручную видимость слайдера
+      isSliderManuallyVisible.value = false;
+      isManuallyHidden.value = false;
+      
+      // Для некоторых типов применяем специальные правила
+      switch (type) {
+        case 'transfer':
+          // Для переводов скрываем слайдер и сбрасываем второго участника
+          removeSecondPerson();
+          break;
+          
+        case 'debt':
+          // Для долгов, если слайдер не виден, показываем его
+          if (!isSliderVisible.value) {
+            isSliderManuallyVisible.value = true;
+            isManuallyHidden.value = false;
+          }
+          
+          // Если нет второго участника, но есть распределение в книге, добавляем участника
+          if (!secondUserId.value && hasBookDistribution.value) {
+            const bookDistData = getBookDistributionData(selectedBookRef.value);
+            if (bookDistData) {
+              secondUserId.value = bookDistData.ownerId;
+              distributionPercentage.value = 100 - bookDistData.percentage;
+            }
+          }
+          break;
+          
+        default:
+          // Для обычных транзакций используем стандартное значение
+          if (!secondUserId.value) {
+            distributionPercentage.value = 100; // Устанавливаем 100% для текущего пользователя
+          } else {
+            distributionPercentage.value = getStandardDistributionValue.value;
+          }
+      }
+    }
   };
   
   // ---- WATCHES И LIFECYCLE ----
   
-  // Обновление процента распределения при изменении книги
+  // Обновление при изменении книги
   watch(selectedBookRef, (newBookId) => {
-    const book = bookStore.getBookById(newBookId);
-    if (book && book.distributionRules && book.distributionRules.length >= 2) {
-      // Устанавливаем процент первого владельца из правил
-      distributionPercentage.value = book.distributionRules[0].percentage;
-    }
+    console.log('[useDistribution] Selected book changed:', newBookId);
+    
+    if (!newBookId) return;
     
     // Сбрасываем ручные настройки при смене книги
     isSliderManuallyVisible.value = false;
     isManuallyHidden.value = false;
-  });
-  
-  // Сбрасываем ручную видимость при изменении типа транзакции
-  watch(selectedTypeRef, (newType) => {
-    isSliderManuallyVisible.value = false;
-    isManuallyHidden.value = false;
     
-    // При изменении типа транзакции обновляем распределение
-    distributionPercentage.value = getStandardDistributionValue.value;
+    // Проверяем распределение в новой книге
+    const bookDistributionData = getBookDistributionData(newBookId);
+    
+    if (bookDistributionData) {
+      // Если в книге есть распределение, устанавливаем второго участника
+      secondUserId.value = bookDistributionData.ownerId;
+      distributionPercentage.value = 100 - bookDistributionData.percentage;
+    } else {
+      // Иначе сбрасываем участников и устанавливаем 100% для текущего пользователя
+      secondUserId.value = null;
+      distributionPercentage.value = 100;
+    }
+  }, { immediate: true });
+  
+  // Отслеживаем изменение типа транзакции
+  watch(selectedTypeRef, (newType) => {
+    // Вызываем настройку распределения для нового типа
+    setupDistributionForTransactionType(newType);
   });
   
   // При изменении категории пытаемся загрузить сохраненное распределение
@@ -324,23 +475,35 @@ export function useDistribution(
   initDistributionSettings();
   
   return {
-    // State
+    // State для распределения
     distributionPercentage,
-    
-    // Computed
-    distributionOwners,
     shouldShowDistribution,
-    shouldAutoShowSlider,
+    distributionOwners,
     isNonStandardDistribution,
     getStandardDistributionValue,
+    hasBookDistribution,
+    
+    // Управление видимостью
     isSliderVisible,
     showDistributionToggle,
-    hasDistributionData,
+    toggleDistributionVisibility,
     
-    // Methods
+    // Управление участниками
+    secondUserId,
+    personSelectionPopupVisible,
+    currentSlotIndex,
+    handlePersonClick,
+    handleAddPerson,
+    handlePersonSelect,
+    removeSecondPerson,
+    setPopupVisibility,
+    
+    // Работа с типами транзакций
+    setupDistributionForTransactionType,
+    
+    // Вспомогательные функции
     saveDistributionSetting,
     loadDistributionSetting,
-    checkCategoryDistributionConflict,
-    toggleDistributionVisibility
+    checkCategoryDistributionConflict
   };
 }

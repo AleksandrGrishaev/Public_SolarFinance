@@ -8,8 +8,8 @@ export interface TransactionTypeInfo {
 
 // Основной набор типов транзакций
 export const PRIMARY_TRANSACTION_TYPES: TransactionTypeInfo[] = [
-  { id: 'income', name: 'Доход' },
   { id: 'expense', name: 'Расход' },
+  { id: 'income', name: 'Доход' },
   { id: 'transfer', name: 'Перевод' }
 ];
 

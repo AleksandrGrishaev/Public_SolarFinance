@@ -37,17 +37,19 @@
         @toggle-distribution="toggleDistributionVisibility"
       />
       
-      <!-- Слайдер распределения -->
-      <PercentageSlider 
-        v-show="isSliderVisible"
-        :owners="distributionOwners" 
-        v-model="distributionPercentage"
-        :total-amount="parseFloat(amount) || 0"
-        :currency="sourceCurrencySymbol"
-        :class="{ 'invisible': !isSliderVisible }"
-        :is-non-standard="isNonStandardDistribution"
-        :standard-value="getStandardDistributionValue"
-      />
+      <!-- Секция распределения с улучшенным слайдером -->
+      <div v-if="isSliderVisible" class="percentage-slider-section">
+        <PercentageSlider 
+          :owners="distributionOwners" 
+          v-model="distributionPercentage"
+          :total-amount="parseFloat(amount) || 0"
+          :currency="sourceCurrencySymbol"
+          :is-non-standard="isNonStandardDistribution"
+          :standard-value="getStandardDistributionValue"
+          @person-click="handlePersonClick"
+          @add-person="handleAddPerson"
+        />
+      </div>
       
       <div class="keypad-container">
         <NumberKeypad 
@@ -59,7 +61,7 @@
       </div>
     </div>
 
-    <!-- Popups and Dialogs -->
+    <!-- Popups для работы с транзакциями -->
     <TransactionDialogs
       v-model:show-category-selector="showCategorySelector"
       v-model:show-category-list="showCategoryList"
@@ -86,6 +88,16 @@
       @select-debtor="onDebtorSelected"
       @cancel-debtor="hideDebtorDialog"
     />
+    
+    <!-- Popup для выбора участника распределения -->
+    <PersonSelectionPopup
+      v-model="personSelectionPopupVisible"
+      :book-id="selectedBook"
+      :current-user-id="currentUserId"
+      :slot-index="currentSlotIndex"
+      @select="handlePersonSelect"
+      @add="handlePersonAdd"
+    />
   </div>
 </template>
 
@@ -98,8 +110,9 @@ import TransactionSelectors from './components/TransactionSelectors.vue';
 import NumberKeypad from './components/NumberKeypad.vue';
 import PercentageSlider from './components/PercentageSlider.vue';
 import TransactionDialogs from './components/TransactionDialogs.vue';
+import PersonSelectionPopup from '@/views/person/components/PersonSelectionPopup.vue';
 
-// Главный composable для всей логики транзакций
+// Импортируем хуки для управления транзакциями
 import { useTransactionManager } from './composables/useTransactionManager';
 
 // Определяем события для emit
@@ -138,7 +151,7 @@ const {
   handleCategoriesReordered,
   handleToggleActiveCategory,
   
-  // Распределение
+  // Распределение - полный набор функций из useDistribution
   distributionPercentage,
   distributionOwners,
   isSliderVisible,
@@ -146,6 +159,12 @@ const {
   isNonStandardDistribution,
   getStandardDistributionValue,
   toggleDistributionVisibility,
+  personSelectionPopupVisible,
+  currentSlotIndex,
+  handlePersonClick,
+  handleAddPerson,
+  handlePersonSelect,
+  setPopupVisibility,
   
   // Валюты
   sourceCurrencySymbol,
@@ -187,6 +206,12 @@ const cancelDialogAction = () => {
     confirmationDialog.value.onCancel();
   }
   confirmationDialog.value.show = false;
+};
+
+// Обработчик добавления новой персоны
+const handlePersonAdd = () => {
+  // Здесь можно добавить обработчик создания нового пользователя
+  console.log('Implement person add functionality');
 };
 
 // Lifecycle hooks
@@ -248,15 +273,9 @@ onMounted(async () => {
   margin-top: 12px;
 }
 
-.invisible {
-  visibility: hidden;
-  opacity: 0;
-  pointer-events: none;
-  height: 0 !important;
-  overflow: hidden;
-  margin: 0 !important;
-  padding: 0 !important;
-  transition: opacity 0.3s, visibility 0.3s;
+.percentage-slider-section {
+  width: 100%;
+  transition: opacity 0.3s ease, max-height 0.3s ease;
 }
 
 .keypad-container {
