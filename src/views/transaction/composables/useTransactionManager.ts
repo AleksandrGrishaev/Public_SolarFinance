@@ -1,5 +1,5 @@
 // src/views/transaction/composables/useTransactionManager.ts
-import { computed, watch } from 'vue';
+import { computed, watch, ref } from 'vue';
 import { useTransactionCore } from './useTransactionCore';
 import { useRegularTransaction } from './useRegularTransaction';
 import { useTransferTransaction } from './useTransferTransaction';
@@ -11,7 +11,7 @@ import { useCurrency } from './useCurrency';
 /**
  * Главный composable, объединяющий логику для всех типов транзакций
  */
-export function useTransactionManager(emit) {
+export function useTransactionManager(emit, amountSectionRef) {
   // Инициализируем базовую логику транзакций
   const core = useTransactionCore(emit);
   
@@ -99,25 +99,36 @@ export function useTransactionManager(emit) {
     }
   });
   
+  // Создаем ref для контроля состояния активной суммы
+  const isSourceAmountActive = ref(true);
+  const manualDestinationAmount = ref('0');
+  
   // Обработчик нажатия на клавиатуре, учитывающий тип транзакции
   const handleKeypadInput = (value) => {
-    // Используем core.handleKeypadInput, который напрямую работает с core.amount
     // Если это перевод или обмен с разными валютами
     if ((core.selectedType.value === 'transfer' || core.selectedType.value === 'exchange') && 
         currency.isTransferWithDifferentCurrencies.value) {
       
       // Если активен ввод конечной суммы
-      if (!transferTransaction.isSourceAmountActive.value) {
-        if (value === '.' && transferTransaction.manualDestinationAmount.value.includes('.')) {
+      if (!isSourceAmountActive.value) {
+        if (value === '.' && manualDestinationAmount.value.includes('.')) {
           return;
         }
         
-        if (transferTransaction.manualDestinationAmount.value === '0' && value !== '.') {
-          transferTransaction.updateManualDestinationAmount(value);
+        if (manualDestinationAmount.value === '0' && value !== '.') {
+          manualDestinationAmount.value = value;
         } else {
-          transferTransaction.updateManualDestinationAmount(
-            transferTransaction.manualDestinationAmount.value + value
-          );
+          manualDestinationAmount.value = manualDestinationAmount.value + value;
+        }
+        
+        // Обновляем также в компоненте, если нужно
+        updateAmountSectionComponent();
+        
+        // Обновляем значение в соответствующем обработчике транзакции
+        if (core.selectedType.value === 'transfer') {
+          transferTransaction.updateManualDestinationAmount(manualDestinationAmount.value);
+        } else if (core.selectedType.value === 'exchange') {
+          exchangeTransaction.updateManualDestinationAmount(manualDestinationAmount.value);
         }
       } else {
         // Стандартный ввод для исходной суммы
@@ -131,19 +142,26 @@ export function useTransactionManager(emit) {
   
   // Обработчик удаления символа, учитывающий тип транзакции
   const deleteLastDigit = () => {
-    // Используем core.deleteLastDigit, который напрямую работает с core.amount
     // Если это перевод или обмен с разными валютами
     if ((core.selectedType.value === 'transfer' || core.selectedType.value === 'exchange') && 
         currency.isTransferWithDifferentCurrencies.value && 
-        !transferTransaction.isSourceAmountActive.value) {
+        !isSourceAmountActive.value) {
       
       // Удаляем из суммы назначения
-      if (transferTransaction.manualDestinationAmount.value.length > 1) {
-        transferTransaction.updateManualDestinationAmount(
-          transferTransaction.manualDestinationAmount.value.slice(0, -1)
-        );
+      if (manualDestinationAmount.value.length > 1) {
+        manualDestinationAmount.value = manualDestinationAmount.value.slice(0, -1);
       } else {
-        transferTransaction.updateManualDestinationAmount('0');
+        manualDestinationAmount.value = '0';
+      }
+      
+      // Обновляем также в компоненте, если нужно
+      updateAmountSectionComponent();
+      
+      // Обновляем значение в соответствующем обработчике транзакции
+      if (core.selectedType.value === 'transfer') {
+        transferTransaction.updateManualDestinationAmount(manualDestinationAmount.value);
+      } else if (core.selectedType.value === 'exchange') {
+        exchangeTransaction.updateManualDestinationAmount(manualDestinationAmount.value);
       }
     } else {
       // Стандартное удаление для всех остальных случаев
@@ -151,17 +169,44 @@ export function useTransactionManager(emit) {
     }
   };
   
+  // Функция для обновления компонента AmountSection
+  const updateAmountSectionComponent = () => {
+    if (amountSectionRef.value) {
+      amountSectionRef.value.updateManualAmount(manualDestinationAmount.value);
+    }
+  };
+  
   // Общий обработчик добавления транзакции
   const handleAddTransaction = async () => {
+    let result;
+    
     switch (core.selectedType.value) {
       case 'transfer':
-        return await transferTransaction.handleAddTransferTransaction();
+        result = await transferTransaction.handleAddTransferTransaction();
+        if (result) {
+          // Сбрасываем также конвертируемую сумму
+          manualDestinationAmount.value = '0';
+          isSourceAmountActive.value = true;
+          updateAmountSectionComponent();
+        }
+        return result;
+        
       case 'debt':
-        return await debtTransaction.handleAddDebtTransaction();
+        result = await debtTransaction.handleAddDebtTransaction();
+        return result;
+        
       case 'exchange':
-        return await exchangeTransaction.handleAddExchangeTransaction();
+        result = await exchangeTransaction.handleAddExchangeTransaction();
+        if (result) {
+          // Сбрасываем также конвертируемую сумму
+          manualDestinationAmount.value = '0';
+          isSourceAmountActive.value = true;
+          updateAmountSectionComponent();
+        }
+        return result;
+        
       default: // income или expense
-        const result = await regularTransaction.handleAddRegularTransaction();
+        result = await regularTransaction.handleAddRegularTransaction();
         if (result && result.action === 'openCategorySelector') {
           core.showCategorySelector.value = true;
         }
@@ -186,6 +231,8 @@ export function useTransactionManager(emit) {
   
   // Обработчики для AmountSection при конвертации валют
   const handleSourceAmountActive = () => {
+    isSourceAmountActive.value = true;
+    
     if (core.selectedType.value === 'transfer') {
       transferTransaction.handleSourceAmountActive();
     } else if (core.selectedType.value === 'exchange') {
@@ -194,14 +241,19 @@ export function useTransactionManager(emit) {
   };
   
   const handleDestinationAmountActive = (value) => {
+    isSourceAmountActive.value = false;
+    manualDestinationAmount.value = value || currency.convertedAmount.value;
+    
     if (core.selectedType.value === 'transfer') {
-      transferTransaction.handleDestinationAmountActive(value);
+      transferTransaction.handleDestinationAmountActive(value || manualDestinationAmount.value);
     } else if (core.selectedType.value === 'exchange') {
-      exchangeTransaction.handleDestinationAmountActive(value);
+      exchangeTransaction.handleDestinationAmountActive(value || manualDestinationAmount.value);
     }
   };
   
   const handleUpdateDestinationAmount = (value) => {
+    manualDestinationAmount.value = value;
+    
     if (core.selectedType.value === 'transfer') {
       transferTransaction.updateManualDestinationAmount(value);
     } else if (core.selectedType.value === 'exchange') {
@@ -212,6 +264,9 @@ export function useTransactionManager(emit) {
   // Сброс при смене типа транзакции
   watch(core.selectedType, (newType) => {
     // Сбросим состояние ввода суммы при смене типа
+    isSourceAmountActive.value = true;
+    manualDestinationAmount.value = '0';
+    
     if (newType === 'transfer') {
       transferTransaction.resetTransferState();
     } else if (newType === 'exchange') {
@@ -239,11 +294,61 @@ export function useTransactionManager(emit) {
     [core.selectedAccount, core.destinationAccount, currency.convertedAmount], 
     () => {
       if (currency.isTransferWithDifferentCurrencies.value) {
-        if (core.selectedType.value === 'transfer') {
-          transferTransaction.updateManualDestinationAmount(currency.convertedAmount.value);
-        } else if (core.selectedType.value === 'exchange') {
-          exchangeTransaction.updateManualDestinationAmount(currency.convertedAmount.value);
+        // Обновляем значение в зависимости от типа транзакции
+        if (isSourceAmountActive.value) {
+          manualDestinationAmount.value = currency.convertedAmount.value;
+          
+          // Обновляем в компоненте AmountSection
+          updateAmountSectionComponent();
         }
+        
+        // Обновляем также в обработчиках транзакций
+        if (core.selectedType.value === 'transfer') {
+          transferTransaction.updateManualDestinationAmount(manualDestinationAmount.value);
+        } else if (core.selectedType.value === 'exchange') {
+          exchangeTransaction.updateManualDestinationAmount(manualDestinationAmount.value);
+        }
+      }
+    }
+  );
+  
+  // Следим за изменениями в isSourceAmountActive и manualDestinationAmount 
+  // в transferTransaction и обновляем наши локальные переменные
+  watch(
+    () => transferTransaction.isSourceAmountActive.value,
+    (newValue) => {
+      if (isSourceAmountActive.value !== newValue) {
+        isSourceAmountActive.value = newValue;
+      }
+    }
+  );
+  
+  watch(
+    () => transferTransaction.manualDestinationAmount.value,
+    (newValue) => {
+      if (manualDestinationAmount.value !== newValue) {
+        manualDestinationAmount.value = newValue;
+        updateAmountSectionComponent();
+      }
+    }
+  );
+  
+  // Аналогично для exchangeTransaction, если нужно
+  watch(
+    () => exchangeTransaction.isSourceAmountActive?.value,
+    (newValue) => {
+      if (newValue !== undefined && isSourceAmountActive.value !== newValue) {
+        isSourceAmountActive.value = newValue;
+      }
+    }
+  );
+  
+  watch(
+    () => exchangeTransaction.manualDestinationAmount?.value,
+    (newValue) => {
+      if (newValue !== undefined && manualDestinationAmount.value !== newValue) {
+        manualDestinationAmount.value = newValue;
+        updateAmountSectionComponent();
       }
     }
   );
@@ -277,9 +382,9 @@ export function useTransactionManager(emit) {
     convertedAmount: currency.convertedAmount,
     initCurrencyStore: currency.initCurrencyStore,
     
-    // TransferTransaction
-    isSourceAmountActive: transferTransaction.isSourceAmountActive,
-    manualDestinationAmount: transferTransaction.manualDestinationAmount,
+    // Активная сумма и мануальное значение
+    isSourceAmountActive,
+    manualDestinationAmount,
     
     // DebtTransaction
     debtorDialog: debtTransaction.debtorDialog,

@@ -46,6 +46,7 @@ export function useTransferTransaction(
    * Переключение на ввод суммы назначения
    */
   const handleDestinationAmountActive = (value) => {
+    console.log('Switching to destination amount mode');
     isSourceAmountActive.value = false;
     manualDestinationAmount.value = value || convertedAmount.value;
   };

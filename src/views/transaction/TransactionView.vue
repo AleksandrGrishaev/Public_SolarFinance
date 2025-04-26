@@ -6,18 +6,20 @@
     <div class="body-container" v-else>
       <!-- Секция отображения суммы с поддержкой конвертации валют -->
       <AmountSection
-        ref="amountSectionRef"
-        :amount="amount"
-        :source-currency-symbol="sourceCurrencySymbol"
-        :destination-currency-symbol="destinationCurrencySymbol"
-        :converted-amount="convertedAmount"
-        :is-transfer-with-different-currencies="isTransferWithDifferentCurrencies"
-        :use-smaller-destination-font="true"
-        @source-active="handleSourceAmountActive"
-        @destination-active="handleDestinationAmountActive"
-        @update-destination-amount="handleUpdateDestinationAmount"
-        class="amount-display"
-      />
+  ref="amountSectionRef"
+  :amount="amount"
+  :source-currency-symbol="sourceCurrencySymbol"
+  :destination-currency-symbol="destinationCurrencySymbol"
+  :converted-amount="convertedAmount"
+  :is-transfer-with-different-currencies="isTransferWithDifferentCurrencies"
+  :use-smaller-destination-font="true"
+  :is-source-active="isSourceAmountActive"
+  :manual-destination-amount="manualDestinationAmount"  
+  @source-active="handleSourceAmountActive"
+  @destination-active="handleDestinationAmountActive"
+  @update-destination-amount="handleUpdateDestinationAmount"
+  class="amount-display"
+/>
       
       <!-- Селектор книги, отображается, если это не перевод -->
       <BookSelector 
@@ -103,7 +105,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, onBeforeMount } from 'vue';
+import { onMounted, ref, onBeforeMount, watch } from 'vue';
 import LoadingOverlay from './components/LoadingOverlay.vue';
 import AmountSection from './components/AmountSection.vue';
 import BookSelector from './components/BookSelector.vue';
@@ -191,10 +193,12 @@ const {
   handleAddTransaction,
   
   // Обработчики для валютных транзакций
+  isSourceAmountActive,
+  manualDestinationAmount,
   handleSourceAmountActive,
   handleDestinationAmountActive,
   handleUpdateDestinationAmount
-} = useTransactionManager(emit);
+} = useTransactionManager(emit, amountSectionRef);
 
 // Обработчики действий диалогов
 const confirmDialogAction = () => {
@@ -216,6 +220,24 @@ const handlePersonAdd = () => {
   // Здесь можно добавить обработчик создания нового пользователя
   console.log('Implement person add functionality');
 };
+
+// Синхронизация состояния компонента AmountSection при изменениях
+watch([isSourceAmountActive, manualDestinationAmount], ([newIsSourceActive, newManualAmount]) => {
+  if (amountSectionRef.value) {
+    // Обеспечиваем синхронизацию с компонентом AmountSection
+    if (amountSectionRef.value.isSourceAmountActive !== newIsSourceActive) {
+      if (newIsSourceActive) {
+        amountSectionRef.value.switchToSourceAmount();
+      } else {
+        amountSectionRef.value.switchToDestinationAmount();
+      }
+    }
+    
+    if (amountSectionRef.value.manualDestinationAmount !== newManualAmount) {
+      amountSectionRef.value.updateManualAmount(newManualAmount);
+    }
+  }
+});
 
 // Lifecycle hooks
 onBeforeMount(() => {
