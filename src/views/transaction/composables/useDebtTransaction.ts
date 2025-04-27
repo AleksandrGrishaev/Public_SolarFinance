@@ -4,7 +4,7 @@ import { useAccountStore } from '@/stores/account';
 import { useBookStore } from '@/stores/book';
 import { useCurrencyStore } from '@/stores/currency';
 import { useTransactionStore } from '@/stores/transaction';
-import { useDebtStore } from '@/stores/debt';
+import { useDebtStore } from '@/stores/debt/debtStore';
 import { useUserStore } from '@/stores/user';
 import { messageService } from '@/services/system/MessageService';
 

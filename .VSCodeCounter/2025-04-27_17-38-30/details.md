@@ -1,10 +1,10 @@
 # Details
 
-Date : 2025-04-27 07:46:17
+Date : 2025-04-27 17:38:30
 
 Directory /Users/peaker/dev/solar-finance/src
 
-Total : 234 files,  34301 codes, 2803 comments, 5367 blanks, all 42471 lines
+Total : 260 files,  36617 codes, 2932 comments, 5734 blanks, all 45283 lines
 
 [Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
@@ -24,11 +24,21 @@ Total : 234 files,  34301 codes, 2803 comments, 5367 blanks, all 42471 lines
 | [src/components/atoms/alerts/BaseAlert.vue](/src/components/atoms/alerts/BaseAlert.vue) | Vue | 223 | 1 | 26 | 250 |
 | [src/components/atoms/buttons/AddIconButton.vue](/src/components/atoms/buttons/AddIconButton.vue) | Vue | 69 | 1 | 8 | 78 |
 | [src/components/atoms/buttons/BaseButton.vue](/src/components/atoms/buttons/BaseButton.vue) | Vue | 68 | 1 | 8 | 77 |
+| [src/components/atoms/buttons/CreateActionButton.vue](/src/components/atoms/buttons/CreateActionButton.vue) | Vue | 55 | 1 | 6 | 62 |
 | [src/components/atoms/buttons/index.js](/src/components/atoms/buttons/index.js) | JavaScript | 1 | 1 | 0 | 2 |
+| [src/components/atoms/buttons/readme.md](/src/components/atoms/buttons/readme.md) | Markdown | 3 | 0 | 0 | 3 |
 | [src/components/atoms/icons/BaseIcon.vue](/src/components/atoms/icons/BaseIcon.vue) | Vue | 49 | 0 | 4 | 53 |
 | [src/components/atoms/icons/BaseIconComponent.vue](/src/components/atoms/icons/BaseIconComponent.vue) | Vue | 128 | 3 | 9 | 140 |
 | [src/components/atoms/icons/index.js](/src/components/atoms/icons/index.js) | JavaScript | 1 | 1 | 0 | 2 |
-| [src/components/atoms/index.js](/src/components/atoms/index.js) | JavaScript | 3 | 1 | 0 | 4 |
+| [src/components/atoms/icons/readme.md](/src/components/atoms/icons/readme.md) | Markdown | 2 | 0 | 0 | 2 |
+| [src/components/atoms/index.js](/src/components/atoms/index.js) | JavaScript | 5 | 1 | 0 | 6 |
+| [src/components/atoms/items/BaseItem.vue](/src/components/atoms/items/BaseItem.vue) | Vue | 128 | 4 | 20 | 152 |
+| [src/components/atoms/items/index.js](/src/components/atoms/items/index.js) | JavaScript | 1 | 1 | 0 | 2 |
+| [src/components/atoms/items/readme.md](/src/components/atoms/items/readme.md) | Markdown | 1 | 0 | 0 | 1 |
+| [src/components/atoms/selectors/BaseSelector.vue](/src/components/atoms/selectors/BaseSelector.vue) | Vue | 57 | 1 | 7 | 65 |
+| [src/components/atoms/selectors/BaseSelectorAddButton.vue](/src/components/atoms/selectors/BaseSelectorAddButton.vue) | Vue | 277 | 5 | 33 | 315 |
+| [src/components/atoms/selectors/index.js](/src/components/atoms/selectors/index.js) | JavaScript | 1 | 1 | 0 | 2 |
+| [src/components/atoms/selectors/readme.md](/src/components/atoms/selectors/readme.md) | Markdown | 2 | 0 | 0 | 2 |
 | [src/components/atoms/typography/BaseDescription.vue](/src/components/atoms/typography/BaseDescription.vue) | Vue | 29 | 0 | 3 | 32 |
 | [src/components/atoms/typography/BaseTitle.vue](/src/components/atoms/typography/BaseTitle.vue) | Vue | 28 | 0 | 5 | 33 |
 | [src/components/atoms/typography/index.js](/src/components/atoms/typography/index.js) | JavaScript | 2 | 1 | 0 | 3 |
@@ -48,10 +58,16 @@ Total : 234 files,  34301 codes, 2803 comments, 5367 blanks, all 42471 lines
 | [src/components/index.js](/src/components/index.js) | JavaScript | 3 | 1 | 0 | 4 |
 | [src/components/molecules/actions/ExpressAction.vue](/src/components/molecules/actions/ExpressAction.vue) | Vue | 152 | 1 | 13 | 166 |
 | [src/components/molecules/actions/index.js](/src/components/molecules/actions/index.js) | JavaScript | 1 | 1 | 0 | 2 |
-| [src/components/molecules/index.js](/src/components/molecules/index.js) | JavaScript | 2 | 1 | 0 | 3 |
+| [src/components/molecules/actions/readme.md](/src/components/molecules/actions/readme.md) | Markdown | 1 | 0 | 0 | 1 |
+| [src/components/molecules/groups/BaseGroup.vue](/src/components/molecules/groups/BaseGroup.vue) | Vue | 81 | 3 | 12 | 96 |
+| [src/components/molecules/groups/index.js](/src/components/molecules/groups/index.js) | JavaScript | 1 | 1 | 0 | 2 |
+| [src/components/molecules/groups/readme.md](/src/components/molecules/groups/readme.md) | Markdown | 1 | 0 | 0 | 1 |
+| [src/components/molecules/index.js](/src/components/molecules/index.js) | JavaScript | 3 | 1 | 0 | 4 |
 | [src/components/molecules/information/InfoBlock.vue](/src/components/molecules/information/InfoBlock.vue) | Vue | 82 | 0 | 7 | 89 |
 | [src/components/molecules/information/index.js](/src/components/molecules/information/index.js) | JavaScript | 1 | 1 | 0 | 2 |
+| [src/components/molecules/information/readme.md](/src/components/molecules/information/readme.md) | Markdown | 1 | 0 | 0 | 1 |
 | [src/components/molecules/lists/BaseList.vue](/src/components/molecules/lists/BaseList.vue) | Vue | 84 | 1 | 12 | 97 |
+| [src/components/molecules/lists/readme.md](/src/components/molecules/lists/readme.md) | Markdown | 1 | 0 | 0 | 1 |
 | [src/components/navigation/AppTopHeader.vue](/src/components/navigation/AppTopHeader.vue) | Vue | 280 | 2 | 23 | 305 |
 | [src/components/navigation/NavMenu.vue](/src/components/navigation/NavMenu.vue) | Vue | 207 | 4 | 24 | 235 |
 | [src/components/navigation/SubNavigation.vue](/src/components/navigation/SubNavigation.vue) | Vue | 91 | 1 | 14 | 106 |
@@ -60,11 +76,12 @@ Total : 234 files,  34301 codes, 2803 comments, 5367 blanks, all 42471 lines
 | [src/components/organisms/notifications/Notification.vue](/src/components/organisms/notifications/Notification.vue) | Vue | 87 | 0 | 5 | 92 |
 | [src/components/organisms/notifications/index.js](/src/components/organisms/notifications/index.js) | JavaScript | 1 | 0 | 0 | 1 |
 | [src/components/organisms/popups/BaseFloatingPopup.vue](/src/components/organisms/popups/BaseFloatingPopup.vue) | Vue | 185 | 1 | 23 | 209 |
+| [src/components/organisms/popups/readme.md](/src/components/organisms/popups/readme.md) | Markdown | 1 | 0 | 0 | 1 |
 | [src/components/providers/AlertProvider.vue](/src/components/providers/AlertProvider.vue) | Vue | 6 | 1 | 1 | 8 |
 | [src/components/system/MessageProvider.vue](/src/components/system/MessageProvider.vue) | Vue | 11 | 0 | 3 | 14 |
 | [src/components/ui/BasePopup.vue](/src/components/ui/BasePopup.vue) | Vue | 206 | 7 | 25 | 238 |
 | [src/components/ui/CreateCategoryButton.vue](/src/components/ui/CreateCategoryButton.vue) | Vue | 54 | 1 | 7 | 62 |
-| [src/components/ui/buttons/CreateActionButton.vue](/src/components/ui/buttons/CreateActionButton.vue) | Vue | 53 | 1 | 6 | 60 |
+| [src/components/ui/buttons/CreateActionButton.vue](/src/components/ui/buttons/CreateActionButton.vue) | Vue | 55 | 1 | 6 | 62 |
 | [src/components/ui/filters/DateFilter.vue](/src/components/ui/filters/DateFilter.vue) | Vue | 503 | 14 | 73 | 590 |
 | [src/components/ui/icons/BaseAddIcon.vue](/src/components/ui/icons/BaseAddIcon.vue) | Vue | 90 | 1 | 13 | 104 |
 | [src/components/ui/icons/BaseDropdownArrow.vue](/src/components/ui/icons/BaseDropdownArrow.vue) | Vue | 37 | 1 | 1 | 39 |
@@ -98,7 +115,7 @@ Total : 234 files,  34301 codes, 2803 comments, 5367 blanks, all 42471 lines
 | [src/constants/transactionTypes.ts](/src/constants/transactionTypes.ts) | TypeScript | 26 | 6 | 6 | 38 |
 | [src/layouts/ConsoleLayout.vue](/src/layouts/ConsoleLayout.vue) | Vue | 70 | 3 | 9 | 82 |
 | [src/layouts/EmptyLayout.vue](/src/layouts/EmptyLayout.vue) | Vue | 15 | 0 | 2 | 17 |
-| [src/layouts/IosLayout.vue](/src/layouts/IosLayout.vue) | Vue | 158 | 1 | 23 | 182 |
+| [src/layouts/IosLayout.vue](/src/layouts/IosLayout.vue) | Vue | 160 | 1 | 23 | 184 |
 | [src/main.ts](/src/main.ts) | TypeScript | 30 | 9 | 9 | 48 |
 | [src/router/index.ts](/src/router/index.ts) | TypeScript | 192 | 17 | 10 | 219 |
 | [src/services/BaseCrudService.ts](/src/services/BaseCrudService.ts) | TypeScript | 54 | 22 | 11 | 87 |
@@ -199,12 +216,21 @@ Total : 234 files,  34301 codes, 2803 comments, 5367 blanks, all 42471 lines
 | [src/views/book/popup/EditBookPopup.vue](/src/views/book/popup/EditBookPopup.vue) | Vue | 35 | 1 | 5 | 41 |
 | [src/views/book/popup/NewBookPopup.vue](/src/views/book/popup/NewBookPopup.vue) | Vue | 30 | 1 | 5 | 36 |
 | [src/views/currency/popup/CurrencyPopup.vue](/src/views/currency/popup/CurrencyPopup.vue) | Vue | 162 | 3 | 25 | 190 |
-| [src/views/debt/DebtDetailsView.vue](/src/views/debt/DebtDetailsView.vue) | Vue | 351 | 6 | 56 | 413 |
-| [src/views/debt/DebtView.vue](/src/views/debt/DebtView.vue) | Vue | 212 | 7 | 27 | 246 |
-| [src/views/debt/components/DebtGroup.vue](/src/views/debt/components/DebtGroup.vue) | Vue | 83 | 2 | 13 | 98 |
-| [src/views/debt/components/DebtItem.vue](/src/views/debt/components/DebtItem.vue) | Vue | 102 | 3 | 20 | 125 |
+| [src/views/debt/DebtDetailsView.vue](/src/views/debt/DebtDetailsView.vue) | Vue | 247 | 6 | 41 | 294 |
+| [src/views/debt/DebtView.vue](/src/views/debt/DebtView.vue) | Vue | 293 | 8 | 41 | 342 |
+| [src/views/debt/components/DebtAcceptGroup.vue](/src/views/debt/components/DebtAcceptGroup.vue) | Vue | 102 | 0 | 18 | 120 |
+| [src/views/debt/components/DebtHeader.vue](/src/views/debt/components/DebtHeader.vue) | Vue | 176 | 3 | 31 | 210 |
+| [src/views/debt/components/DebtIcons.vue](/src/views/debt/components/DebtIcons.vue) | Vue | 143 | 0 | 24 | 167 |
+| [src/views/debt/components/DebtInfo.vue](/src/views/debt/components/DebtInfo.vue) | Vue | 298 | 8 | 52 | 358 |
+| [src/views/debt/components/DebtTypeSelector.vue](/src/views/debt/components/DebtTypeSelector.vue) | Vue | 41 | 0 | 6 | 47 |
+| [src/views/debt/components/FastDebtAction.vue](/src/views/debt/components/FastDebtAction.vue) | Vue | 106 | 0 | 19 | 125 |
+| [src/views/debt/components/SwipeableDebtOperation.vue](/src/views/debt/components/SwipeableDebtOperation.vue) | Vue | 235 | 1 | 44 | 280 |
+| [src/views/debt/components/TransactionItem.vue](/src/views/debt/components/TransactionItem.vue) | Vue | 207 | 0 | 32 | 239 |
+| [src/views/debt/components/TransactionList.vue](/src/views/debt/components/TransactionList.vue) | Vue | 143 | 2 | 25 | 170 |
 | [src/views/debt/components/index.ts](/src/views/debt/components/index.ts) | TypeScript | 2 | 1 | 0 | 3 |
-| [src/views/debt/composables/useDebts.ts](/src/views/debt/composables/useDebts.ts) | TypeScript | 81 | 37 | 15 | 133 |
+| [src/views/debt/composables/useDebtOperations.ts](/src/views/debt/composables/useDebtOperations.ts) | TypeScript | 134 | 31 | 21 | 186 |
+| [src/views/debt/composables/useDebtTransactions.ts](/src/views/debt/composables/useDebtTransactions.ts) | TypeScript | 196 | 40 | 21 | 257 |
+| [src/views/debt/composables/useDebts.ts](/src/views/debt/composables/useDebts.ts) | TypeScript | 203 | 68 | 45 | 316 |
 | [src/views/debug/DebugStoreView.vue](/src/views/debug/DebugStoreView.vue) | Vue | 193 | 4 | 23 | 220 |
 | [src/views/debug/components/BaseStoresDebugPanel.vue](/src/views/debug/components/BaseStoresDebugPanel.vue) | Vue | 208 | 7 | 20 | 235 |
 | [src/views/debug/components/FinanceStoresDebugPanel.vue](/src/views/debug/components/FinanceStoresDebugPanel.vue) | Vue | 279 | 9 | 21 | 309 |

@@ -1,0 +1,87 @@
+Date : 2025-04-27 17:38:30
+Directory : /Users/peaker/dev/solar-finance/src
+Total : 37 files,  2316 codes, 129 comments, 367 blanks, all 2812 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| Vue        |         20 |      1,845 |         24 |        295 |      2,164 |
+| TypeScript |          3 |        452 |        102 |         72 |        626 |
+| Markdown   |          9 |         13 |          0 |          0 |         13 |
+| JavaScript |          5 |          6 |          3 |          0 |          9 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                     | files      | code       | comment    | blank      | total      |
++------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                        |         37 |      2,316 |        129 |        367 |      2,812 |
+| components                                                                               |         20 |        619 |         17 |         78 |        714 |
+| components/atoms                                                                         |         11 |        529 |         13 |         66 |        608 |
+| components/atoms (Files)                                                                 |          1 |          2 |          0 |          0 |          2 |
+| components/atoms/buttons                                                                 |          2 |         58 |          1 |          6 |         65 |
+| components/atoms/icons                                                                   |          1 |          2 |          0 |          0 |          2 |
+| components/atoms/items                                                                   |          3 |        130 |          5 |         20 |        155 |
+| components/atoms/selectors                                                               |          4 |        337 |          7 |         40 |        384 |
+| components/molecules                                                                     |          7 |         87 |          4 |         12 |        103 |
+| components/molecules (Files)                                                             |          1 |          1 |          0 |          0 |          1 |
+| components/molecules/actions                                                             |          1 |          1 |          0 |          0 |          1 |
+| components/molecules/groups                                                              |          3 |         83 |          4 |         12 |         99 |
+| components/molecules/information                                                         |          1 |          1 |          0 |          0 |          1 |
+| components/molecules/lists                                                               |          1 |          1 |          0 |          0 |          1 |
+| components/organisms                                                                     |          1 |          1 |          0 |          0 |          1 |
+| components/organisms/popups                                                              |          1 |          1 |          0 |          0 |          1 |
+| components/ui                                                                            |          1 |          2 |          0 |          0 |          2 |
+| components/ui/buttons                                                                    |          1 |          2 |          0 |          0 |          2 |
+| layouts                                                                                  |          1 |          2 |          0 |          0 |          2 |
+| views                                                                                    |         16 |      1,695 |        112 |        289 |      2,096 |
+| views/debt                                                                               |         16 |      1,695 |        112 |        289 |      2,096 |
+| views/debt (Files)                                                                       |          2 |        -23 |          1 |         -1 |        -23 |
+| views/debt/components                                                                    |         11 |      1,266 |          9 |        218 |      1,493 |
+| views/debt/composables                                                                   |          3 |        452 |        102 |         72 |        626 |
++------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                                 | language   | code       | comment    | blank      | total      |
++------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| /Users/peaker/dev/solar-finance/src/components/atoms/buttons/CreateActionButton.vue      | Vue        |         55 |          1 |          6 |         62 |
+| /Users/peaker/dev/solar-finance/src/components/atoms/buttons/readme.md                   | Markdown   |          3 |          0 |          0 |          3 |
+| /Users/peaker/dev/solar-finance/src/components/atoms/icons/readme.md                     | Markdown   |          2 |          0 |          0 |          2 |
+| /Users/peaker/dev/solar-finance/src/components/atoms/index.js                            | JavaScript |          2 |          0 |          0 |          2 |
+| /Users/peaker/dev/solar-finance/src/components/atoms/items/BaseItem.vue                  | Vue        |        128 |          4 |         20 |        152 |
+| /Users/peaker/dev/solar-finance/src/components/atoms/items/index.js                      | JavaScript |          1 |          1 |          0 |          2 |
+| /Users/peaker/dev/solar-finance/src/components/atoms/items/readme.md                     | Markdown   |          1 |          0 |          0 |          1 |
+| /Users/peaker/dev/solar-finance/src/components/atoms/selectors/BaseSelector.vue          | Vue        |         57 |          1 |          7 |         65 |
+| /Users/peaker/dev/solar-finance/src/components/atoms/selectors/BaseSelectorAddButton.vue | Vue        |        277 |          5 |         33 |        315 |
+| /Users/peaker/dev/solar-finance/src/components/atoms/selectors/index.js                  | JavaScript |          1 |          1 |          0 |          2 |
+| /Users/peaker/dev/solar-finance/src/components/atoms/selectors/readme.md                 | Markdown   |          2 |          0 |          0 |          2 |
+| /Users/peaker/dev/solar-finance/src/components/molecules/actions/readme.md               | Markdown   |          1 |          0 |          0 |          1 |
+| /Users/peaker/dev/solar-finance/src/components/molecules/groups/BaseGroup.vue            | Vue        |         81 |          3 |         12 |         96 |
+| /Users/peaker/dev/solar-finance/src/components/molecules/groups/index.js                 | JavaScript |          1 |          1 |          0 |          2 |
+| /Users/peaker/dev/solar-finance/src/components/molecules/groups/readme.md                | Markdown   |          1 |          0 |          0 |          1 |
+| /Users/peaker/dev/solar-finance/src/components/molecules/index.js                        | JavaScript |          1 |          0 |          0 |          1 |
+| /Users/peaker/dev/solar-finance/src/components/molecules/information/readme.md           | Markdown   |          1 |          0 |          0 |          1 |
+| /Users/peaker/dev/solar-finance/src/components/molecules/lists/readme.md                 | Markdown   |          1 |          0 |          0 |          1 |
+| /Users/peaker/dev/solar-finance/src/components/organisms/popups/readme.md                | Markdown   |          1 |          0 |          0 |          1 |
+| /Users/peaker/dev/solar-finance/src/components/ui/buttons/CreateActionButton.vue         | Vue        |          2 |          0 |          0 |          2 |
+| /Users/peaker/dev/solar-finance/src/layouts/IosLayout.vue                                | Vue        |          2 |          0 |          0 |          2 |
+| /Users/peaker/dev/solar-finance/src/views/debt/DebtDetailsView.vue                       | Vue        |       -104 |          0 |        -15 |       -119 |
+| /Users/peaker/dev/solar-finance/src/views/debt/DebtView.vue                              | Vue        |         81 |          1 |         14 |         96 |
+| /Users/peaker/dev/solar-finance/src/views/debt/components/DebtAcceptGroup.vue            | Vue        |        102 |          0 |         18 |        120 |
+| /Users/peaker/dev/solar-finance/src/views/debt/components/DebtGroup.vue                  | Vue        |        -83 |         -2 |        -13 |        -98 |
+| /Users/peaker/dev/solar-finance/src/views/debt/components/DebtHeader.vue                 | Vue        |        176 |          3 |         31 |        210 |
+| /Users/peaker/dev/solar-finance/src/views/debt/components/DebtIcons.vue                  | Vue        |        143 |          0 |         24 |        167 |
+| /Users/peaker/dev/solar-finance/src/views/debt/components/DebtInfo.vue                   | Vue        |        298 |          8 |         52 |        358 |
+| /Users/peaker/dev/solar-finance/src/views/debt/components/DebtItem.vue                   | Vue        |       -102 |         -3 |        -20 |       -125 |
+| /Users/peaker/dev/solar-finance/src/views/debt/components/DebtTypeSelector.vue           | Vue        |         41 |          0 |          6 |         47 |
+| /Users/peaker/dev/solar-finance/src/views/debt/components/FastDebtAction.vue             | Vue        |        106 |          0 |         19 |        125 |
+| /Users/peaker/dev/solar-finance/src/views/debt/components/SwipeableDebtOperation.vue     | Vue        |        235 |          1 |         44 |        280 |
+| /Users/peaker/dev/solar-finance/src/views/debt/components/TransactionItem.vue            | Vue        |        207 |          0 |         32 |        239 |
+| /Users/peaker/dev/solar-finance/src/views/debt/components/TransactionList.vue            | Vue        |        143 |          2 |         25 |        170 |
+| /Users/peaker/dev/solar-finance/src/views/debt/composables/useDebtOperations.ts          | TypeScript |        134 |         31 |         21 |        186 |
+| /Users/peaker/dev/solar-finance/src/views/debt/composables/useDebtTransactions.ts        | TypeScript |        196 |         40 |         21 |        257 |
+| /Users/peaker/dev/solar-finance/src/views/debt/composables/useDebts.ts                   | TypeScript |        122 |         31 |         30 |        183 |
+| Total                                                                                    |            |      2,316 |        129 |        367 |      2,812 |
++------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
