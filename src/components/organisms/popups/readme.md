@@ -1,0 +1,1 @@
+ssrc/components/organisms/popups/BaseFloatingPopup.vue - размытый экран, с верхним меню. 

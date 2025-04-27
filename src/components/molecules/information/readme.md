@@ -1,0 +1,1 @@
+InfoBlock - Используется в notificcation для вывода Alert
