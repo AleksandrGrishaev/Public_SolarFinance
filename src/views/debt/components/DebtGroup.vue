@@ -32,6 +32,7 @@
 import { computed } from 'vue';
 import DebtItem from './DebtItem.vue';
 import { type Debt } from '@/stores/debt/debtStore';
+import { useFormatBalance } from '@/composables/transaction/useFormatBalance';
 
 const props = defineProps({
   title: {
@@ -62,24 +63,29 @@ const props = defineProps({
 
 defineEmits(['itemClick']);
 
+// Используем форматирование из useFormatBalance
+const { formatBalance, getCurrencySymbol } = useFormatBalance();
+
 // Получаем символ валюты пользователя
 const currencySymbolValue = computed(() => {
   if (typeof props.currencySymbol === 'function') {
     return props.currencySymbol();
   }
-  return props.currencySymbol;
+  return props.currencySymbol as string;
 });
 
 // Отформатированная общая сумма в валюте пользователя
 const formattedTotal = computed(() => {
-  const prefix = props.totalAmount < 0 ? '-' : '';
-  const absAmount = Math.abs(props.totalAmount);
+  // Получаем валюту первого долга, или используем default USD
+  const firstDebtCurrency = props.debts[0]?.currency || 'USD';
   
-  if (absAmount >= 1000) {
-    return `${prefix}${currencySymbolValue.value} ${(absAmount / 1000).toFixed(0)}k`;
-  } else {
-    return `${prefix}${currencySymbolValue.value} ${absAmount.toFixed(2)}`;
-  }
+  // Форматируем с помощью useFormatBalance
+  return formatBalance(props.totalAmount, 2, firstDebtCurrency, {
+    symbol: currencySymbolValue.value,
+    useAbbreviations: true,
+    minValueToAbbreviate: 10000, // Начинаем сокращать с 10к
+    showDecimalsOnWhole: false
+  });
 });
 </script>
 

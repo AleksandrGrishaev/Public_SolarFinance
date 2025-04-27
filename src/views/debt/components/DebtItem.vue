@@ -25,6 +25,7 @@
   <script setup lang="ts">
   import { computed } from 'vue';
   import { type Debt } from '@/stores/debt/debtStore';
+  import { useFormatBalance } from '@/composables/transaction/useFormatBalance';
   
   const props = defineProps<{
     debt: Debt;
@@ -36,6 +37,9 @@
     (e: 'click', id: string): void;
   }>();
   
+  // Используем современный метод форматирования сумм
+  const { formatBalance } = useFormatBalance();
+  
   // Обработчик клика для надежной передачи ID
   const handleClick = () => {
     // Добавляем логирование для отладки
@@ -43,17 +47,16 @@
     emit('click', props.debt.id);
   };
   
-  // Форматированная сумма в оригинальной валюте долга
+  // Форматированная сумма в оригинальной валюте долга с использованием useFormatBalance
   const formattedAmount = computed(() => {
-    const prefix = props.isPositive ? '' : '-';
-    const amount = Math.abs(props.debt.remainingAmount);
-    const currencySymbol = props.debt.currency;
+    // Определяем знак на основе isPositive
+    const amount = props.isPositive ? props.debt.remainingAmount : -props.debt.remainingAmount;
     
-    if (amount >= 1000) {
-      return `${prefix}${currencySymbol} ${(amount / 1000).toFixed(0)}k`;
-    } else {
-      return `${prefix}${currencySymbol} ${amount.toFixed(2)}`;
-    }
+    return formatBalance(amount, 2, props.debt.currency, {
+      useAbbreviations: true,
+      minValueToAbbreviate: 10000, // Начинаем сокращать с 10к
+      showDecimalsOnWhole: false
+    });
   });
   </script>
   

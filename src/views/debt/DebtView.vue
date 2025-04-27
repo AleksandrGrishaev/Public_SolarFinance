@@ -80,6 +80,12 @@
             @itemClick="navigateToDebtDetails"
           />
           
+          <!-- Пустое состояние, если нет долгов -->
+          <div v-if="!hasAnyDebts" class="empty-state">
+            <div class="empty-message">No debts found</div>
+            <div class="empty-description">Add a new debt to get started</div>
+          </div>
+          
           <!-- Кнопка добавления нового долга -->
           <div class="add-debt-container">
             <CreateActionButton text="Add new" @click="openAddDebtModal" />
@@ -90,7 +96,8 @@
   </template>
   
   <script setup lang="ts">
-  import { onMounted, ref } from 'vue';
+  // Script не изменяется
+  import { onMounted, ref, computed } from 'vue';
   import { useRouter } from 'vue-router';
   import AddIconButton from '@/components/atoms/buttons/AddIconButton.vue';
   import CreateActionButton from '@/components/ui/buttons/CreateActionButton.vue';
@@ -99,6 +106,7 @@
   
   const router = useRouter();
   const {
+    isLoading,
     selectedOwner,
     totalDebtAmount,
     debtsByGroup,
@@ -113,6 +121,15 @@
   
   // Состояние для выбора валюты (для будущей функциональности)
   const showCurrencySelector = ref(false);
+  
+  // Проверка наличия долгов
+  const hasAnyDebts = computed(() => {
+    return (
+      debtsByGroup.value.book.length > 0 ||
+      debtsByGroup.value.person.length > 0 ||
+      debtsByGroup.value.credit.length > 0
+    );
+  });
   
   // Обновляем заголовок и настройки в родительском IosLayout
   const updateHeaderSettings = () => {
@@ -173,22 +190,27 @@
   </script>
   
   <style scoped>
-  .debt-dashboard {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    background-color: var(--bg-screen);
-    color: var(--text-usual);
-  }
-  
-  .debt-body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 0 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
+.debt-dashboard {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Важно */
+  min-height: 100%; /* Дополнительная гарантия */
+  width: 100%;
+  background-color: var(--bg-screen);
+  color: var(--text-usual);
+  position: relative;
+  /* НЕТ overflow: hidden здесь */
+}
+
+.debt-body {
+  flex: 1;
+  width: 100%;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  /* НЕТ overflow-y: auto здесь */
+}
   
   /* Стили для секции с общей суммой */
   .balance-section {
@@ -198,6 +220,7 @@
     justify-content: center;
     align-items: center;
     gap: 16px;
+    flex-shrink: 0; /* Предотвращает сжатие секции при скролле */
   }
   
   .balance-container {
@@ -239,6 +262,7 @@
     padding: 8px 0;
     display: flex;
     justify-content: center;
+    flex-shrink: 0; /* Предотвращает сжатие секции при скролле */
   }
   
   .owner-filter {
@@ -270,6 +294,31 @@
     gap: 16px;
     margin-bottom: 20px;
     padding-bottom: 80px; /* Добавляем отступ снизу для навигационной панели */
+    flex: 1; /* Позволяет контейнеру с долгами занимать доступное пространство */
+  }
+  
+  /* Пустое состояние */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+    background-color: var(--bg-field-dark);
+    border-radius: 32px;
+    margin: 16px 0;
+  }
+  
+  .empty-message {
+    font-size: var(--font-body-size);
+    font-weight: 500;
+    color: var(--text-usual);
+    margin-bottom: 8px;
+  }
+  
+  .empty-description {
+    font-size: var(--font-small-size);
+    color: var(--text-grey);
   }
   
   /* Контейнер для кнопки добавления долга */
@@ -277,5 +326,6 @@
     display: flex;
     justify-content: center;
     padding: 16px 0;
+    flex-shrink: 0; /* Предотвращает сжатие при скролле */
   }
   </style>

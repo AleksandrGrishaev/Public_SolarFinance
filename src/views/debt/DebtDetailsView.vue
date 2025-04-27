@@ -38,7 +38,7 @@
             
             <!-- Первоначальная сумма (если отличается) -->
             <div class="amount-original" v-if="debt.amount !== debt.remainingAmount">
-              из {{ formatCurrency(debt.amount, debt.currency) }}
+              от {{ formatCurrency(debt.amount, debt.currency) }}
             </div>
           </div>
           
@@ -140,11 +140,13 @@ import { useRoute, useRouter } from 'vue-router';
 import { useDebts } from './composables/useDebts';
 import { type Debt, type DebtStatus, type DebtType, type DebtCategory } from '@/stores/debt/debtStore';
 import { useCurrencyStore } from '@/stores/currency';
+import { useFormatBalance } from '@/composables/transaction/useFormatBalance';
 
 const route = useRoute();
 const router = useRouter();
 const debtId = computed(() => route.params.id as string);
 const currencyStore = useCurrencyStore();
+const { formatBalance } = useFormatBalance();
 
 const {
   isLoading,
@@ -174,16 +176,12 @@ const formatAmountInUserCurrency = (debt: Debt) => {
     userBaseCurrency.value
   );
   
-  // Форматируем результат
-  const symbol = getUserCurrencySymbol.value;
-  const absAmount = Math.abs(convertedAmount);
-  const prefix = convertedAmount < 0 ? '-' : '';
-  
-  if (absAmount >= 1000) {
-    return `${prefix}${symbol} ${(absAmount / 1000).toFixed(0)}k`;
-  } else {
-    return `${prefix}${symbol} ${absAmount.toFixed(2)}`;
-  }
+  // Форматируем результат с помощью useFormatBalance
+  return formatBalance(convertedAmount, 2, userBaseCurrency.value, {
+    useAbbreviations: true,
+    minValueToAbbreviate: 10000, // Начинаем сокращать с 10к
+    showDecimalsOnWhole: false
+  });
 };
 
 // Загрузка данных о долге
@@ -250,12 +248,25 @@ const formatDebtCategory = (category: DebtCategory): string => {
   }
 };
 
-// Форматирование даты
+// Форматирование даты с использованием Intl.DateTimeFormat для лучшего отображения
 const formatDate = (date: Date | string): string => {
   if (!date) return 'N/A';
   
-  const dateObj = new Date(date);
-  return dateObj.toLocaleDateString();
+  try {
+    const dateObj = new Date(date);
+    // Проверяем, валидная ли дата
+    if (isNaN(dateObj.getTime())) return 'Invalid date';
+    
+    // Используем Intl.DateTimeFormat для локализованного форматирования
+    return new Intl.DateTimeFormat('default', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    }).format(dateObj);
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return 'Invalid date';
+  }
 };
 
 // Обновляем заголовок и настройки в родительском IosLayout

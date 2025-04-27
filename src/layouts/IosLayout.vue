@@ -158,6 +158,7 @@ onMounted(() => {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 
 .ios-content {
@@ -167,6 +168,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* Для плавности на iOS */
 }
 
 .menu-container {

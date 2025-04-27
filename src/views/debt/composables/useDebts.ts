@@ -3,11 +3,13 @@ import { ref, computed, onMounted } from 'vue';
 import { useDebtStore, type Debt, type DebtOwner } from '@/stores/debt/debtStore';
 import { useCurrencyStore } from '@/stores/currency';
 import { useUserStore } from '@/stores/user';
+import { useFormatBalance } from '@/composables/transaction/useFormatBalance';
 
 export function useDebts() {
   const debtStore = useDebtStore();
   const currencyStore = useCurrencyStore();
   const userStore = useUserStore();
+  const { formatBalance, getCurrencySymbol } = useFormatBalance();
   
   const isLoading = ref(false);
   const error = ref<string | null>(null);
@@ -78,66 +80,73 @@ export function useDebts() {
   
   /**
    * Форматирует сумму долга с учетом валюты и знака
+   * Использует новый компонент useFormatBalance
    */
   const formatDebtAmount = (debt: Debt): string => {
     const isOwed = isDebtOwed(debt);
-    const prefix = isOwed ? '' : '-';
-    const amount = Math.abs(debt.remainingAmount);
+    // Определяем знак в зависимости от того, кто кому должен
+    const amount = isOwed ? debt.remainingAmount : -debt.remainingAmount;
     
-    if (amount >= 1000) {
-      // Для тысяч используем суффикс k
-      return `${prefix}${debt.currency} ${(amount / 1000).toFixed(0)}k`;
-    } else {
-      // Для меньших сумм показываем обычное форматирование
-      return `${prefix}${debt.currency} ${amount.toFixed(2)}`;
-    }
+    return formatBalance(amount, 2, debt.currency, {
+      useAbbreviations: true,
+      minValueToAbbreviate: 10000, // Начинаем сокращать с 10к
+      showDecimalsOnWhole: false
+    });
   };
   
   /**
    * Форматирует общую сумму в базовой валюте пользователя
    */
   const formatTotalInUserCurrency = (amount: number): string => {
-    return currencyStore.formatCurrency(amount, userBaseCurrency.value);
+    return formatBalance(amount, 2, userBaseCurrency.value, {
+      useAbbreviations: true,
+      minValueToAbbreviate: 10000, // Начинаем сокращать с 10к
+      showDecimalsOnWhole: false
+    });
   };
   
   /**
    * Общее форматирование суммы с учетом валюты
    */
-  const formatCurrency = (amount: number, currency: string = '$'): string => {
-    // Абсолютное значение для отображения
-    const absAmount = Math.abs(amount);
-    const sign = amount < 0 ? '-' : '';
-    
-    // Определяем формат в зависимости от суммы
-    if (absAmount >= 1000) {
-      // Для тысяч используем суффикс k
-      return `${sign}${currency} ${(absAmount / 1000).toFixed(0)}k`;
-    } else {
-      // Для меньших сумм показываем обычное форматирование
-      return `${sign}${currency} ${absAmount.toFixed(2)}`;
-    }
+  const formatCurrency = (amount: number, currencyCode: string = '$'): string => {
+    return formatBalance(amount, 2, currencyCode, {
+      useAbbreviations: true,
+      minValueToAbbreviate: 10000, // Начинаем сокращать с 10к
+      showDecimalsOnWhole: false
+    });
   };
   
   /**
    * Получить символ валюты пользователя
    */
   const getUserCurrencySymbol = computed(() => {
-    const currency = currencyStore.getCurrency(userBaseCurrency.value);
-    return currency?.symbol || userBaseCurrency.value;
+    return getCurrencySymbol(userBaseCurrency.value);
   });
   
   /**
    * Форматирует сумму в базовой валюте пользователя с понятным знаком
    */
   const formatAmountWithSign = (amount: number): string => {
-    const absAmount = Math.abs(amount);
+    // Определяем тип знака (+ или -) в зависимости от величины
     const prefix = amount < 0 ? '-' : '+';
+    // Форматируем по абсолютной величине, а затем добавляем знак
+    const formatted = formatBalance(Math.abs(amount), 2, userBaseCurrency.value, {
+      useAbbreviations: true,
+      minValueToAbbreviate: 10000,
+      showDecimalsOnWhole: false
+    });
     
-    if (absAmount >= 1000) {
-      return `${prefix}${getUserCurrencySymbol.value} ${(absAmount / 1000).toFixed(0)}k`;
-    } else {
-      return `${prefix}${getUserCurrencySymbol.value} ${absAmount.toFixed(2)}`;
+    // Если сумма уже отрицательна, не добавляем знак -
+    if (amount < 0) return formatted;
+    
+    // Если в начале formatted есть символ валюты, вставляем знак после него
+    const currencySymbol = getCurrencySymbol(userBaseCurrency.value);
+    if (formatted.startsWith(currencySymbol)) {
+      return formatted.replace(currencySymbol, `${currencySymbol}${prefix}`);
     }
+    
+    // Иначе добавляем знак в начало
+    return `${prefix}${formatted}`;
   };
   
   /**
