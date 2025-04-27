@@ -5,9 +5,10 @@
         <div class="balance-section">
           <div class="balance-container">
             <span class="total-amount" :class="{'negative': totalDebtAmount < 0, 'positive': totalDebtAmount > 0}">
-              {{ formatCurrency(totalDebtAmount) }}
+              {{ formatTotalInUserCurrency(totalDebtAmount) }}
             </span>
             <div class="dropdown-arrow" @click="toggleCurrencyFilter">
+              <span class="currency-code">{{ userBaseCurrency }}</span>
               <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
                 <path d="M5 6L0 0L10 0L5 6Z" fill="currentColor"/>
               </svg>
@@ -52,6 +53,7 @@
             :debts="debtsByGroup['book']"
             :totalAmount="totalByGroup['book']"
             :isDebtPositive="isDebtOwed"
+            :currencySymbol="getUserCurrencySymbol"
             @itemClick="navigateToDebtDetails"
           />
           
@@ -62,6 +64,7 @@
             :debts="debtsByGroup['person']"
             :totalAmount="totalByGroup['person']"
             :isDebtPositive="isDebtOwed"
+            :currencySymbol="getUserCurrencySymbol"
             @itemClick="navigateToDebtDetails"
           />
           
@@ -72,6 +75,7 @@
             :debts="debtsByGroup['credit']"
             :totalAmount="totalByGroup['credit']"
             :isDebtPositive="isDebtOwed"
+            :currencySymbol="getUserCurrencySymbol"
             :showIcons="true"
             @itemClick="navigateToDebtDetails"
           />
@@ -86,7 +90,7 @@
   </template>
   
   <script setup lang="ts">
-  import { onMounted } from 'vue';
+  import { onMounted, ref } from 'vue';
   import { useRouter } from 'vue-router';
   import AddIconButton from '@/components/atoms/buttons/AddIconButton.vue';
   import CreateActionButton from '@/components/ui/buttons/CreateActionButton.vue';
@@ -99,16 +103,20 @@
     totalDebtAmount,
     debtsByGroup,
     totalByGroup,
+    userBaseCurrency,
+    getUserCurrencySymbol,
     isDebtOwed,
-    formatCurrency,
+    formatTotalInUserCurrency,
     setSelectedOwner,
     loadDebts
   } = useDebts();
   
+  // Состояние для выбора валюты (для будущей функциональности)
+  const showCurrencySelector = ref(false);
+  
   // Обновляем заголовок и настройки в родительском IosLayout
   const updateHeaderSettings = () => {
     // Отправляем событие родительскому компоненту IosLayout
-    // для обновления настроек заголовка
     router.currentRoute.value.meta.title = 'Debts';
     router.currentRoute.value.meta.header = {
       show: true,
@@ -120,8 +128,9 @@
   };
   
   const toggleCurrencyFilter = () => {
-    // TODO: Реализовать фильтрацию по валюте
-    console.log('Toggle currency filter');
+    showCurrencySelector.value = !showCurrencySelector.value;
+    console.log('Toggle currency filter:', showCurrencySelector.value);
+    // TODO: Реализовать переключение валют для просмотра
   };
   
   const openAddDebtModal = () => {
@@ -129,7 +138,27 @@
     console.log('Open add debt modal');
   };
   
+  // Навигация к деталям долга с добавлением отладочной информации
   const navigateToDebtDetails = (debtId: string) => {
+    console.log('Navigating to debt details with ID:', debtId);
+    
+    // Проверяем, что ID не undefined и не null
+    if (!debtId) {
+      console.error('Error: Trying to navigate with empty debtId');
+      return;
+    }
+    
+    // Проверяем, существует ли долг с таким ID
+    const debt = debtsByGroup.value.book.find(d => d.id === debtId) ||
+                 debtsByGroup.value.person.find(d => d.id === debtId) ||
+                 debtsByGroup.value.credit.find(d => d.id === debtId);
+    
+    if (!debt) {
+      console.warn(`Warning: Navigating to debt with ID ${debtId}, but no matching debt found in store`);
+    } else {
+      console.log('Found matching debt:', debt.name);
+    }
+    
     router.push(`/debt/${debtId}`);
   };
   
@@ -196,7 +225,13 @@
     cursor: pointer;
     display: flex;
     align-items: center;
+    gap: 4px;
     color: var(--text-grey);
+  }
+  
+  .currency-code {
+    font-size: var(--font-small-size);
+    color: var(--text-usual);
   }
   
   /* Стили для фильтра владельца */

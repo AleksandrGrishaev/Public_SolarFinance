@@ -1,0 +1,49 @@
+Date : 2025-04-27 07:46:17
+Directory : /Users/peaker/dev/solar-finance/src
+Total : 16 files,  -1826 codes, -142 comments, -322 blanks, all -2290 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| TypeScript |          8 |       -589 |       -143 |       -146 |       -878 |
+| Vue        |          8 |     -1,237 |          1 |       -176 |     -1,412 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                          | files      | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                             |         16 |     -1,826 |       -142 |       -322 |     -2,290 |
+| router                                                                        |          1 |         15 |          0 |          0 |         15 |
+| stores                                                                        |          5 |       -390 |       -131 |        -85 |       -606 |
+| stores/debt                                                                   |          5 |       -390 |       -131 |        -85 |       -606 |
+| views                                                                         |         10 |     -1,451 |        -11 |       -237 |     -1,699 |
+| views/debt                                                                    |         10 |     -1,451 |        -11 |       -237 |     -1,699 |
+| views/debt (Files)                                                            |          2 |         88 |         11 |         23 |        122 |
+| views/debt/components                                                         |          7 |     -1,323 |         -9 |       -199 |     -1,531 |
+| views/debt/composables                                                        |          1 |       -216 |        -13 |        -61 |       -290 |
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                      | language   | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| /Users/peaker/dev/solar-finance/src/router/index.ts                           | TypeScript |         15 |          0 |          0 |         15 |
+| /Users/peaker/dev/solar-finance/src/stores/debt/debtService.ts                | TypeScript |       -156 |        -43 |        -24 |       -223 |
+| /Users/peaker/dev/solar-finance/src/stores/debt/debtStore.ts                  | TypeScript |        -69 |        -69 |        -48 |       -186 |
+| /Users/peaker/dev/solar-finance/src/stores/debt/defaultDebts.ts               | TypeScript |       -116 |         -5 |         -1 |       -122 |
+| /Users/peaker/dev/solar-finance/src/stores/debt/index.ts                      | TypeScript |         -4 |         -2 |         -1 |         -7 |
+| /Users/peaker/dev/solar-finance/src/stores/debt/types.ts                      | TypeScript |        -45 |        -12 |        -11 |        -68 |
+| /Users/peaker/dev/solar-finance/src/views/debt/DebtDetailsView.vue            | Vue        |        351 |          6 |         56 |        413 |
+| /Users/peaker/dev/solar-finance/src/views/debt/DebtView.vue                   | Vue        |       -263 |          5 |        -33 |       -291 |
+| /Users/peaker/dev/solar-finance/src/views/debt/components/DebtAddForm.vue     | Vue        |       -443 |         -4 |        -62 |       -509 |
+| /Users/peaker/dev/solar-finance/src/views/debt/components/DebtDetail.vue      | Vue        |       -404 |         -5 |        -68 |       -477 |
+| /Users/peaker/dev/solar-finance/src/views/debt/components/DebtGroup.vue       | Vue        |         83 |          2 |         13 |         98 |
+| /Users/peaker/dev/solar-finance/src/views/debt/components/DebtItem.vue        | Vue        |        102 |          3 |         20 |        125 |
+| /Users/peaker/dev/solar-finance/src/views/debt/components/DebtList.vue        | Vue        |       -385 |         -4 |        -60 |       -449 |
+| /Users/peaker/dev/solar-finance/src/views/debt/components/DebtPaymentForm.vue | Vue        |       -278 |         -2 |        -42 |       -322 |
+| /Users/peaker/dev/solar-finance/src/views/debt/components/index.ts            | TypeScript |          2 |          1 |          0 |          3 |
+| /Users/peaker/dev/solar-finance/src/views/debt/composables/useDebts.ts        | TypeScript |       -216 |        -13 |        -61 |       -290 |
+| Total                                                                         |            |     -1,826 |       -142 |       -322 |     -2,290 |
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+

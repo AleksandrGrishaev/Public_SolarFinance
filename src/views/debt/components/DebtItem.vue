@@ -2,7 +2,7 @@
     <div 
       class="debt-item"
       :class="{ 'inactive': debt.status === 'paid' || debt.status === 'cancelled' }"
-      @click="$emit('click', debt.id)"
+      @click="handleClick"
     >
       <!-- Иконка (только для кредитов) -->
       <div class="icon-container" v-if="showIcon">
@@ -15,7 +15,7 @@
         <div class="debt-subtitle" v-if="debt.subtitle">{{ debt.subtitle }}</div>
       </div>
       
-      <!-- Сумма долга -->
+      <!-- Сумма долга в оригинальной валюте -->
       <div class="debt-amount" :class="{ 'negative': !isPositive, 'positive': isPositive }">
         {{ formattedAmount }}
       </div>
@@ -32,19 +32,27 @@
     showIcon?: boolean;
   }>();
   
-  defineEmits<{
+  const emit = defineEmits<{
     (e: 'click', id: string): void;
   }>();
   
-  // Форматированная сумма
+  // Обработчик клика для надежной передачи ID
+  const handleClick = () => {
+    // Добавляем логирование для отладки
+    console.log('Clicking debt item with ID:', props.debt.id);
+    emit('click', props.debt.id);
+  };
+  
+  // Форматированная сумма в оригинальной валюте долга
   const formattedAmount = computed(() => {
     const prefix = props.isPositive ? '' : '-';
     const amount = Math.abs(props.debt.remainingAmount);
+    const currencySymbol = props.debt.currency;
     
     if (amount >= 1000) {
-      return `${prefix}${props.debt.currency} ${(amount / 1000).toFixed(0)}k`;
+      return `${prefix}${currencySymbol} ${(amount / 1000).toFixed(0)}k`;
     } else {
-      return `${prefix}${props.debt.currency} ${amount.toFixed(2)}`;
+      return `${prefix}${currencySymbol} ${amount.toFixed(2)}`;
     }
   });
   </script>
@@ -68,7 +76,7 @@
   }
   
   .debt-item.inactive {
-    background-color: var(--bg-light);
+    opacity: 0.7;
     color: var(--text-grey);
   }
   

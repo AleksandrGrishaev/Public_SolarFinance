@@ -1,10 +1,10 @@
 # Details
 
-Date : 2025-04-26 22:44:35
+Date : 2025-04-27 07:46:17
 
 Directory /Users/peaker/dev/solar-finance/src
 
-Total : 238 files,  36127 codes, 2945 comments, 5689 blanks, all 44761 lines
+Total : 234 files,  34301 codes, 2803 comments, 5367 blanks, all 42471 lines
 
 [Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
@@ -100,7 +100,7 @@ Total : 238 files,  36127 codes, 2945 comments, 5689 blanks, all 44761 lines
 | [src/layouts/EmptyLayout.vue](/src/layouts/EmptyLayout.vue) | Vue | 15 | 0 | 2 | 17 |
 | [src/layouts/IosLayout.vue](/src/layouts/IosLayout.vue) | Vue | 158 | 1 | 23 | 182 |
 | [src/main.ts](/src/main.ts) | TypeScript | 30 | 9 | 9 | 48 |
-| [src/router/index.ts](/src/router/index.ts) | TypeScript | 177 | 17 | 10 | 204 |
+| [src/router/index.ts](/src/router/index.ts) | TypeScript | 192 | 17 | 10 | 219 |
 | [src/services/BaseCrudService.ts](/src/services/BaseCrudService.ts) | TypeScript | 54 | 22 | 11 | 87 |
 | [src/services/api/ApiService.ts](/src/services/api/ApiService.ts) | TypeScript | 6 | 1 | 4 | 11 |
 | [src/services/api/LocalStorageApiService.ts](/src/services/api/LocalStorageApiService.ts) | TypeScript | 76 | 30 | 32 | 138 |
@@ -127,11 +127,7 @@ Total : 238 files,  36127 codes, 2945 comments, 5689 blanks, all 44761 lines
 | [src/stores/currency/defaultCurrencies.ts](/src/stores/currency/defaultCurrencies.ts) | TypeScript | 50 | 2 | 2 | 54 |
 | [src/stores/currency/index.ts](/src/stores/currency/index.ts) | TypeScript | 3 | 3 | 1 | 7 |
 | [src/stores/currency/types.ts](/src/stores/currency/types.ts) | TypeScript | 25 | 1 | 3 | 29 |
-| [src/stores/debt/debtService.ts](/src/stores/debt/debtService.ts) | TypeScript | 156 | 43 | 24 | 223 |
-| [src/stores/debt/debtStore.ts](/src/stores/debt/debtStore.ts) | TypeScript | 355 | 92 | 78 | 525 |
-| [src/stores/debt/defaultDebts.ts](/src/stores/debt/defaultDebts.ts) | TypeScript | 116 | 5 | 1 | 122 |
-| [src/stores/debt/index.ts](/src/stores/debt/index.ts) | TypeScript | 4 | 2 | 1 | 7 |
-| [src/stores/debt/types.ts](/src/stores/debt/types.ts) | TypeScript | 45 | 12 | 11 | 68 |
+| [src/stores/debt/debtStore.ts](/src/stores/debt/debtStore.ts) | TypeScript | 286 | 23 | 30 | 339 |
 | [src/stores/notification/DefaultNotification.ts](/src/stores/notification/DefaultNotification.ts) | TypeScript | 89 | 17 | 5 | 111 |
 | [src/stores/notification/composables/useNotifications.ts](/src/stores/notification/composables/useNotifications.ts) | TypeScript | 78 | 13 | 12 | 103 |
 | [src/stores/notification/index.ts](/src/stores/notification/index.ts) | TypeScript | 27 | 9 | 6 | 42 |
@@ -203,12 +199,12 @@ Total : 238 files,  36127 codes, 2945 comments, 5689 blanks, all 44761 lines
 | [src/views/book/popup/EditBookPopup.vue](/src/views/book/popup/EditBookPopup.vue) | Vue | 35 | 1 | 5 | 41 |
 | [src/views/book/popup/NewBookPopup.vue](/src/views/book/popup/NewBookPopup.vue) | Vue | 30 | 1 | 5 | 36 |
 | [src/views/currency/popup/CurrencyPopup.vue](/src/views/currency/popup/CurrencyPopup.vue) | Vue | 162 | 3 | 25 | 190 |
-| [src/views/debt/DebtView.vue](/src/views/debt/DebtView.vue) | Vue | 475 | 2 | 60 | 537 |
-| [src/views/debt/components/DebtAddForm.vue](/src/views/debt/components/DebtAddForm.vue) | Vue | 443 | 4 | 62 | 509 |
-| [src/views/debt/components/DebtDetail.vue](/src/views/debt/components/DebtDetail.vue) | Vue | 404 | 5 | 68 | 477 |
-| [src/views/debt/components/DebtList.vue](/src/views/debt/components/DebtList.vue) | Vue | 385 | 4 | 60 | 449 |
-| [src/views/debt/components/DebtPaymentForm.vue](/src/views/debt/components/DebtPaymentForm.vue) | Vue | 278 | 2 | 42 | 322 |
-| [src/views/debt/composables/useDebts.ts](/src/views/debt/composables/useDebts.ts) | TypeScript | 297 | 50 | 76 | 423 |
+| [src/views/debt/DebtDetailsView.vue](/src/views/debt/DebtDetailsView.vue) | Vue | 351 | 6 | 56 | 413 |
+| [src/views/debt/DebtView.vue](/src/views/debt/DebtView.vue) | Vue | 212 | 7 | 27 | 246 |
+| [src/views/debt/components/DebtGroup.vue](/src/views/debt/components/DebtGroup.vue) | Vue | 83 | 2 | 13 | 98 |
+| [src/views/debt/components/DebtItem.vue](/src/views/debt/components/DebtItem.vue) | Vue | 102 | 3 | 20 | 125 |
+| [src/views/debt/components/index.ts](/src/views/debt/components/index.ts) | TypeScript | 2 | 1 | 0 | 3 |
+| [src/views/debt/composables/useDebts.ts](/src/views/debt/composables/useDebts.ts) | TypeScript | 81 | 37 | 15 | 133 |
 | [src/views/debug/DebugStoreView.vue](/src/views/debug/DebugStoreView.vue) | Vue | 193 | 4 | 23 | 220 |
 | [src/views/debug/components/BaseStoresDebugPanel.vue](/src/views/debug/components/BaseStoresDebugPanel.vue) | Vue | 208 | 7 | 20 | 235 |
 | [src/views/debug/components/FinanceStoresDebugPanel.vue](/src/views/debug/components/FinanceStoresDebugPanel.vue) | Vue | 279 | 9 | 21 | 309 |
