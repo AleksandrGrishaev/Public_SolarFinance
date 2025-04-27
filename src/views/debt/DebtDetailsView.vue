@@ -90,13 +90,15 @@ const route = useRoute();
 const router = useRouter();
 const debtId = computed(() => route.params.id as string);
 
+// Local state to store the loaded debt
+const debt = ref(null);
+const isLoading = ref(false);
+const error = ref(null);
+
 // Use composables
 const {
-  isLoading,
-  error,
-  debt,
-  getDebtById,
   loadDebts,
+  getDebtById,
   getRelatedDebtsByType
 } = useDebts();
 
@@ -147,8 +149,10 @@ const loadDebtDetails = async () => {
       loadTransactions()
     ]);
     
-    // Set debt data from store
-    debt.value = getDebtById(debtId.value);
+    // Get debt data from the store
+    const foundDebt = getDebtById(debtId.value);
+    // Store it in our local ref
+    debt.value = foundDebt;
     
     console.log('Found debt:', debt.value);
     
@@ -224,7 +228,10 @@ onMounted(async () => {
   
   // Update header title in parent layout
   if (router.currentRoute.value && router.currentRoute.value.meta) {
-    router.currentRoute.value.meta.title = debt.value?.name || 'Debt Details';
+    const title = debt.value?.name || 'Debt Details';
+    if (router.currentRoute.value.meta.title !== undefined) {
+      router.currentRoute.value.meta.title = title;
+    }
   }
 });
 </script>

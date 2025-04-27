@@ -95,6 +95,29 @@ export function useDebts() {
   };
   
   /**
+   * Форматирует сумму в базовой валюте пользователя
+   */
+  const formatAmountInUserCurrency = (debt: Debt): string => {
+    if (!debt) return '';
+    
+    const isOwed = isDebtOwed(debt);
+    const amount = isOwed ? debt.remainingAmount : -debt.remainingAmount;
+    
+    // Конвертируем в базовую валюту пользователя
+    const { convertedAmount } = currencyStore.convertAmount(
+      amount,
+      debt.currency,
+      userBaseCurrency.value
+    );
+    
+    return formatBalance(convertedAmount, 2, userBaseCurrency.value, {
+      useAbbreviations: true,
+      minValueToAbbreviate: 10000,
+      showDecimalsOnWhole: false
+    });
+  };
+  
+  /**
    * Форматирует общую сумму в базовой валюте пользователя
    */
   const formatTotalInUserCurrency = (amount: number): string => {
@@ -193,6 +216,13 @@ export function useDebts() {
   };
   
   /**
+   * Получение связанных долгов по типу группы
+   */
+  const getRelatedDebtsByType = (groupType: string): Debt[] => {
+    return debtsByGroup.value[groupType] || [];
+  };
+  
+  /**
    * Загрузка долгов
    */
   const loadDebts = async () => {
@@ -264,10 +294,12 @@ export function useDebts() {
     isDebtOwed,
     formatDebtAmount,
     formatCurrency,
+    formatAmountInUserCurrency,
     formatTotalInUserCurrency,
     formatAmountWithSign,
     setSelectedOwner,
     getDebtById,
+    getRelatedDebtsByType,
     loadDebts,
     addDebt,
     updateDebt,
