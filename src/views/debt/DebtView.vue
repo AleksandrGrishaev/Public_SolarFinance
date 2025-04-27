@@ -229,7 +229,7 @@ onMounted(async () => {
   padding: 0 16px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 0px;
 }
 
 /* Стили для секции с общей суммой */
