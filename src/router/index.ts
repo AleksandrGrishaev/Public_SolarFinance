@@ -117,6 +117,21 @@ const routes: Array<RouteRecordRaw> = [
             hasNotifications: true
           }
         }
+      },
+      {
+        path: ':id',
+        name: 'debt-details',
+        component: () => import('@/views/debt/DebtDetailsView.vue'),
+        meta: {
+          requiresAuth: true,
+          title: 'Детали долга',
+          header: {
+            show: true,
+            showBack: true,
+            showMessageIcon: true,
+            hasNotifications: true
+          }
+        }
       }
     ]
   },
