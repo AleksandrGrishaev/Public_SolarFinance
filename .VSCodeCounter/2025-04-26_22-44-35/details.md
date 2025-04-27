@@ -1,10 +1,10 @@
 # Details
 
-Date : 2025-04-26 13:32:01
+Date : 2025-04-26 22:44:35
 
 Directory /Users/peaker/dev/solar-finance/src
 
-Total : 237 files,  35420 codes, 2934 comments, 5561 blanks, all 43915 lines
+Total : 238 files,  36127 codes, 2945 comments, 5689 blanks, all 44761 lines
 
 [Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
@@ -16,6 +16,7 @@ Total : 237 files,  35420 codes, 2934 comments, 5561 blanks, all 43915 lines
 | [src/about/Description.md](/src/about/Description.md) | Markdown | 58 | 0 | 28 | 86 |
 | [src/about/WorkFlow/BaseStores.md](/src/about/WorkFlow/BaseStores.md) | Markdown | 169 | 0 | 52 | 221 |
 | [src/about/WorkFlow/BookView.md](/src/about/WorkFlow/BookView.md) | Markdown | 77 | 0 | 47 | 124 |
+| [src/about/WorkFlow/DebtInterface.md](/src/about/WorkFlow/DebtInterface.md) | Markdown | 581 | 0 | 103 | 684 |
 | [src/about/WorkFlow/DistributionRules.md](/src/about/WorkFlow/DistributionRules.md) | Markdown | 606 | 0 | 140 | 746 |
 | [src/about/WorkFlow/MainPlan.md](/src/about/WorkFlow/MainPlan.md) | Markdown | 468 | 0 | 151 | 619 |
 | [src/about/WorkFlow/Mock.md](/src/about/WorkFlow/Mock.md) | Markdown | 1,306 | 0 | 68 | 1,374 |
@@ -225,9 +226,9 @@ Total : 237 files,  35420 codes, 2934 comments, 5561 blanks, all 43915 lines
 | [src/views/profile/pages/ProfileView.vue](/src/views/profile/pages/ProfileView.vue) | Vue | 239 | 7 | 49 | 295 |
 | [src/views/profile/pages/components/DebugAccess.vue](/src/views/profile/pages/components/DebugAccess.vue) | Vue | 53 | 0 | 6 | 59 |
 | [src/views/profile/pages/components/LanguageSettings.vue](/src/views/profile/pages/components/LanguageSettings.vue) | Vue | 61 | 0 | 8 | 69 |
-| [src/views/transaction/TransactionView.vue](/src/views/transaction/TransactionView.vue) | Vue | 252 | 6 | 32 | 290 |
+| [src/views/transaction/TransactionView.vue](/src/views/transaction/TransactionView.vue) | Vue | 272 | 6 | 34 | 312 |
 | [src/views/transaction/components/AccountSelector.vue](/src/views/transaction/components/AccountSelector.vue) | Vue | 195 | 2 | 29 | 226 |
-| [src/views/transaction/components/AmountSection.vue](/src/views/transaction/components/AmountSection.vue) | Vue | 190 | 5 | 24 | 219 |
+| [src/views/transaction/components/AmountSection.vue](/src/views/transaction/components/AmountSection.vue) | Vue | 218 | 5 | 26 | 249 |
 | [src/views/transaction/components/BookSelector.vue](/src/views/transaction/components/BookSelector.vue) | Vue | 135 | 1 | 19 | 155 |
 | [src/views/transaction/components/DebtorSelectionDialog.vue](/src/views/transaction/components/DebtorSelectionDialog.vue) | Vue | 215 | 1 | 33 | 249 |
 | [src/views/transaction/components/DistributionConfirmDialog.vue](/src/views/transaction/components/DistributionConfirmDialog.vue) | Vue | 188 | 1 | 24 | 213 |
@@ -241,12 +242,12 @@ Total : 237 files,  35420 codes, 2934 comments, 5561 blanks, all 43915 lines
 | [src/views/transaction/composables/useCategory.ts](/src/views/transaction/composables/useCategory.ts) | TypeScript | 74 | 22 | 17 | 113 |
 | [src/views/transaction/composables/useCurrency.ts](/src/views/transaction/composables/useCurrency.ts) | TypeScript | 148 | 48 | 34 | 230 |
 | [src/views/transaction/composables/useDebtTransaction.ts](/src/views/transaction/composables/useDebtTransaction.ts) | TypeScript | 253 | 87 | 48 | 388 |
-| [src/views/transaction/composables/useDistribution.ts](/src/views/transaction/composables/useDistribution.ts) | TypeScript | 294 | 145 | 88 | 527 |
+| [src/views/transaction/composables/useDistribution.ts](/src/views/transaction/composables/useDistribution.ts) | TypeScript | 298 | 144 | 89 | 531 |
 | [src/views/transaction/composables/useExchangeTransaction.ts](/src/views/transaction/composables/useExchangeTransaction.ts) | TypeScript | 149 | 43 | 30 | 222 |
 | [src/views/transaction/composables/useKeypad.ts](/src/views/transaction/composables/useKeypad.ts) | TypeScript | 38 | 22 | 7 | 67 |
 | [src/views/transaction/composables/useRegularTransaction.ts](/src/views/transaction/composables/useRegularTransaction.ts) | TypeScript | 185 | 38 | 24 | 247 |
 | [src/views/transaction/composables/useTransactionCore.ts](/src/views/transaction/composables/useTransactionCore.ts) | TypeScript | 162 | 47 | 31 | 240 |
-| [src/views/transaction/composables/useTransactionManager.ts](/src/views/transaction/composables/useTransactionManager.ts) | TypeScript | 232 | 39 | 32 | 303 |
-| [src/views/transaction/composables/useTransferTransaction.ts](/src/views/transaction/composables/useTransferTransaction.ts) | TypeScript | 138 | 41 | 26 | 205 |
+| [src/views/transaction/composables/useTransactionManager.ts](/src/views/transaction/composables/useTransactionManager.ts) | TypeScript | 305 | 51 | 52 | 408 |
+| [src/views/transaction/composables/useTransferTransaction.ts](/src/views/transaction/composables/useTransferTransaction.ts) | TypeScript | 139 | 41 | 26 | 206 |
 
 [Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
