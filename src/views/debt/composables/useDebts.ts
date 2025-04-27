@@ -14,6 +14,7 @@ export function useDebts() {
   const isLoading = ref(false);
   const error = ref<string | null>(null);
   const isInitialized = ref(false);
+  const debt = ref<Debt | null>(null);
   
   // Получаем данные из хранилища
   const allDebts = computed(() => debtStore.debts);
@@ -52,19 +53,23 @@ export function useDebts() {
       'credit': 0
     };
     
+    if (!debtsByGroup.value) return totals;
+    
     Object.keys(debtsByGroup.value).forEach(group => {
-      debtsByGroup.value[group].forEach(debt => {
-        const multiplier = isDebtOwed(debt) ? 1 : -1;
-        
-        // Конвертируем в базовую валюту пользователя
-        const { convertedAmount } = currencyStore.convertAmount(
-          debt.remainingAmount * multiplier,
-          debt.currency,
-          userBaseCurrency.value
-        );
-        
-        totals[group] += convertedAmount;
-      });
+      if (debtsByGroup.value[group]) {
+        debtsByGroup.value[group].forEach(debt => {
+          const multiplier = isDebtOwed(debt) ? 1 : -1;
+          
+          // Конвертируем в базовую валюту пользователя
+          const { convertedAmount } = currencyStore.convertAmount(
+            debt.remainingAmount * multiplier,
+            debt.currency,
+            userBaseCurrency.value
+          );
+          
+          totals[group] += convertedAmount;
+        });
+      }
     });
     
     return totals;
@@ -88,6 +93,30 @@ export function useDebts() {
     const amount = isOwed ? debt.remainingAmount : -debt.remainingAmount;
     
     return formatBalance(amount, 2, debt.currency, {
+      useAbbreviations: true,
+      minValueToAbbreviate: 10000, // Начинаем сокращать с 10к
+      showDecimalsOnWhole: false
+    });
+  };
+  
+  /**
+   * Форматирует сумму долга в валюте пользователя
+   */
+  const formatAmountInUserCurrency = (debt: Debt): string => {
+    if (!debt) return '';
+    
+    const multiplier = isDebtOwed(debt) ? 1 : -1;
+    const amount = debt.remainingAmount * multiplier;
+    
+    // Конвертируем в базовую валюту пользователя
+    const { convertedAmount } = currencyStore.convertAmount(
+      amount,
+      debt.currency,
+      userBaseCurrency.value
+    );
+    
+    // Форматируем результат с помощью useFormatBalance
+    return formatBalance(convertedAmount, 2, userBaseCurrency.value, {
       useAbbreviations: true,
       minValueToAbbreviate: 10000, // Начинаем сокращать с 10к
       showDecimalsOnWhole: false
@@ -193,6 +222,14 @@ export function useDebts() {
   };
   
   /**
+   * Get related debts by type (same group)
+   */
+  const getRelatedDebtsByType = (group: string): Debt[] => {
+    if (!allDebts.value) return [];
+    return allDebts.value.filter(d => d.group === group);
+  };
+  
+  /**
    * Загрузка долгов
    */
   const loadDebts = async () => {
@@ -253,6 +290,7 @@ export function useDebts() {
   return {
     isLoading,
     error,
+    debt,
     allDebts,
     selectedOwner,
     filteredDebts,
@@ -263,11 +301,13 @@ export function useDebts() {
     getUserCurrencySymbol,
     isDebtOwed,
     formatDebtAmount,
+    formatAmountInUserCurrency,
     formatCurrency,
     formatTotalInUserCurrency,
     formatAmountWithSign,
     setSelectedOwner,
     getDebtById,
+    getRelatedDebtsByType,
     loadDebts,
     addDebt,
     updateDebt,

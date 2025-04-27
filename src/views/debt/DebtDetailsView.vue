@@ -1,135 +1,70 @@
 <template>
-  <div class="debt-details-view">
+  <div class="debt-detail-view">
+    <!-- Header section with debt type selector and debt icons -->
+    <DebtTypeSelector 
+      v-model="currentDebtType"
+      @add-debt="openAddDebtModal"
+    />
     
-    <div class="debt-content">
-      <div v-if="isLoading" class="loading-container">
-        <p>Loading debt details...</p>
-      </div>
+    <DebtIcons 
+      v-if="debt && relatedDebts && relatedDebts.length > 0"
+      :debts="relatedDebts"
+      :selectedDebtId="debtId"
+      @select-debt="navigateToDebt"
+    />
+    
+    <div v-if="isLoading" class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>Loading debt details...</p>
+    </div>
+    
+    <div v-else-if="error" class="error-container">
+      <p>{{ error }}</p>
+      <button @click="loadDebtDetails" class="retry-button">Retry</button>
+    </div>
+    
+    <div v-else-if="!debt" class="not-found-container">
+      <p>Debt not found</p>
+      <p class="error-details">ID: {{ debtId }}</p>
+      <button @click="$router.push('/debt')" class="back-button">Back to Debts</button>
+    </div>
+    
+    <div v-else class="debt-content">
+      <!-- Debt header with title and edit button -->
+      <DebtHeader 
+        :debt="debt"
+        :editable="true"
+        @edit="editDebtInfo"
+      />
       
-      <div v-else-if="error" class="error-container">
-        <p>{{ error }}</p>
-        <button @click="loadDebtDetails" class="retry-button">Retry</button>
-      </div>
+      <!-- Debt info section with date filter -->
+      <DebtInfo 
+        :debt="debt"
+        :dateFilter="dateFilter"
+        @update:dateFilter="updateDateFilter"
+      />
       
-      <div v-else-if="!debt" class="not-found-container">
-        <p>Debt not found</p>
-        <p class="error-details">ID: {{ debtId }}</p>
-        <button @click="$router.push('/debt')" class="back-button">Back to Debts</button>
-      </div>
+      <!-- Quick action button for debt payment -->
+      <FastDebtAction 
+        :debt="debt"
+        @pay="initiateDebtPayment"
+      />
       
-      <div v-else class="debt-info">
-        <!-- Основная информация -->
-        <div class="info-card">
-          <h2>{{ debt.name }}</h2>
-          <div class="debt-subtitle" v-if="debt.subtitle">{{ debt.subtitle }}</div>
-          
-          <div class="amount-display">
-            <!-- Сумма в оригинальной валюте -->
-            <div class="amount-value" :class="{'negative': !isDebtOwed(debt), 'positive': isDebtOwed(debt)}">
-              {{ formatDebtAmount(debt) }}
-            </div>
-
-            <!-- Сумма в валюте пользователя (если отличается) -->
-            <div class="amount-converted" v-if="debt.currency !== userBaseCurrency">
-              <span>
-                {{ formatAmountInUserCurrency(debt) }}
-              </span>
-            </div>
-            
-            <!-- Первоначальная сумма (если отличается) -->
-            <div class="amount-original" v-if="debt.amount !== debt.remainingAmount">
-              от {{ formatCurrency(debt.amount, debt.currency) }}
-            </div>
-          </div>
-          
-          <div class="debt-status">
-            Status: <span :class="`status-${debt.status}`">{{ formatStatus(debt.status) }}</span>
-          </div>
-          
-          <!-- Информация о категории и типе долга -->
-          <div class="info-section">
-            <div class="info-row">
-              <div class="info-label">Type:</div>
-              <div class="info-value">{{ formatDebtType(debt.type) }}</div>
-            </div>
-            <div class="info-row">
-              <div class="info-label">Category:</div>
-              <div class="info-value">{{ formatDebtCategory(debt.category) }}</div>
-            </div>
-            <div class="info-row" v-if="debt.creditorName">
-              <div class="info-label">Creditor:</div>
-              <div class="info-value">{{ debt.creditorName }}</div>
-            </div>
-          </div>
-          
-          <!-- Информация о датах -->
-          <div class="info-section">
-            <div class="info-row">
-              <div class="info-label">Created:</div>
-              <div class="info-value">{{ formatDate(debt.createdAt) }}</div>
-            </div>
-            <div class="info-row">
-              <div class="info-label">Start Date:</div>
-              <div class="info-value">{{ formatDate(debt.startDate) }}</div>
-            </div>
-            <div class="info-row" v-if="debt.endDate">
-              <div class="info-label">End Date:</div>
-              <div class="info-value">{{ formatDate(debt.endDate) }}</div>
-            </div>
-            <div class="info-row" v-if="debt.dueDate">
-              <div class="info-label">Next Payment:</div>
-              <div class="info-value due-date">{{ formatDate(debt.dueDate) }}</div>
-            </div>
-          </div>
-          
-          <!-- Информация о процентах (для кредитов) -->
-          <div class="info-section" v-if="debt.interestRate">
-            <div class="info-row">
-              <div class="info-label">Interest Rate:</div>
-              <div class="info-value">{{ debt.interestRate }}%</div>
-            </div>
-            <div class="info-row" v-if="debt.totalInterest">
-              <div class="info-label">Total Interest:</div>
-              <div class="info-value">{{ formatCurrency(debt.totalInterest, debt.currency) }}</div>
-            </div>
-          </div>
-          
-          <!-- Информация об участниках -->
-          <div class="info-section" v-if="debt.fromParties && debt.fromParties.length > 0">
-            <h3>Who Owes</h3>
-            <div class="parties-list">
-              <div 
-                v-for="party in debt.fromParties" 
-                :key="party.entityId"
-                class="party-item"
-              >
-                <div class="party-name">{{ party.name || party.entityId }}</div>
-                <div class="party-percentage">{{ party.percentage }}%</div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="info-section" v-if="debt.toParties && debt.toParties.length > 0">
-            <h3>To Whom</h3>
-            <div class="parties-list">
-              <div 
-                v-for="party in debt.toParties" 
-                :key="party.entityId"
-                class="party-item"
-              >
-                <div class="party-name">{{ party.name || party.entityId }}</div>
-                <div class="party-percentage">{{ party.percentage }}%</div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Добавить кнопку выплаты долга, если он активен -->
-          <div class="action-buttons" v-if="debt.status === 'active' || debt.status === 'partially_paid'">
-            <button class="action-button pay-button">Make Payment</button>
-            <button class="action-button edit-button">Edit</button>
-          </div>
-        </div>
-      </div>
+      <!-- Pending operations that need approval -->
+      <DebtAcceptGroup 
+        v-if="pendingOperations && pendingOperations.length > 0"
+        :operations="pendingOperations"
+        @accept="acceptOperation"
+        @decline="declineOperation"
+        @view="viewOperationDetails"
+      />
+      
+      <!-- List of all transactions related to this debt -->
+      <TransactionList 
+        :transactions="filteredTransactions || []"
+        :dateFilter="dateFilter"
+        @view-transaction="viewTransactionDetails"
+      />
     </div>
   </div>
 </template>
@@ -138,64 +73,81 @@
 import { ref, onMounted, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useDebts } from './composables/useDebts';
-import { type Debt, type DebtStatus, type DebtType, type DebtCategory } from '@/stores/debt/debtStore';
-import { useCurrencyStore } from '@/stores/currency';
-import { useFormatBalance } from '@/composables/transaction/useFormatBalance';
+import { useDebtOperations } from './composables/useDebtOperations';
+import { useDebtTransactions } from './composables/useDebtTransactions';
 
+// Import components
+import DebtTypeSelector from './components/DebtTypeSelector.vue';
+import DebtIcons from './components/DebtIcons.vue';
+import DebtHeader from './components/DebtHeader.vue';
+import DebtInfo from './components/DebtInfo.vue';
+import FastDebtAction from './components/FastDebtAction.vue';
+import DebtAcceptGroup from './components/DebtAcceptGroup.vue';
+import TransactionList from './components/TransactionList.vue';
+
+// Router and route
 const route = useRoute();
 const router = useRouter();
 const debtId = computed(() => route.params.id as string);
-const currencyStore = useCurrencyStore();
-const { formatBalance } = useFormatBalance();
 
+// Use composables
 const {
   isLoading,
   error,
+  debt,
   getDebtById,
   loadDebts,
-  isDebtOwed,
-  formatDebtAmount,
-  formatCurrency,
-  userBaseCurrency,
-  getUserCurrencySymbol
+  getRelatedDebtsByType
 } = useDebts();
 
-const debt = ref<Debt | undefined>(undefined);
+const {
+  pendingOperations,
+  acceptOperation,
+  declineOperation,
+  viewOperationDetails,
+  loadPendingOperations
+} = useDebtOperations(debtId);
 
-// Метод для форматирования суммы долга в валюте пользователя
-const formatAmountInUserCurrency = (debt: Debt) => {
-  if (!debt) return '';
-  
-  const multiplier = isDebtOwed(debt) ? 1 : -1;
-  const amount = debt.remainingAmount * multiplier;
-  
-  // Используем CurrencyStore для конвертации
-  const { convertedAmount } = currencyStore.convertAmount(
-    amount,
-    debt.currency,
-    userBaseCurrency.value
-  );
-  
-  // Форматируем результат с помощью useFormatBalance
-  return formatBalance(convertedAmount, 2, userBaseCurrency.value, {
-    useAbbreviations: true,
-    minValueToAbbreviate: 10000, // Начинаем сокращать с 10к
-    showDecimalsOnWhole: false
-  });
-};
+const {
+  transactions: allTransactions,
+  filteredTransactions,
+  dateFilter,
+  updateDateFilter,
+  loadTransactions
+} = useDebtTransactions(debtId);
 
-// Загрузка данных о долге
+// Local state
+const currentDebtType = ref('all');
+
+// Get related debts with safeguards
+const relatedDebts = computed(() => {
+  if (!debt.value || !debt.value.group) return [];
+  
+  const related = getRelatedDebtsByType(debt.value.group);
+  return related || [];
+});
+
+// Main loading function
 const loadDebtDetails = async () => {
+  if (!debtId.value) {
+    error.value = 'Invalid debt ID';
+    return;
+  }
+  
   isLoading.value = true;
   error.value = null;
   
   try {
     console.log('Loading debt details for ID:', debtId.value);
     
-    // Сначала загружаем все долги
-    await loadDebts();
+    // Load all required data in parallel
+    await Promise.all([
+      loadDebts(),
+      loadPendingOperations(),
+      loadTransactions()
+    ]);
     
-    // Затем пытаемся найти нужный долг
+    // Set debt data from store
     debt.value = getDebtById(debtId.value);
     
     console.log('Found debt:', debt.value);
@@ -203,6 +155,9 @@ const loadDebtDetails = async () => {
     if (!debt.value) {
       error.value = 'Debt not found';
       console.error(`Debt with ID ${debtId.value} not found after loading all debts`);
+    } else {
+      // Set current debt type based on loaded debt
+      currentDebtType.value = debt.value.group || 'all';
     }
   } catch (err) {
     console.error('Error loading debt details:', err);
@@ -212,109 +167,86 @@ const loadDebtDetails = async () => {
   }
 };
 
-// Форматирование статуса долга
-const formatStatus = (status: DebtStatus): string => {
-  switch (status) {
-    case 'active': return 'Active';
-    case 'partially_paid': return 'Partially Paid';
-    case 'paid': return 'Paid';
-    case 'cancelled': return 'Cancelled';
-    default: return status;
-  }
+// Event handlers
+const navigateToDebt = (id: string) => {
+  if (id === debtId.value) return;
+  router.push(`/debt/${id}`);
 };
 
-// Форматирование типа долга
-const formatDebtType = (type: DebtType): string => {
-  switch (type) {
-    case 'internal': return 'Internal';
-    case 'external': return 'External';
-    case 'family': return 'Family';
-    case 'group': return 'Group';
-    default: return type;
-  }
+const openAddDebtModal = () => {
+  // Implementation for adding a new debt
+  console.log('Opening add debt modal');
+  // TODO: Implement actual functionality
 };
 
-// Форматирование категории долга
-const formatDebtCategory = (category: DebtCategory): string => {
-  switch (category) {
-    case 'loan': return 'Loan';
-    case 'mortgage': return 'Mortgage';
-    case 'credit_card': return 'Credit Card';
-    case 'personal_loan': return 'Personal Loan';
-    case 'family_debt': return 'Family Debt';
-    case 'group_debt': return 'Group Debt';
-    case 'book_balance': return 'Book Balance';
-    default: return category;
-  }
+const editDebtInfo = () => {
+  // Implementation for editing debt info
+  console.log('Editing debt info');
+  // TODO: Implement actual functionality
 };
 
-// Форматирование даты с использованием Intl.DateTimeFormat для лучшего отображения
-const formatDate = (date: Date | string): string => {
-  if (!date) return 'N/A';
+const initiateDebtPayment = () => {
+  // Implementation for initiating debt payment
+  console.log('Initiating debt payment');
   
-  try {
-    const dateObj = new Date(date);
-    // Проверяем, валидная ли дата
-    if (isNaN(dateObj.getTime())) return 'Invalid date';
-    
-    // Используем Intl.DateTimeFormat для локализованного форматирования
-    return new Intl.DateTimeFormat('default', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    }).format(dateObj);
-  } catch (error) {
-    console.error('Error formatting date:', error);
-    return 'Invalid date';
+  if (debt.value) {
+    // Navigate to transaction page with pre-filled data
+    router.push({
+      path: '/transaction',
+      query: {
+        type: 'expense',
+        debtId: debt.value.id,
+        amount: debt.value.remainingAmount.toString(),
+        currency: debt.value.currency,
+        description: `Payment for ${debt.value.name}`
+      }
+    });
   }
 };
 
-// Обновляем заголовок и настройки в родительском IosLayout
-const updateHeaderSettings = () => {
-  // Отправляем событие родительскому компоненту IosLayout
-  router.currentRoute.value.meta.title = debt.value?.name || 'Debt Details';
-  router.currentRoute.value.meta.header = {
-    show: true,
-    showBack: true,
-    showMessageIcon: true,
-    hasNotifications: true,
-    showProfileIcon: true
-  };
+const viewTransactionDetails = (transaction) => {
+  console.log('Viewing transaction details:', transaction.id);
+  // TODO: Implement transaction details view
 };
 
-// Следим за изменением ID долга в URL
+// Watch for debt ID changes and reload data
 watch(debtId, async (newId, oldId) => {
   if (newId !== oldId) {
     console.log(`Debt ID changed from ${oldId} to ${newId}, reloading details`);
     await loadDebtDetails();
-    updateHeaderSettings();
   }
 }, { immediate: false });
 
-// Загрузка данных при монтировании компонента
+// Initialize on component mount
 onMounted(async () => {
-  console.log('DebtDetailsView mounted, loading debt with ID:', debtId.value);
+  console.log('DebtDetailView mounted, loading debt with ID:', debtId.value);
   await loadDebtDetails();
-  // Обновляем заголовок после загрузки долга
-  updateHeaderSettings();
+  
+  // Update header title in parent layout
+  if (router.currentRoute.value && router.currentRoute.value.meta) {
+    router.currentRoute.value.meta.title = debt.value?.name || 'Debt Details';
+  }
 });
 </script>
 
 <style scoped>
-.debt-details-view {
+.debt-detail-view {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100%;
+  padding: 16px;
   background-color: var(--bg-screen);
   color: var(--text-usual);
 }
 
 .debt-content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 80px; /* Leave space for bottom navigation */
 }
 
+/* Loading states */
 .loading-container,
 .error-container,
 .not-found-container {
@@ -323,7 +255,24 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   padding: 32px;
+  margin-top: 32px;
   text-align: center;
+  background-color: var(--bg-field-dark);
+  border-radius: 16px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--bg-light);
+  border-top-color: var(--accent-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 .error-details {
@@ -341,156 +290,5 @@ onMounted(async () => {
   border: none;
   border-radius: var(--border-radius-xl);
   cursor: pointer;
-}
-
-.info-card {
-  background-color: var(--bg-field-dark);
-  border-radius: 32px;
-  padding: 24px;
-  margin-bottom: 16px;
-}
-
-h2 {
-  margin: 0 0 8px 0;
-  font-size: var(--font-heading-size);
-  font-weight: var(--font-heading-weight);
-  color: var(--text-header);
-}
-
-.debt-subtitle {
-  font-size: var(--font-small-size);
-  color: var(--text-grey);
-  margin-bottom: 16px;
-}
-
-.amount-display {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 24px 0;
-}
-
-.amount-value {
-  font-size: 32px;
-  font-weight: bold;
-  margin-bottom: 4px;
-}
-
-.amount-value.negative {
-  color: var(--maincolor-colorwarrning, #a44942);
-}
-
-.amount-value.positive {
-  color: var(--maincolor-colorsucces, #53b794);
-}
-
-.amount-converted {
-  font-size: var(--font-body-size);
-  margin-bottom: 8px;
-  color: var(--text-usual);
-  opacity: 0.8;
-}
-
-.amount-original {
-  font-size: var(--font-small-size);
-  color: var(--text-grey);
-}
-
-.debt-status {
-  background-color: var(--bg-light);
-  border-radius: 16px;
-  padding: 8px 16px;
-  text-align: center;
-  margin-bottom: 24px;
-}
-
-.status-active {
-  color: var(--maincolor-colorsucces, #53b794);
-}
-
-.status-partially_paid {
-  color: var(--color-primary);
-}
-
-.status-paid {
-  color: var(--text-grey);
-}
-
-.status-cancelled {
-  color: var(--maincolor-colorwarrning, #a44942);
-}
-
-.info-section {
-  border-top: 1px solid var(--border-color);
-  padding: 16px 0;
-}
-
-.info-section h3 {
-  font-size: var(--font-body-size);
-  font-weight: var(--font-body-weight);
-  margin: 0 0 12px 0;
-  color: var(--text-header);
-}
-
-.info-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-
-.info-label {
-  color: var(--text-grey);
-}
-
-.info-value {
-  font-weight: 500;
-}
-
-.due-date {
-  color: var(--color-primary);
-}
-
-.parties-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.party-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px;
-  background-color: var(--bg-screen);
-  border-radius: 8px;
-}
-
-.party-percentage {
-  font-weight: 500;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 12px;
-  margin-top: 24px;
-}
-
-.action-button {
-  flex: 1;
-  padding: 12px;
-  border: none;
-  border-radius: var(--border-radius-xl);
-  font-size: var(--font-button-size);
-  font-weight: var(--font-button-weight);
-  cursor: pointer;
-}
-
-.pay-button {
-  background-color: var(--accent-color);
-  color: var(--text-contrast);
-}
-
-.edit-button {
-  background-color: var(--bg-light);
-  color: var(--text-usual);
 }
 </style>

@@ -23,13 +23,13 @@
       <div class="debts-container">
         <!-- Долги по книгам -->
         <BaseGroup 
-          v-if="debtsByGroup['book'].length > 0"
+          v-if="hasDebtsInGroup('book')"
           title="Books"
-          :totalValue="formatTotalInUserCurrency(totalByGroup['book'])"
-          :totalValueType="getTotalValueType(totalByGroup['book'])"
+          :totalValue="formatTotalInUserCurrency(getTotalForGroup('book'))"
+          :totalValueType="getTotalValueType(getTotalForGroup('book'))"
         >
           <BaseItem
-            v-for="debt in debtsByGroup['book']"
+            v-for="debt in getDebtsForGroup('book')"
             :key="debt.id"
             :title="debt.name"
             :subtitle="debt.subtitle"
@@ -42,13 +42,13 @@
         
         <!-- Долги с людьми -->
         <BaseGroup
-          v-if="debtsByGroup['person'].length > 0"
+          v-if="hasDebtsInGroup('person')"
           title="Persons"
-          :totalValue="formatTotalInUserCurrency(totalByGroup['person'])"
-          :totalValueType="getTotalValueType(totalByGroup['person'])"
+          :totalValue="formatTotalInUserCurrency(getTotalForGroup('person'))"
+          :totalValueType="getTotalValueType(getTotalForGroup('person'))"
         >
           <BaseItem
-            v-for="debt in debtsByGroup['person']"
+            v-for="debt in getDebtsForGroup('person')"
             :key="debt.id"
             :title="debt.name"
             :subtitle="debt.subtitle"
@@ -61,13 +61,13 @@
         
         <!-- Кредиты с иконками -->
         <BaseGroup
-          v-if="debtsByGroup['credit'].length > 0"
+          v-if="hasDebtsInGroup('credit')"
           title="Credits"
-          :totalValue="formatTotalInUserCurrency(totalByGroup['credit'])"
-          :totalValueType="getTotalValueType(totalByGroup['credit'])"
+          :totalValue="formatTotalInUserCurrency(getTotalForGroup('credit'))"
+          :totalValueType="getTotalValueType(getTotalForGroup('credit'))"
         >
           <BaseItem
-            v-for="debt in debtsByGroup['credit']"
+            v-for="debt in getDebtsForGroup('credit')"
             :key="debt.id"
             :title="debt.name"
             :subtitle="debt.subtitle"
@@ -99,7 +99,7 @@
 import { onMounted, ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import AddIconButton from '@/components/atoms/buttons/AddIconButton.vue';
-import CreateActionButton from '@/components/ui/buttons/CreateActionButton.vue';
+import CreateActionButton from '@/components/atoms/buttons/CreateActionButton.vue';
 import BaseGroup from '@/components/molecules/groups/BaseGroup.vue';
 import BaseItem from '@/components/atoms/items/BaseItem.vue';
 import BaseSelector from '@/components/atoms/selectors/BaseSelector.vue';
@@ -133,9 +133,31 @@ const ownerOptions = [
 
 // Текущий выбранный фильтр
 const currentOwnerFilter = computed({
-  get: () => selectedOwner.value,
+  get: () => selectedOwner.value || 'all',
   set: (value) => setSelectedOwner(value as 'all' | 'my' | 'family')
 });
+
+// Функция для получения долгов по группе с защитой от undefined
+const getDebtsForGroup = (group: string) => {
+  if (!debtsByGroup || !debtsByGroup.value || !debtsByGroup.value[group]) {
+    return [];
+  }
+  return debtsByGroup.value[group] || [];
+};
+
+// Функция для проверки наличия долгов в группе
+const hasDebtsInGroup = (group: string) => {
+  const debts = getDebtsForGroup(group);
+  return debts && debts.length > 0;
+};
+
+// Функция для получения суммы по группе с защитой от undefined
+const getTotalForGroup = (group: string) => {
+  if (!totalByGroup || !totalByGroup.value) {
+    return 0;
+  }
+  return totalByGroup.value[group] || 0;
+};
 
 // Функция для определения типа значения (positive/negative) для общей суммы
 const getTotalValueType = (amount: number): 'positive' | 'negative' | 'neutral' => {
@@ -144,26 +166,24 @@ const getTotalValueType = (amount: number): 'positive' | 'negative' | 'neutral' 
   return 'neutral';
 };
 
-// Проверка наличия долгов
+// Проверка наличия долгов с учетом возможных null/undefined значений
 const hasAnyDebts = computed(() => {
-  return (
-    debtsByGroup.value.book.length > 0 ||
-    debtsByGroup.value.person.length > 0 ||
-    debtsByGroup.value.credit.length > 0
-  );
+  return hasDebtsInGroup('book') || hasDebtsInGroup('person') || hasDebtsInGroup('credit');
 });
 
 // Обновляем заголовок и настройки в родительском IosLayout
 const updateHeaderSettings = () => {
-  // Отправляем событие родительскому компоненту IosLayout
-  router.currentRoute.value.meta.title = 'Debts';
-  router.currentRoute.value.meta.header = {
-    show: true,
-    showBack: true,
-    showMessageIcon: true,
-    hasNotifications: true,
-    showProfileIcon: true
-  };
+  if (router && router.currentRoute && router.currentRoute.value && router.currentRoute.value.meta) {
+    // Отправляем событие родительскому компоненту IosLayout
+    router.currentRoute.value.meta.title = 'Debts';
+    router.currentRoute.value.meta.header = {
+      show: true,
+      showBack: true,
+      showMessageIcon: true,
+      hasNotifications: true,
+      showProfileIcon: true
+    };
+  }
 };
 
 const toggleCurrencyFilter = () => {
@@ -188,9 +208,9 @@ const navigateToDebtDetails = (debtId: string) => {
   }
   
   // Проверяем, существует ли долг с таким ID
-  const debt = debtsByGroup.value.book.find(d => d.id === debtId) ||
-               debtsByGroup.value.person.find(d => d.id === debtId) ||
-               debtsByGroup.value.credit.find(d => d.id === debtId);
+  const debt = getDebtsForGroup('book').find(d => d.id === debtId) ||
+               getDebtsForGroup('person').find(d => d.id === debtId) ||
+               getDebtsForGroup('credit').find(d => d.id === debtId);
   
   if (!debt) {
     console.warn(`Warning: Navigating to debt with ID ${debtId}, but no matching debt found in store`);
