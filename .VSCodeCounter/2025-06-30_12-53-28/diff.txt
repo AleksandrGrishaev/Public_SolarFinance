@@ -1,0 +1,40 @@
+Date : 2025-06-30 12:53:28
+Directory : /Users/peaker/dev/solar-finance/src
+Total : 6 files,  216 codes, 4 comments, 34 blanks, all 254 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| Vue        |          4 |        221 |          5 |         35 |        261 |
+| Markdown   |          1 |          1 |          0 |          0 |          1 |
+| TypeScript |          1 |         -6 |         -1 |         -1 |         -8 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++---------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                      | files      | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                         |          6 |        216 |          4 |         34 |        254 |
+| components                                                                |          1 |          1 |          0 |          0 |          1 |
+| components/molecules                                                      |          1 |          1 |          0 |          0 |          1 |
+| components/molecules/groups                                               |          1 |          1 |          0 |          0 |          1 |
+| views                                                                     |          5 |        215 |          4 |         34 |        253 |
+| views/debt                                                                |          5 |        215 |          4 |         34 |        253 |
+| views/debt (Files)                                                        |          2 |         -2 |          0 |         -2 |         -4 |
+| views/debt/components                                                     |          2 |        223 |          5 |         37 |        265 |
+| views/debt/composables                                                    |          1 |         -6 |         -1 |         -1 |         -8 |
++---------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++---------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                  | language   | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| /Users/peaker/dev/solar-finance/src/components/molecules/groups/readme.md | Markdown   |          1 |          0 |          0 |          1 |
+| /Users/peaker/dev/solar-finance/src/views/debt/DebtDetailsView.vue        | Vue        |          6 |          0 |          1 |          7 |
+| /Users/peaker/dev/solar-finance/src/views/debt/DebtView.vue               | Vue        |         -8 |          0 |         -3 |        -11 |
+| /Users/peaker/dev/solar-finance/src/views/debt/components/DebtGroup.vue   | Vue        |        112 |          2 |         15 |        129 |
+| /Users/peaker/dev/solar-finance/src/views/debt/components/DebtItem.vue    | Vue        |        111 |          3 |         22 |        136 |
+| /Users/peaker/dev/solar-finance/src/views/debt/composables/useDebts.ts    | TypeScript |         -6 |         -1 |         -1 |         -8 |
+| Total                                                                     |            |        216 |          4 |         34 |        254 |
++---------------------------------------------------------------------------+------------+------------+------------+------------+------------+

@@ -1,3 +1,6 @@
+//TODO: проверить импорты и в целом вопрос к файлу.
+
+
 // src/stores/system/constants.ts
 import type { TransactionType, Currency, Owner } from './types';
 
@@ -18,6 +21,8 @@ export const FILTER_TRANSACTION_TYPES: TransactionType[] = [
   { id: 'income', name: 'Income' }
 ];
 
+
+//TODO: скорее всего дублируется Types
 /**
  * Валюты - системная константа
  */
@@ -43,6 +48,8 @@ export const CURRENCIES: Currency[] = [
   }
 ];
 
+
+//TODO: нужно ли это
 /**
  * Временные данные о владельцах (будут заменены на полную реализацию хранилища владельцев)
  */

@@ -40,14 +40,14 @@ export const defaultExchangeRates: ExchangeRate[] = [
   {
     fromCurrency: 'USD',
     toCurrency: 'IDR',
-    rate: 14500,
+    rate: 16500,
     timestamp: Date.now(),
     source: 'default'
   },
   {
     fromCurrency: 'RUB',
     toCurrency: 'IDR',
-    rate: 192.05,
+    rate: 202.05,
     timestamp: Date.now(),
     source: 'default'
   }
